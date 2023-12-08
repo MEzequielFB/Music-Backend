@@ -45,4 +45,8 @@ public class Playlist {
 		this.isPublic = request.isPublic();
 		this.user = request.getUser();
 	}
+	
+	public void addSong(Song song) {
+		songs.add(song);
+	}
 }

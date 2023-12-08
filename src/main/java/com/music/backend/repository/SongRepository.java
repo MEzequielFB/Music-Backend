@@ -1,15 +1,24 @@
 package com.music.backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.music.backend.model.Playlist;
 import com.music.backend.model.Song;
 
 @Repository(value = "songRepository")
 public interface SongRepository extends JpaRepository<Song, Integer> {
+	
+	@Query("SELECT s"
+			+ " FROM Song s"
+			+ " JOIN s.playlists p"
+			+ " WHERE s.id = :id"
+			+ " AND p = :playlist")
+	public Optional<Song> findByPlaylist(int id, Playlist playlist);
 	
 	@Query("SELECT s"
 			+ " FROM Song s"

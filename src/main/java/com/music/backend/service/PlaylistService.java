@@ -7,18 +7,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.music.backend.dto.AddSongRequestDTO;
 import com.music.backend.dto.PlaylistRequestDTO;
 import com.music.backend.dto.PlaylistResponseDTO;
+import com.music.backend.dto.SongResponseDTO;
+import com.music.backend.exception.AlreadyContainsSongException;
 import com.music.backend.exception.NameAlreadyUsedException;
 import com.music.backend.exception.NotFoundException;
 import com.music.backend.model.Playlist;
+import com.music.backend.model.Song;
 import com.music.backend.repository.PlaylistRepository;
+import com.music.backend.repository.SongRepository;
 
 @Service(value = "playlistService")
 public class PlaylistService {
 
 	@Autowired
 	private PlaylistRepository repository;
+	
+	@Autowired
+	private SongRepository songRepository;
 	
 	@Transactional(readOnly = true)
 	public List<PlaylistResponseDTO> findAll() {
@@ -45,6 +53,34 @@ public class PlaylistService {
 		} else {
 			throw new NameAlreadyUsedException("Playlist", request.getName());
 		}
+	}
+	
+	public SongResponseDTO addSong(int id, AddSongRequestDTO request) throws NotFoundException, AlreadyContainsSongException {
+		Optional<Playlist> optional = repository.findById(id);
+		Optional<Song> songOptional = songRepository.findById(request.getSongId());
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Playlist", id);
+		}
+		if (!songOptional.isPresent()) {
+			throw new NotFoundException("Song", request.getSongId());
+		}
+		
+		Playlist playlist = optional.get();
+		Song song = songOptional.get();
+		
+//		boolean containsSong = repository.containsSong(id, song);
+//		if (containsSong) {
+//			throw new AlreadyContainsSongException("Playlist");
+//		}
+		Optional<Song> songOptional2 = songRepository.findByPlaylist(request.getSongId(), playlist);
+		if (songOptional2.isPresent()) {
+			throw new AlreadyContainsSongException("Playlist");
+		}
+		
+		playlist.addSong(song);
+		repository.save(playlist);
+		
+		return new SongResponseDTO(song);
 	}
 	
 	@Transactional
