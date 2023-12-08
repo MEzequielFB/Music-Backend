@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.music.backend.dto.AlbumRequestDTO;
 import com.music.backend.dto.AlbumResponseDTO;
@@ -12,20 +13,18 @@ import com.music.backend.exception.NotFoundException;
 import com.music.backend.model.Album;
 import com.music.backend.repository.AlbumRepository;
 
-import jakarta.transaction.Transactional;
-
 @Service(value = "albumService")
 public class AlbumService {
 
 	@Autowired
 	private AlbumRepository repository;
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<AlbumResponseDTO> findAll() {
 		return repository.findAll().stream().map( AlbumResponseDTO::new ).toList();
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public AlbumResponseDTO findById(int id) throws NotFoundException {
 		Optional<Album> optional = repository.findById(id);
 		if (optional.isPresent()) {

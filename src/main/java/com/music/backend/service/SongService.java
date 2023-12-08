@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.music.backend.dto.SongRequestDTO;
 import com.music.backend.dto.SongResponseDTO;
@@ -13,15 +14,13 @@ import com.music.backend.exception.NotFoundException;
 import com.music.backend.model.Song;
 import com.music.backend.repository.SongRepository;
 
-import jakarta.transaction.Transactional;
-
 @Service(value = "songService")
 public class SongService {
 
 	@Autowired
 	private SongRepository repository;
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<SongResponseDTO> searchSongs(String name, List<String> genres, List<Integer> years) {
 		if (name != null) {
 			if (genres == null && years == null) {
@@ -44,12 +43,12 @@ public class SongService {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<SongResponseDTO> findAll() {
 		return repository.findAll().stream().map( SongResponseDTO::new ).toList();
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public SongResponseDTO findById(int id) throws NotFoundException {
 		Optional<Song> optional = repository.findById(id);
 		if (optional.isPresent()) {

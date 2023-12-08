@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.music.backend.dto.FollowRequestDTO;
 import com.music.backend.dto.UserFollowerResponseDTO;
@@ -13,8 +14,6 @@ import com.music.backend.model.User;
 import com.music.backend.model.UserFollowers;
 import com.music.backend.repository.UserFollowerRepository;
 import com.music.backend.repository.UserRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service(value = "userFollowerService")
 public class UserFollowerService {

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.music.backend.dto.UserRequestDTO;
 import com.music.backend.dto.UserResponseDTO;
@@ -13,15 +14,13 @@ import com.music.backend.exception.NotFoundException;
 import com.music.backend.model.User;
 import com.music.backend.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
-
 @Service(value = "userService")
 public class UserService {
 	
 	@Autowired
 	private UserRepository repository;
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findFollowedUsersById(int id) throws NotFoundException {
 		Optional<User> optional = repository.findById(id);
 		if (optional.isPresent()) {
@@ -31,7 +30,7 @@ public class UserService {
 		}
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findFollowersById(int id) throws NotFoundException {
 		Optional<User> optional = repository.findById(id);
 		if (optional.isPresent()) {
@@ -41,12 +40,12 @@ public class UserService {
 		}
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findAll() {
 		return repository.findAll().stream().map( UserResponseDTO::new ).toList();
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	public UserResponseDTO findById(int id) throws NotFoundException {
 		Optional<User> optional = repository.findById(id);
 		if (optional.isPresent()) {
