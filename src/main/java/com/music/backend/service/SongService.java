@@ -73,21 +73,7 @@ public class SongService {
 	@Transactional
 	public SongResponseDTO saveSong(SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
 		Optional<Song> optional = repository.findByArtistsAndName(request.getArtists(), request.getName());
-//		List<Artist> artists = null;
-//		List<Genre> genres = null;
-		
-		// Fail if some or all ids are not found, no entities are returned for these IDs
-//		try {
-//			artists = artistRepository.findAllById(request.getArtists()
-//					.stream()
-//					.map(artist -> artist.getId()).toList());
-//			
-//			genres = genreRepository.findAllById(request.getGenres()
-//					.stream()
-//					.map(genre -> genre.getId()).toList());
-//		} catch (IllegalArgumentException e) {
-//			throw new SomeArtistDoesNotExistException();
-//		}
+
 		List<Artist> artists = artistRepository.findAllById(request.getArtists()
 				.stream()
 				.map(artist -> artist.getId()).toList());
