@@ -1,7 +1,6 @@
 package com.music.backend.dto;
 
 import com.music.backend.model.Playlist;
-import com.music.backend.model.User;
 
 import lombok.Data;
 

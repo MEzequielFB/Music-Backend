@@ -49,6 +49,15 @@ public class PlaylistService {
 		}
 	}
 	
+	public List<SongResponseDTO> getSongsFromPlaylist(int id) throws NotFoundException {
+		Optional<Playlist> optional = repository.findById(id);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Playlist", id);
+		}
+		
+		return repository.getSongsFromPlaylist(id);
+	}
+	
 	@Transactional
 	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
 		Optional<User> userOptional = userRepository.findById(request.getUser().getId());

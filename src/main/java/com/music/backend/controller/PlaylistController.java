@@ -43,6 +43,11 @@ public class PlaylistController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
+	@GetMapping("/{id}/songs")
+	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable int id) throws NotFoundException {
+		return ResponseEntity.ok(service.getSongsFromPlaylist(id));
+	}
+	
 	@PostMapping("")
 	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
 		return new ResponseEntity<>(service.savePlaylist(request), HttpStatus.CREATED);

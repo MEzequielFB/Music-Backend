@@ -2,8 +2,6 @@ package com.music.backend.dto;
 
 import java.util.List;
 
-import com.music.backend.model.Artist;
-import com.music.backend.model.Genre;
 import com.music.backend.model.Song;
 
 import lombok.Data;
