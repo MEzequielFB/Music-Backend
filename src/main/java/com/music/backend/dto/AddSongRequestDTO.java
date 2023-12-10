@@ -1,7 +1,7 @@
 package com.music.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddSongRequestDTO {
 	@NotNull(message = "songId should't be null")
-	@PositiveOrZero(message = "songId should be positive or zero")
+	@Positive(message = "songId should be positive")
 	private int songId;
 }

@@ -17,8 +17,10 @@ import com.music.backend.exception.NameAlreadyUsedException;
 import com.music.backend.exception.NotFoundException;
 import com.music.backend.model.Playlist;
 import com.music.backend.model.Song;
+import com.music.backend.model.User;
 import com.music.backend.repository.PlaylistRepository;
 import com.music.backend.repository.SongRepository;
+import com.music.backend.repository.UserRepository;
 
 @Service(value = "playlistService")
 public class PlaylistService {
@@ -28,6 +30,9 @@ public class PlaylistService {
 	
 	@Autowired
 	private SongRepository songRepository;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@Transactional(readOnly = true)
 	public List<PlaylistResponseDTO> findAll() {
@@ -45,15 +50,23 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request) throws NameAlreadyUsedException {
-		//Doesn't allow playlists with the same name from the same user 
+	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
+		Optional<User> userOptional = userRepository.findById(request.getUser().getId());
+		if (!userOptional.isPresent()) {
+			throw new NotFoundException("User", request.getUser().getId());
+		}
+		
+		//Doesn't allow playlists with the same name from the same user
 		Optional<Playlist> optional = repository.findByUserAndName(request.getUser(), request.getName());
-		if (!optional.isPresent()) {
-			Playlist playlist = new Playlist(request);
-			return new PlaylistResponseDTO(repository.save(playlist));
-		} else {
+		if (optional.isPresent()) {
 			throw new NameAlreadyUsedException("Playlist", request.getName());
 		}
+		
+		Playlist playlist = new Playlist(request);
+		User user = userOptional.get();
+		
+		playlist.setUser(user);
+		return new PlaylistResponseDTO(repository.save(playlist));
 	}
 	
 	public SongResponseDTO addSong(int id, AddSongRequestDTO request) throws NotFoundException, AlreadyContainsSongException {

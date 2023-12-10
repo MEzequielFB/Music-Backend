@@ -44,7 +44,7 @@ public class PlaylistController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request) throws NameAlreadyUsedException {
+	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
 		return new ResponseEntity<>(service.savePlaylist(request), HttpStatus.CREATED);
 	}
 	
