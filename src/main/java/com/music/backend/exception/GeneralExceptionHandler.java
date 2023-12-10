@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GeneralExceptionHandler {
+	@ExceptionHandler(SomeEntityDoesNotExistException.class)
+	public ResponseEntity<String> handleSomeEntityDoesNotExistException(SomeEntityDoesNotExistException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 	
 	@ExceptionHandler(AlreadyContainsSongException.class)
 	public ResponseEntity<String> handleAlreadyContainsSongException(AlreadyContainsSongException e) {

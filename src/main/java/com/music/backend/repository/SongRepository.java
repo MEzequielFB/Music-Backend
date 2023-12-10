@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.music.backend.model.Artist;
 import com.music.backend.model.Playlist;
 import com.music.backend.model.Song;
 
@@ -64,10 +65,10 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 			+ " WHERE s.name LIKE :name%")
 	public List<Song> findByName(String name);
 
-//	@Query("SELECT s"
-//			+ " FROM Song s"
-//			+ " JOIN s.artists a"
-//			+ " WHERE s.name = :name"
-//			+ " AND a ON :artists")
-//	public Optional<Song> findByArtistsAndName(List<Artist> artists, String name);
+	@Query("SELECT s"
+			+ " FROM Song s"
+			+ " JOIN s.artists a"
+			+ " WHERE s.name = :name"
+			+ " AND a IN :artists")
+	public Optional<Song> findByArtistsAndName(List<Artist> artists, String name);
 }

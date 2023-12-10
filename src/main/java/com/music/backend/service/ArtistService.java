@@ -37,7 +37,7 @@ public class ArtistService {
 	@Transactional
 	public ArtistResponseDTO saveArtist(ArtistRequestDTO request) {
 		Artist artist = new Artist(request);
-		return new ArtistResponseDTO(artist);
+		return new ArtistResponseDTO(repository.save(artist));
 	}
 	
 	@Transactional

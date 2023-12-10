@@ -10,8 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.music.backend.dto.SongRequestDTO;
 import com.music.backend.dto.SongResponseDTO;
+import com.music.backend.exception.NameAlreadyUsedException;
 import com.music.backend.exception.NotFoundException;
+import com.music.backend.exception.SomeEntityDoesNotExistException;
+import com.music.backend.model.Artist;
+import com.music.backend.model.Genre;
 import com.music.backend.model.Song;
+import com.music.backend.repository.ArtistRepository;
+import com.music.backend.repository.GenreRepository;
 import com.music.backend.repository.SongRepository;
 
 @Service(value = "songService")
@@ -19,6 +25,12 @@ public class SongService {
 
 	@Autowired
 	private SongRepository repository;
+	
+	@Autowired
+	private ArtistRepository artistRepository;
+	
+	@Autowired
+	private GenreRepository genreRepository;
 	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> searchSongs(String name, List<String> genres, List<Integer> years) {
@@ -59,9 +71,47 @@ public class SongService {
 	}
 	
 	@Transactional
-	public SongResponseDTO saveSong(SongRequestDTO request) {
-		//Optional<Song> optional = repository.findByArtistsAndName(request.getArtists(), request.getName());
+	public SongResponseDTO saveSong(SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
+		Optional<Song> optional = repository.findByArtistsAndName(request.getArtists(), request.getName());
+//		List<Artist> artists = null;
+//		List<Genre> genres = null;
+		
+		// Fail if some or all ids are not found, no entities are returned for these IDs
+//		try {
+//			artists = artistRepository.findAllById(request.getArtists()
+//					.stream()
+//					.map(artist -> artist.getId()).toList());
+//			
+//			genres = genreRepository.findAllById(request.getGenres()
+//					.stream()
+//					.map(genre -> genre.getId()).toList());
+//		} catch (IllegalArgumentException e) {
+//			throw new SomeArtistDoesNotExistException();
+//		}
+		List<Artist> artists = artistRepository.findAllById(request.getArtists()
+				.stream()
+				.map(artist -> artist.getId()).toList());
+		
+		if (artists.size() != request.getArtists().size()) {
+			throw new SomeEntityDoesNotExistException("artists");
+		}
+		
+		List<Genre> genres = genreRepository.findAllById(request.getGenres()
+				.stream()
+				.map(genre -> genre.getId()).toList());
+		
+		if (genres.size() != request.getGenres().size()) {
+			throw new SomeEntityDoesNotExistException("genres");
+		}
+		
+		if (optional.isPresent()) {
+			throw new NameAlreadyUsedException("Song", request.getName());
+		}
+		
 		Song song = new Song(request);
+		song.setArtists(artists);
+		song.setGenres(genres);
+		
 		//Default date -> current date
 		song.setReleaseDate(new Date(System.currentTimeMillis()));
 		

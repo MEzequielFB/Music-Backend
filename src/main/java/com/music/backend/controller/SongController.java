@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.music.backend.dto.SongRequestDTO;
 import com.music.backend.dto.SongResponseDTO;
+import com.music.backend.exception.NameAlreadyUsedException;
 import com.music.backend.exception.NotFoundException;
+import com.music.backend.exception.SomeEntityDoesNotExistException;
 import com.music.backend.service.SongService;
 
 import jakarta.validation.Valid;
@@ -46,7 +48,7 @@ public class SongController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<SongResponseDTO> saveSong(@RequestBody @Valid SongRequestDTO request) {
+	public ResponseEntity<SongResponseDTO> saveSong(@RequestBody @Valid SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
 		return new ResponseEntity<>(service.saveSong(request), HttpStatus.CREATED);
 	}
 	

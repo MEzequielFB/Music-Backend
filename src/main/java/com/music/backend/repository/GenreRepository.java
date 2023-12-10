@@ -1,5 +1,6 @@
 package com.music.backend.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,9 @@ public interface GenreRepository extends JpaRepository<Genre, Integer> {
 			+ " FROM Genre g"
 			+ " WHERE g.name = :name")
 	public Optional<Genre> findByName(String name);
+	
+	@Query("SELECT g"
+			+ " FROM Genre g"
+			+ " WHERE g.id IN :ids")
+	public List<Genre> findAllById(List<Integer> ids);
 }
