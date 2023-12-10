@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.music.backend.dto.AddSongRequestDTO;
 import com.music.backend.dto.PlaylistRequestDTO;
 import com.music.backend.dto.PlaylistResponseDTO;
+import com.music.backend.dto.PlaylistUpdateDTO;
 import com.music.backend.dto.SongResponseDTO;
 import com.music.backend.exception.AlreadyContainsSongException;
 import com.music.backend.exception.NameAlreadyUsedException;
@@ -48,7 +49,7 @@ public class PlaylistController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable int id, @RequestBody @Valid PlaylistRequestDTO request) throws NotFoundException {
+	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable int id, @RequestBody @Valid PlaylistUpdateDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updatePlaylist(id, request));
 	}
 	

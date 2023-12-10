@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.music.backend.dto.AddSongRequestDTO;
 import com.music.backend.dto.PlaylistRequestDTO;
 import com.music.backend.dto.PlaylistResponseDTO;
+import com.music.backend.dto.PlaylistUpdateDTO;
 import com.music.backend.dto.SongResponseDTO;
 import com.music.backend.exception.AlreadyContainsSongException;
 import com.music.backend.exception.NameAlreadyUsedException;
@@ -84,7 +85,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO updatePlaylist(int id, PlaylistRequestDTO request) throws NotFoundException {
+	public PlaylistResponseDTO updatePlaylist(int id, PlaylistUpdateDTO request) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();
