@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.SongRequestDTO;
@@ -29,60 +30,42 @@ public class SongService {
 	@Autowired
 	private GenreRepository genreRepository;
 	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
+	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> searchSongs(String name, List<String> genres, List<Integer> years) {
 		if (name != null) {
 			if (genres == null && years == null) {
 				return repository.findByName(name)
 						.stream()
-						.map(song -> {
-							List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-							return new SongResponseDTO(song, artistsDTO);
-						}).toList();
+						.map( SongResponseDTO::new ).toList();
 			} else if (genres != null && years == null) {
 				return repository.findByNameAndGenre(name, genres)
 						.stream()
-						.map(song -> {
-							List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-							return new SongResponseDTO(song, artistsDTO);
-						}).toList();
+						.map( SongResponseDTO::new ).toList();
 			} else if (genres == null && years != null) {
 				return repository.findByNameAndYear(name, years)
 						.stream()
-						.map(song -> {
-							List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-							return new SongResponseDTO(song, artistsDTO);
-						}).toList();
+						.map( SongResponseDTO::new ).toList();
 			} else {
 				return repository.findByNameGenreAndYear(name, genres, years)
 						.stream()
-						.map(song -> {
-							List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-							return new SongResponseDTO(song, artistsDTO);
-						}).toList();
+						.map( SongResponseDTO::new ).toList();
 			}
 		} else {
 			if (genres != null && years == null) {
 				return repository.findByGenre(genres)
 						.stream()
-						.map(song -> {
-							List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-							return new SongResponseDTO(song, artistsDTO);
-						}).toList();
+						.map( SongResponseDTO::new ).toList();
 			} else if (genres == null && years != null) {
 				return repository.findByYear(years)
 						.stream()
-						.map(song -> {
-							List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-							return new SongResponseDTO(song, artistsDTO);
-						}).toList();
+						.map( SongResponseDTO::new ).toList();
 			} else {
 				return repository.findByGenreAndYear(genres, years)
 						.stream()
-						.map(song -> {
-							List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-							return new SongResponseDTO(song, artistsDTO);
-						}).toList();
+						.map( SongResponseDTO::new ).toList();
 			}
 		}
 	}
@@ -91,18 +74,14 @@ public class SongService {
 	public List<SongResponseDTO> findAll() {
 		return repository.findAll()
 				.stream()
-				.map(song -> {
-					List<ArtistResponseDTO> artistsDTO = new LinkedList<>(); // TRAER CON WEBCLIENT
-					return new SongResponseDTO(song, artistsDTO);
-				}).toList();
+				.map( SongResponseDTO::new ).toList();
 	}
 	
 	@Transactional(readOnly = true)
 	public SongResponseDTO findById(int id) throws NotFoundException {
 		Optional<Song> optional = repository.findById(id);
 		if (optional.isPresent()) {
-			List<ArtistResponseDTO> artists = new LinkedList<>(); // TRAER CON WEBCLIENT
-			return new SongResponseDTO(optional.get(), artists);
+			return new SongResponseDTO(optional.get());
 		} else {
 			throw new NotFoundException("Song", id);
 		}
@@ -113,10 +92,6 @@ public class SongService {
 		Optional<Song> optional = repository.findByArtistsAndName(request.getArtists(), request.getName());
 
 		List<ArtistResponseDTO> artists = new LinkedList<>(); // TRAER CON WEBCLIENT
-		
-//		List<Artist> artists = artistRepository.findAllById(request.getArtists()
-//				.stream()
-//				.map(artist -> artist.getId()).toList());
 		
 		if (artists.size() != request.getArtists().size()) {
 			throw new SomeEntityDoesNotExistException("artists");
