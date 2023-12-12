@@ -15,7 +15,7 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
 
 	@Query("SELECT p"
 			+ " FROM Playlist p"
-			+ " WHERE p.userId = :userId"
+			+ " WHERE p.user.id = :userId"
 			+ " AND p.name = :name")
 	public Optional<Playlist> findByUserAndName(Integer userId, String name);
 
@@ -23,5 +23,5 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
 			+ " FROM Playlist p"
 			+ " JOIN p.songs s"
 			+ " WHERE p.id = :id")
-	public List<SongResponseDTO> getSongsFromPlaylist(int id);
+	public List<SongResponseDTO> getSongsFromPlaylist(Integer id);
 }

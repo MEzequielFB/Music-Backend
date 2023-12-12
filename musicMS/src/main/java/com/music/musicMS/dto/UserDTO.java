@@ -5,9 +5,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserResponseDTO {
-	private int id;
+public class UserDTO {
+	private Integer id;
 	private String username;
 	private String email;
-	private int role;
+	private Integer role;
 }

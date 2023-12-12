@@ -15,10 +15,10 @@ public class SongResponseDTO {
 	private List<ArtistResponseDTO> artists;
 	private List<GenreResponseDTO> genres;
 	
-	public SongResponseDTO(Song song, List<ArtistResponseDTO> artists) {
+	public SongResponseDTO(Song song) {
 		this.id = song.getId();
 		this.name = song.getName();
-		this.artists = artists;
+		this.artists = song.getArtists();
 		this.genres = song.getGenres().stream().map(GenreResponseDTO::new).toList();
 	}
 }

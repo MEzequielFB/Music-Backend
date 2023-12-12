@@ -8,15 +8,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PlaylistResponseDTO {
-	private int id;
+	private Integer id;
 	private String name;
-	private boolean isPublic;
-	private UserResponseDTO user;
+	private Boolean isPublic;
+	private UserDTO user;
 	
-	public PlaylistResponseDTO(Playlist playlist, UserResponseDTO user) {
+	public PlaylistResponseDTO(Playlist playlist) {
 		this.id = playlist.getId();
 		this.name = playlist.getName();
 		this.isPublic = playlist.isPublic();
-		this.user = user;
+		this.user = playlist.getUser();
 	}
 }
