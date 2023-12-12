@@ -13,7 +13,7 @@ public class GeneralExceptionHandler {
 	
 	@ExceptionHandler(SomeEntityDoesNotExistException.class)
 	public ResponseEntity<String> handleSomeEntityDoesNotExistException(SomeEntityDoesNotExistException e) {
-		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)

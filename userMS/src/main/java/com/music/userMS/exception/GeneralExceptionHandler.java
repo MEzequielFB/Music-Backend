@@ -10,6 +10,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GeneralExceptionHandler {
+	
+	@ExceptionHandler(BadParamsException.class)
+	public ResponseEntity<String> handleBadParamsException(BadParamsException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<HashMap<String, String>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		HashMap<String, String> errors = new HashMap<>();
