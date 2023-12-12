@@ -24,5 +24,13 @@ public class GeneralExceptionHandler {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
 	
-
+	@ExceptionHandler(NameAlreadyUsedException.class)
+	public ResponseEntity<String> handleNameAlreadyUsedException(NameAlreadyUsedException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(AlreadyContainsSongException.class)
+	public ResponseEntity<String> handleAlreadyContainsSongException(AlreadyContainsSongException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 }

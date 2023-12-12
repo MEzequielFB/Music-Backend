@@ -3,8 +3,10 @@ package com.music.musicMS.dto;
 import com.music.musicMS.model.Playlist;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class PlaylistResponseDTO {
 	private int id;
 	private String name;
