@@ -35,6 +35,7 @@ public class Song {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Album album;
 	
+	@Column(nullable = false)
 	private List<Integer> artists; // ids
 	
 	@ManyToMany(fetch = FetchType.LAZY)
