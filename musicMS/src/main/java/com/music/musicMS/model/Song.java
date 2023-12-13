@@ -3,7 +3,6 @@ package com.music.musicMS.model;
 import java.sql.Date;
 import java.util.List;
 
-import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.SongRequestDTO;
 
 import jakarta.persistence.Column;
@@ -37,7 +36,7 @@ public class Song {
 	private Album album;
 	
 	@Column(nullable = false)
-	private List<ArtistResponseDTO> artists;
+	private List<Integer> artists;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
@@ -51,6 +50,7 @@ public class Song {
 	public Song(SongRequestDTO request) {
 		this.name = request.getName();
 		this.album = request.getAlbum();
+		this.artists = request.getArtists();
 		this.genres = request.getGenres();
 	}
 }

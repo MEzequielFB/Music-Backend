@@ -18,7 +18,6 @@ public class SongResponseDTO {
 	public SongResponseDTO(Song song) {
 		this.id = song.getId();
 		this.name = song.getName();
-		this.artists = song.getArtists();
 		this.genres = song.getGenres().stream().map(GenreResponseDTO::new).toList();
 	}
 }

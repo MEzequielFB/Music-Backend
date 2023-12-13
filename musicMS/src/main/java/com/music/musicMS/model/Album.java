@@ -34,5 +34,6 @@ public class Album {
 	public Album(AlbumRequestDTO request) {
 		this.name = request.getName();
 		this.artists = request.getArtists();
+		this.songs = request.getSongs();
 	}
 }

@@ -3,7 +3,6 @@ package com.music.musicMS.model;
 import java.util.List;
 
 import com.music.musicMS.dto.PlaylistRequestDTO;
-import com.music.musicMS.dto.UserDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,7 +31,7 @@ public class Playlist {
 	private boolean isPublic;
 	
 	@Column(nullable = false)
-	private Integer user;
+	private Integer userId;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
@@ -40,10 +39,10 @@ public class Playlist {
 			inverseJoinColumns = {@JoinColumn(name = "song_id")})
 	private List<Song> songs;
 	
-	public Playlist(PlaylistRequestDTO request/*, UserDTO user*/) {
+	public Playlist(PlaylistRequestDTO request) {
 		this.name = request.getName();
 		this.isPublic = request.isPublic();
-		this.user = request.getUserId();
+		this.userId = request.getUserId();
 	}
 	
 	public void addSong(Song song) {

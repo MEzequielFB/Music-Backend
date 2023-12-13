@@ -123,13 +123,14 @@ public class SongService {
 		}
 		
 		Song song = new Song(request);
-		song.setArtists(artists);
-		song.setGenres(genres);
 		
 		//Default date -> current date
 		song.setReleaseDate(new Date(System.currentTimeMillis()));
 		
-		return new SongResponseDTO(repository.save(song));
+		SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
+		responseDTO.setArtists(artists);
+		
+		return responseDTO;
 	}
 	
 	@Transactional
@@ -150,10 +151,13 @@ public class SongService {
 						.retrieve()
 						.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
 						.block();
-				song.setArtists(artists);
+				song.setArtists(request.getArtists());
 				song.setGenres(request.getGenres());
 				
-				return new SongResponseDTO(repository.save(song));
+				SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
+				responseDTO.setArtists(artists);
+				
+				return responseDTO;
 			} catch (Exception e) {
 				throw e;
 			}
