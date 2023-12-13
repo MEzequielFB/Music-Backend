@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(NameAlreadyUsedException.class)
+	public ResponseEntity<String> handleNameAlreadyUsedException(NameAlreadyUsedException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(BadParamsException.class)
 	public ResponseEntity<String> handleBadParamsException(BadParamsException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

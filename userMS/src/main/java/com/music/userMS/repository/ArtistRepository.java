@@ -1,6 +1,7 @@
 package com.music.userMS.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,4 +16,9 @@ public interface ArtistRepository extends JpaRepository<Artist, Integer> {
 			+ " FROM Artist a"
 			+ " WHERE a.id IN :ids")
 	public List<Artist> findAllById(List<Integer> ids);
+
+	@Query("SELECT a"
+			+ " FROM Artist a"
+			+ " WHERE a.name = :name")
+	public Optional<Artist> findByName(String name);
 }
