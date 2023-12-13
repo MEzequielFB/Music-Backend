@@ -13,5 +13,5 @@ public class PlaylistUpdateDTO {
 	private String name;
 	
 	@NotNull(message = "isPublic should't be null")
-	private boolean isPublic;
+	private Boolean isPublic;
 }

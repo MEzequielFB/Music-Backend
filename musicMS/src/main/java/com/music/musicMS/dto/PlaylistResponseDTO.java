@@ -16,6 +16,7 @@ public class PlaylistResponseDTO {
 	public PlaylistResponseDTO(Playlist playlist) {
 		this.id = playlist.getId();
 		this.name = playlist.getName();
-		this.isPublic = playlist.isPublic();
+		this.isPublic = playlist.getIsPublic();
+		this.user = null;
 	}
 }

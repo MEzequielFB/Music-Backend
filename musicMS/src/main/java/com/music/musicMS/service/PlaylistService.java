@@ -39,14 +39,38 @@ public class PlaylistService {
 	public List<PlaylistResponseDTO> findAll() {
 		return repository.findAll()
 				.stream()
-				.map( PlaylistResponseDTO::new ).toList();
+				.map(playlist -> {
+					UserDTO user = webClientBuilder.build()
+							.get()
+							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.retrieve()
+							.bodyToMono(UserDTO.class)
+							.block();
+					
+					PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist);
+					responseDTO.setUser(user);
+					
+					return responseDTO;
+				}).toList();
 	}
 	
 	@Transactional(readOnly = true)
 	public PlaylistResponseDTO findById(int id) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
-			return new PlaylistResponseDTO(optional.get());
+			Playlist playlist = optional.get();
+			
+			UserDTO user = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+			
+			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist);
+			responseDTO.setUser(user);
+					
+			return responseDTO;
 		} else {
 			throw new NotFoundException("Playlist", id);
 		}
@@ -121,9 +145,19 @@ public class PlaylistService {
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();
 			playlist.setName(request.getName());
-			playlist.setPublic(request.isPublic());
+			playlist.setIsPublic(request.getIsPublic());
 			
-			return new PlaylistResponseDTO(repository.save(playlist));
+			UserDTO user = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+			
+			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(repository.save(playlist));
+			responseDTO.setUser(user);
+					
+			return responseDTO;
 		} else {
 			throw new NotFoundException("Playlist", id);
 		}
@@ -136,7 +170,17 @@ public class PlaylistService {
 			Playlist playlist = optional.get();
 			repository.deleteById(id);
 			
-			return new PlaylistResponseDTO(playlist);
+			UserDTO user = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+			
+			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist);
+			responseDTO.setUser(user);
+					
+			return responseDTO;
 		} else {
 			throw new NotFoundException("Playlist", id);
 		}

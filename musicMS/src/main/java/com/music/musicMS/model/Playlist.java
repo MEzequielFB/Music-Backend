@@ -28,7 +28,7 @@ public class Playlist {
 	private String name;
 	
 	@Column(nullable = false)
-	private boolean isPublic;
+	private Boolean isPublic;
 	
 	@Column(nullable = false)
 	private Integer userId;
