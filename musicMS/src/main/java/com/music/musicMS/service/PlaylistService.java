@@ -82,9 +82,12 @@ public class PlaylistService {
 			throw new NameAlreadyUsedException("Playlist", request.getName());
 		}
 		
-		Playlist playlist = new Playlist(request, user);
+		Playlist playlist = new Playlist(request);
 		
-		return new PlaylistResponseDTO(repository.save(playlist));
+		PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(repository.save(playlist));
+		responseDTO.setUser(user);
+		
+		return responseDTO;
 	}
 	
 	@Transactional

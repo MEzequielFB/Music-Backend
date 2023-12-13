@@ -32,7 +32,7 @@ public class Playlist {
 	private boolean isPublic;
 	
 	@Column(nullable = false)
-	private UserDTO user;
+	private Integer user;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
@@ -40,10 +40,10 @@ public class Playlist {
 			inverseJoinColumns = {@JoinColumn(name = "song_id")})
 	private List<Song> songs;
 	
-	public Playlist(PlaylistRequestDTO request, UserDTO user) {
+	public Playlist(PlaylistRequestDTO request/*, UserDTO user*/) {
 		this.name = request.getName();
 		this.isPublic = request.isPublic();
-		this.user = user;
+		this.user = request.getUserId();
 	}
 	
 	public void addSong(Song song) {
