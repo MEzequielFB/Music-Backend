@@ -74,14 +74,50 @@ public class SongService {
 	public List<SongResponseDTO> findAll() {
 		return repository.findAll()
 				.stream()
-				.map( SongResponseDTO::new ).toList();
+				.map(song -> {
+					List<ArtistResponseDTO> artists = webClientBuilder.build()
+							.get()
+							.uri(uriBuilder -> uriBuilder
+									.scheme("http")
+							        .host("localhost")
+							        .port(8001)
+							        .path("/api/artist/allByIds")
+									.queryParam("ids", song.getArtists())
+									.build())
+							.retrieve()
+							.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
+							.block();
+					
+					SongResponseDTO responseDTO = new SongResponseDTO(song);
+					responseDTO.setArtists(artists);
+					
+					return responseDTO;
+				}).toList();
 	}
 	
 	@Transactional(readOnly = true)
 	public SongResponseDTO findById(int id) throws NotFoundException {
 		Optional<Song> optional = repository.findById(id);
 		if (optional.isPresent()) {
-			return new SongResponseDTO(optional.get());
+			Song song = optional.get();
+			
+			List<ArtistResponseDTO> artists = webClientBuilder.build()
+					.get()
+					.uri(uriBuilder -> uriBuilder
+							.scheme("http")
+					        .host("localhost")
+					        .port(8001)
+					        .path("/api/artist/allByIds")
+							.queryParam("ids", song.getArtists())
+							.build())
+					.retrieve()
+					.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
+					.block();
+			
+			SongResponseDTO responseDTO = new SongResponseDTO(song);
+			responseDTO.setArtists(artists);
+			
+			return responseDTO;
 		} else {
 			throw new NotFoundException("Song", id);
 		}
@@ -148,7 +184,10 @@ public class SongService {
 				List<ArtistResponseDTO> artists = webClientBuilder.build()
 						.get()
 						.uri(uriBuilder -> uriBuilder
-								.path("http://localhost:8001/api/artist/allByIds")
+								.scheme("http")
+						        .host("localhost")
+						        .port(8001)
+						        .path("/api/artist/allByIds")
 								.queryParam("ids", request.getArtists())
 								.build())
 						.retrieve()
@@ -189,7 +228,23 @@ public class SongService {
 			Song song = optional.get();
 			repository.deleteById(id);
 			
-			return new SongResponseDTO(song);
+			List<ArtistResponseDTO> artists = webClientBuilder.build()
+					.get()
+					.uri(uriBuilder -> uriBuilder
+							.scheme("http")
+					        .host("localhost")
+					        .port(8001)
+					        .path("/api/artist/allByIds")
+							.queryParam("ids", song.getArtists())
+							.build())
+					.retrieve()
+					.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
+					.block();
+			
+			SongResponseDTO responseDTO = new SongResponseDTO(song);
+			responseDTO.setArtists(artists);
+			
+			return responseDTO;
 		} else {
 			throw new NotFoundException("Song", id);
 		}

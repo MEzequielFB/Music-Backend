@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.music.userMS.dto.ArtistRequestDTO;
 import com.music.userMS.dto.ArtistResponseDTO;
-import com.music.userMS.exception.BadParamsException;
 import com.music.userMS.exception.NameAlreadyUsedException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.model.Artist;

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.music.userMS.dto.ArtistRequestDTO;
 import com.music.userMS.dto.ArtistResponseDTO;
-import com.music.userMS.exception.BadParamsException;
 import com.music.userMS.exception.NameAlreadyUsedException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.service.ArtistService;
