@@ -53,7 +53,7 @@ public class SongController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<SongResponseDTO> updatev(@PathVariable int id, @RequestBody @Valid SongRequestDTO request) throws NotFoundException {
+	public ResponseEntity<SongResponseDTO> updateSong(@PathVariable int id, @RequestBody @Valid SongRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
 		return ResponseEntity.ok(service.updateSong(id, request));
 	}
 	

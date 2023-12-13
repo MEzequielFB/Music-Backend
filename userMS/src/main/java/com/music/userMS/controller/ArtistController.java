@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.userMS.dto.ArtistRequestDTO;
@@ -41,8 +42,8 @@ public class ArtistController {
 	}
 	
 	@GetMapping("/allByIds")
-	public ResponseEntity<List<ArtistResponseDTO>> findAllByIds(@PathVariable List<Integer> request) throws BadParamsException {
-		return ResponseEntity.ok(service.findAllByids(request));
+	public ResponseEntity<List<ArtistResponseDTO>> findAllByIds(@RequestParam List<Integer> ids) {
+		return ResponseEntity.ok(service.findAllByids(ids));
 	}
 	
 	@PostMapping("")

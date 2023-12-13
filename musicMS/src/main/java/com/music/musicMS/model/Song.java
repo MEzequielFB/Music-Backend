@@ -51,6 +51,5 @@ public class Song {
 		this.name = request.getName();
 		this.album = request.getAlbum();
 		this.artists = request.getArtists();
-		this.genres = request.getGenres();
 	}
 }

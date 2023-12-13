@@ -90,13 +90,21 @@ public class SongService {
 	@Transactional
 	public SongResponseDTO saveSong(SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
 		Optional<Song> optional = repository.findByArtistsAndName(request.getArtists(), request.getName());
+		
+		if (optional.isPresent()) {
+			throw new NameAlreadyUsedException("Song", request.getName());
+		}
+		
 		List<ArtistResponseDTO> artists = null;
 		
 		try {
 			artists = webClientBuilder.build()
 					.get()
 					.uri(uriBuilder -> uriBuilder
-							.path("http://localhost:8001/api/artist/allByIds")
+							.scheme("http")
+					        .host("localhost")
+					        .port(8001)
+					        .path("/api/artist/allByIds")
 							.queryParam("ids", request.getArtists())
 							.build())
 					.retrieve()
@@ -110,19 +118,14 @@ public class SongService {
 			throw new SomeEntityDoesNotExistException("artists");
 		}
 		
-		List<Genre> genres = genreRepository.findAllById(request.getGenres()
-				.stream()
-				.map(genre -> genre.getId()).toList());
+		List<Genre> genres = genreRepository.findAllById(request.getGenres());
 		
 		if (genres.size() != request.getGenres().size()) {
 			throw new SomeEntityDoesNotExistException("genres");
 		}
 		
-		if (optional.isPresent()) {
-			throw new NameAlreadyUsedException("Song", request.getName());
-		}
-		
 		Song song = new Song(request);
+		song.setGenres(genres);
 		
 		//Default date -> current date
 		song.setReleaseDate(new Date(System.currentTimeMillis()));
@@ -134,7 +137,7 @@ public class SongService {
 	}
 	
 	@Transactional
-	public SongResponseDTO updateSong(int id, SongRequestDTO request) throws NotFoundException {
+	public SongResponseDTO updateSong(int id, SongRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
 		Optional<Song> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Song song = optional.get();
@@ -151,13 +154,26 @@ public class SongService {
 						.retrieve()
 						.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
 						.block();
+				
+				if (artists.size() != request.getArtists().size()) {
+					throw new SomeEntityDoesNotExistException("artists");
+				}
+				
 				song.setArtists(request.getArtists());
-				song.setGenres(request.getGenres());
+				
+				List<Genre> genres = genreRepository.findAllById(request.getGenres());
+				
+				if (genres.size() != request.getGenres().size()) {
+					throw new SomeEntityDoesNotExistException("genres");
+				}
+				song.setGenres(genres);
 				
 				SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
 				responseDTO.setArtists(artists);
 				
 				return responseDTO;
+			} catch (SomeEntityDoesNotExistException e) {
+				throw e;
 			} catch (Exception e) {
 				throw e;
 			}

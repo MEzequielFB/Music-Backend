@@ -37,18 +37,8 @@ public class ArtistService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<ArtistResponseDTO> findAllByids(List<Integer> request) throws BadParamsException {
-//		List<Integer> ids = null;
-//		try {
-//			ids = request
-//					.stream()
-//					.map( Integer::parseInt )
-//					.toList();
-//		} catch (Exception e) {
-//			throw new BadParamsException("Params should be integers");
-//		}
-                
-		return repository.findAllById(request)
+	public List<ArtistResponseDTO> findAllByids(List<Integer> ids) {
+		return repository.findAllById(ids)
 				.stream()
 				.map( ArtistResponseDTO::new ).toList();
 	}

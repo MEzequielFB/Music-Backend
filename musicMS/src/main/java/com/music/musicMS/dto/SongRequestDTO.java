@@ -3,7 +3,6 @@ package com.music.musicMS.dto;
 import java.util.List;
 
 import com.music.musicMS.model.Album;
-import com.music.musicMS.model.Genre;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -24,5 +23,5 @@ public class SongRequestDTO {
 	
 	@NotNull(message = "the song should have at least one genre")
 	@NotEmpty(message = "the song should have at least one genre")
-	private List<Genre> genres;
+	private List<Integer> genres;
 }
