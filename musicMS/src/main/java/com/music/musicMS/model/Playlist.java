@@ -41,7 +41,7 @@ public class Playlist {
 	
 	public Playlist(PlaylistRequestDTO request) {
 		this.name = request.getName();
-		this.isPublic = request.isPublic();
+		this.isPublic = request.getIsPublic();
 		this.userId = request.getUserId();
 	}
 	

@@ -64,7 +64,6 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 			+ " WHERE s.name LIKE :name%")
 	public List<Song> findByName(String name);
 
-	// ADAPTAR
 	@Query("SELECT s"
 			+ " FROM Song s"
 			+ " WHERE s.name = :name"

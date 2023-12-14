@@ -11,7 +11,7 @@ public class PlaylistRequestDTO {
 	private String name;
 	
 	@NotNull(message = "isPublic should't be null")
-	private boolean isPublic;
+	private Boolean isPublic;
 	
 	@NotNull(message = "user shouldn't be null")
 	private Integer userId;

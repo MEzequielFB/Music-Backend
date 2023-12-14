@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.musicMS.dto.AddSongRequestDTO;
+import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.PlaylistRequestDTO;
 import com.music.musicMS.dto.PlaylistResponseDTO;
 import com.music.musicMS.dto.PlaylistUpdateDTO;
@@ -83,7 +84,26 @@ public class PlaylistService {
 			throw new NotFoundException("Playlist", id);
 		}
 		
-		return repository.getSongsFromPlaylist(id);
+		List<SongResponseDTO> songs = repository.getSongsFromPlaylist(id);
+		
+		for (SongResponseDTO song : songs) {
+			List<ArtistResponseDTO> artists = webClientBuilder.build()
+			.get()
+			.uri(uriBuilder -> uriBuilder
+					.scheme("http")
+			        .host("localhost")
+			        .port(8001)
+			        .path("/api/artist/allByIds")
+					.queryParam("ids", songRepository.findById(song.getId()).get().getArtists())
+					.build())
+			.retrieve()
+			.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
+			.block();
+			
+			song.setArtists(artists);
+		}
+		
+		return songs;
 	}
 	
 	@Transactional
@@ -136,7 +156,23 @@ public class PlaylistService {
 		playlist.addSong(song);
 		repository.save(playlist);
 		
-		return new SongResponseDTO(song);
+		List<ArtistResponseDTO> artists = webClientBuilder.build()
+				.get()
+				.uri(uriBuilder -> uriBuilder
+						.scheme("http")
+				        .host("localhost")
+				        .port(8001)
+				        .path("/api/artist/allByIds")
+						.queryParam("ids", song.getArtists())
+						.build())
+				.retrieve()
+				.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
+				.block();
+		
+		SongResponseDTO responseDTO =  new SongResponseDTO(song);
+		responseDTO.setArtists(artists);
+		
+		return responseDTO;
 	}
 	
 	@Transactional
