@@ -35,8 +35,11 @@ public class Song {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Album album;
 	
-	@Column(nullable = false)
-	private List<Integer> artists;
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			joinColumns = {@JoinColumn(name = "song_id")},
+			inverseJoinColumns = {@JoinColumn(name = "artist_id")})
+	private List<Artist> artists;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
@@ -50,6 +53,5 @@ public class Song {
 	public Song(SongRequestDTO request) {
 		this.name = request.getName();
 		this.album = request.getAlbum();
-		this.artists = request.getArtists();
 	}
 }

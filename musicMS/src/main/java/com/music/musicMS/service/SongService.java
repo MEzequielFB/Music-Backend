@@ -5,19 +5,18 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.SongRequestDTO;
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
+import com.music.musicMS.model.Artist;
 import com.music.musicMS.model.Genre;
 import com.music.musicMS.model.Song;
+import com.music.musicMS.repository.ArtistRepository;
 import com.music.musicMS.repository.GenreRepository;
 import com.music.musicMS.repository.SongRepository;
 
@@ -31,7 +30,7 @@ public class SongService {
 	private GenreRepository genreRepository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private ArtistRepository artistRepository;
 	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> searchSongs(String name, List<String> genres, List<Integer> years) {
@@ -74,53 +73,18 @@ public class SongService {
 	public List<SongResponseDTO> findAll() {
 		return repository.findAll()
 				.stream()
-				.map(song -> {
-					List<ArtistResponseDTO> artists = webClientBuilder.build()
-							.get()
-							.uri(uriBuilder -> uriBuilder
-									.scheme("http")
-							        .host("localhost")
-							        .port(8001)
-							        .path("/api/artist/allByIds")
-									.queryParam("ids", song.getArtists())
-									.build())
-							.retrieve()
-							.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
-							.block();
-					
-					SongResponseDTO responseDTO = new SongResponseDTO(song);
-					responseDTO.setArtists(artists);
-					
-					return responseDTO;
-				}).toList();
+				.map( SongResponseDTO::new ).toList();
 	}
 	
 	@Transactional(readOnly = true)
-	public SongResponseDTO findById(int id) throws NotFoundException {
+	public SongResponseDTO findById(Integer id) throws NotFoundException {
 		Optional<Song> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Song song = optional.get();
-			
-			List<ArtistResponseDTO> artists = webClientBuilder.build()
-					.get()
-					.uri(uriBuilder -> uriBuilder
-							.scheme("http")
-					        .host("localhost")
-					        .port(8001)
-					        .path("/api/artist/allByIds")
-							.queryParam("ids", song.getArtists())
-							.build())
-					.retrieve()
-					.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
-					.block();
-			
-			SongResponseDTO responseDTO = new SongResponseDTO(song);
-			responseDTO.setArtists(artists);
-			
-			return responseDTO;
-		} else {
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Song", id);
 		}
+		Song song = optional.get();
+		
+		return new SongResponseDTO(song); 
 	}
 	
 	@Transactional
@@ -131,24 +95,7 @@ public class SongService {
 			throw new NameAlreadyUsedException("Song", request.getName());
 		}
 		
-		List<ArtistResponseDTO> artists = null;
-		
-		try {
-			artists = webClientBuilder.build()
-					.get()
-					.uri(uriBuilder -> uriBuilder
-							.scheme("http")
-					        .host("localhost")
-					        .port(8001)
-					        .path("/api/artist/allByIds")
-							.queryParam("ids", request.getArtists())
-							.build())
-					.retrieve()
-					.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
-					.block();
-		} catch (Exception e) {
-			throw e;
-		}
+		List<Artist> artists = artistRepository.findAllById(request.getArtists());
 		
 		if (artists.size() != request.getArtists().size()) {
 			throw new SomeEntityDoesNotExistException("artists");
@@ -162,12 +109,12 @@ public class SongService {
 		
 		Song song = new Song(request);
 		song.setGenres(genres);
+		song.setArtists(artists);
 		
 		//Default date -> current date
 		song.setReleaseDate(new Date(System.currentTimeMillis()));
 		
 		SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
-		responseDTO.setArtists(artists);
 		
 		return responseDTO;
 	}
@@ -180,42 +127,25 @@ public class SongService {
 			song.setName(request.getName());
 			song.setAlbum(request.getAlbum());
 			
-			try {
-				List<ArtistResponseDTO> artists = webClientBuilder.build()
-						.get()
-						.uri(uriBuilder -> uriBuilder
-								.scheme("http")
-						        .host("localhost")
-						        .port(8001)
-						        .path("/api/artist/allByIds")
-								.queryParam("ids", request.getArtists())
-								.build())
-						.retrieve()
-						.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
-						.block();
-				
-				if (artists.size() != request.getArtists().size()) {
-					throw new SomeEntityDoesNotExistException("artists");
-				}
-				
-				song.setArtists(request.getArtists());
-				
-				List<Genre> genres = genreRepository.findAllById(request.getGenres());
-				
-				if (genres.size() != request.getGenres().size()) {
-					throw new SomeEntityDoesNotExistException("genres");
-				}
-				song.setGenres(genres);
-				
-				SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
-				responseDTO.setArtists(artists);
-				
-				return responseDTO;
-			} catch (SomeEntityDoesNotExistException e) {
-				throw e;
-			} catch (Exception e) {
-				throw e;
+			List<Artist> artists = artistRepository.findAllById(request.getArtists());
+			
+			if (artists.size() != request.getArtists().size()) {
+				throw new SomeEntityDoesNotExistException("artists");
 			}
+			
+			song.setArtists(artists);
+			
+			List<Genre> genres = genreRepository.findAllById(request.getGenres());
+			
+			if (genres.size() != request.getGenres().size()) {
+				throw new SomeEntityDoesNotExistException("genres");
+			}
+			song.setGenres(genres);
+			
+			SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
+			
+			return responseDTO;
+
 		} else {
 			throw new NotFoundException("Song", id);
 		}
@@ -228,21 +158,7 @@ public class SongService {
 			Song song = optional.get();
 			repository.deleteById(id);
 			
-			List<ArtistResponseDTO> artists = webClientBuilder.build()
-					.get()
-					.uri(uriBuilder -> uriBuilder
-							.scheme("http")
-					        .host("localhost")
-					        .port(8001)
-					        .path("/api/artist/allByIds")
-							.queryParam("ids", song.getArtists())
-							.build())
-					.retrieve()
-					.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
-					.block();
-			
 			SongResponseDTO responseDTO = new SongResponseDTO(song);
-			responseDTO.setArtists(artists);
 			
 			return responseDTO;
 		} else {

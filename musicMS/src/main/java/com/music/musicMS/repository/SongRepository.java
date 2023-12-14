@@ -63,10 +63,20 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 			+ " FROM Song s"
 			+ " WHERE s.name LIKE :name%")
 	public List<Song> findByName(String name);
+	
+//	@Query("SELECT s"
+//			+ " FROM Song s"
+//			+ " WHERE s.name = :name"
+//			+ " AND s.artists = ("
+//				+ " SELECT a"
+//				+ " FROM Artist a"
+//				+ " WHERE a.id IN :artists)")
+//	public Optional<Song> findByArtistsAndName(List<Integer> artists, String name);
 
 	@Query("SELECT s"
 			+ " FROM Song s"
+			+ " JOIN s.artists a"
 			+ " WHERE s.name = :name"
-			+ " AND s.artists = :artists")
+			+ " AND a.id IN :artists")
 	public Optional<Song> findByArtistsAndName(List<Integer> artists, String name);
 }

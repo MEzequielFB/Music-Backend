@@ -43,7 +43,7 @@ public class SongController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<SongResponseDTO> findById(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<SongResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
@@ -53,12 +53,12 @@ public class SongController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<SongResponseDTO> updateSong(@PathVariable int id, @RequestBody @Valid SongRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
+	public ResponseEntity<SongResponseDTO> updateSong(@PathVariable Integer id, @RequestBody @Valid SongRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
 		return ResponseEntity.ok(service.updateSong(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<SongResponseDTO> deleteSong(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<SongResponseDTO> deleteSong(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteSong(id));
 	}
 }
