@@ -1,4 +1,4 @@
-package com.music.userMS.controller;
+package com.music.musicMS.controller;
 
 import java.util.List;
 
@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.music.userMS.dto.ArtistRequestDTO;
-import com.music.userMS.dto.ArtistResponseDTO;
-import com.music.userMS.exception.NameAlreadyUsedException;
-import com.music.userMS.exception.NotFoundException;
-import com.music.userMS.service.ArtistService;
+import com.music.musicMS.dto.ArtistRequestDTO;
+import com.music.musicMS.dto.ArtistResponseDTO;
+import com.music.musicMS.exception.NameAlreadyUsedException;
+import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.service.ArtistService;
 
 import jakarta.validation.Valid;
 

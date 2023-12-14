@@ -1,6 +1,6 @@
-package com.music.userMS.model;
+package com.music.musicMS.model;
 
-import com.music.userMS.dto.ArtistRequestDTO;
+import com.music.musicMS.dto.ArtistRequestDTO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

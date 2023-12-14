@@ -1,4 +1,4 @@
-package com.music.userMS.service;
+package com.music.musicMS.service;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.music.userMS.dto.ArtistRequestDTO;
-import com.music.userMS.dto.ArtistResponseDTO;
-import com.music.userMS.exception.NameAlreadyUsedException;
-import com.music.userMS.exception.NotFoundException;
-import com.music.userMS.model.Artist;
-import com.music.userMS.repository.ArtistRepository;
+import com.music.musicMS.dto.ArtistRequestDTO;
+import com.music.musicMS.dto.ArtistResponseDTO;
+import com.music.musicMS.exception.NameAlreadyUsedException;
+import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.model.Artist;
+import com.music.musicMS.repository.ArtistRepository;
 
 @Service(value = "artistService")
 public class ArtistService {
