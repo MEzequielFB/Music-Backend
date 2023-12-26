@@ -10,11 +10,11 @@ import lombok.Data;
 public class AlbumResponseDTO {
 	private int id;
 	private String name;
-	private List<Integer> artists;
+	private List<ArtistResponseDTO> artists;
 	
 	public AlbumResponseDTO(Album album) {
 		this.id = album.getId();
 		this.name = album.getName();
-		this.artists = album.getArtists();
+		this.artists = album.getArtists().stream().map( ArtistResponseDTO::new ).toList();
 	}
 }

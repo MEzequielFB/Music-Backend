@@ -10,14 +10,20 @@ import org.springframework.transaction.annotation.Transactional;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.model.Album;
+import com.music.musicMS.model.Artist;
 import com.music.musicMS.repository.AlbumRepository;
+import com.music.musicMS.repository.ArtistRepository;
 
 @Service(value = "albumService")
 public class AlbumService {
 
 	@Autowired
 	private AlbumRepository repository;
+	
+	@Autowired
+	private ArtistRepository artistRepository;
 	
 	@Transactional(readOnly = true)
 	public List<AlbumResponseDTO> findAll() {
@@ -28,26 +34,40 @@ public class AlbumService {
 	public AlbumResponseDTO findById(int id) throws NotFoundException {
 		Optional<Album> optional = repository.findById(id);
 		if (optional.isPresent()) {
-			return new AlbumResponseDTO(optional.get());
+			Album album = optional.get();
+			return new AlbumResponseDTO(album);
 		} else {
 			throw new NotFoundException("Album", id);
 		}
 	}
 	
 	@Transactional
-	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request) {
+	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request) throws SomeEntityDoesNotExistException {
 		Album album = new Album(request);
+		List<Artist> artists = artistRepository.findAllById(request.getArtists());
+		if (artists.size() != request.getArtists().size()) {
+			throw new SomeEntityDoesNotExistException("artists");
+		}
+		
+		album.setArtists(artists);
+		
 		return new AlbumResponseDTO(repository.save(album));
 	}
 	
 	@Transactional
-	public AlbumResponseDTO updateAlbum(int id, AlbumRequestDTO request) throws NotFoundException {
+	public AlbumResponseDTO updateAlbum(int id, AlbumRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
 		Optional<Album> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Album album = optional.get();
 			album.setName(request.getName());
-			album.setArtists(request.getArtists());
 			album.setSongs(request.getSongs());
+			
+			List<Artist> artists = artistRepository.findAllById(request.getArtists());
+			if (artists.size() != request.getArtists().size()) {
+				throw new SomeEntityDoesNotExistException("artists");
+			}
+			
+			album.setArtists(artists);
 			
 			return new AlbumResponseDTO(repository.save(album));
 		} else {

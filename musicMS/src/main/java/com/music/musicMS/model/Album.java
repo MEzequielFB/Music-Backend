@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,15 +26,14 @@ public class Album {
 	@Column(nullable = false)
 	private String name;
 	
-	@Column(nullable = false)
-	private List<Integer> artists; // ids
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "albums")
+	private List<Artist> artists;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "album")
 	private List<Song> songs;
 	
 	public Album(AlbumRequestDTO request) {
 		this.name = request.getName();
-		this.artists = request.getArtists();
 		this.songs = request.getSongs();
 	}
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.service.AlbumService;
 
 import jakarta.validation.Valid;
@@ -39,12 +40,12 @@ public class AlbumController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<AlbumResponseDTO> saveAlbum(@RequestBody @Valid AlbumRequestDTO request) {
+	public ResponseEntity<AlbumResponseDTO> saveAlbum(@RequestBody @Valid AlbumRequestDTO request) throws SomeEntityDoesNotExistException {
 		return new ResponseEntity<>(service.saveAlbum(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<AlbumResponseDTO> updateAlbum(@PathVariable int id, @RequestBody @Valid AlbumRequestDTO request) throws NotFoundException {
+	public ResponseEntity<AlbumResponseDTO> updateAlbum(@PathVariable int id, @RequestBody @Valid AlbumRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
 		return ResponseEntity.ok(service.updateAlbum(id, request));
 	}
 	

@@ -19,7 +19,7 @@ public class AlbumRequestDTO {
 	@NotEmpty(message = "album should have at least one artist")
 	private List<Integer> artists;
 	
-	@NotNull(message = "album should have at least one song")
-	@NotEmpty(message = "album should have at least one song")
+	@NotNull(message = "songs should have at least one song")
+	@NotEmpty(message = "songs should have at least one song")
 	private List<Song> songs;
 }
