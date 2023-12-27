@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.music.musicMS.dto.AddSongDTO;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
+import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
 import com.music.musicMS.service.AlbumService;
 
 import jakarta.validation.Valid;
@@ -36,7 +38,7 @@ public class AlbumController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<AlbumResponseDTO> findById(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<AlbumResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
@@ -46,8 +48,13 @@ public class AlbumController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<AlbumResponseDTO> updateAlbum(@PathVariable int id, @RequestBody @Valid AlbumUpdateDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
+	public ResponseEntity<AlbumResponseDTO> updateAlbum(@PathVariable Integer id, @RequestBody @Valid AlbumUpdateDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
 		return ResponseEntity.ok(service.updateAlbum(id, request));
+	}
+	
+	@PutMapping("/{id}/addSong")
+	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody AddSongDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
+		return ResponseEntity.ok(service.addSong(id, request));
 	}
 	
 	@DeleteMapping("/{id}")

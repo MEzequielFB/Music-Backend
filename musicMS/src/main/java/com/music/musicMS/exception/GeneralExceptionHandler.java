@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(SongIsAlreadyInAnAlbumException.class)
+	public ResponseEntity<String> handleSongIsAlreadyInAnAlbumException(SongIsAlreadyInAnAlbumException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(SomeEntityDoesNotExistException.class)
 	public ResponseEntity<String> handleSomeEntityDoesNotExistException(SomeEntityDoesNotExistException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);

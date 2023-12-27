@@ -36,4 +36,14 @@ public class Album {
 	public Album(AlbumRequestDTO request) {
 		this.name = request.getName();
 	}
+	
+	// Method used to show the songs in an album response
+	public void addSong(Song song) {
+		songs.add(song);
+	}
+	
+	// Method used to show the artists in an album response
+	public void addArtist(Artist artist) {
+		artists.add(artist);
+	}
 }

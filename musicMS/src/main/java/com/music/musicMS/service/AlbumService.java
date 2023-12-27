@@ -7,13 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.music.musicMS.dto.AddSongDTO;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
+import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
 import com.music.musicMS.model.Album;
 import com.music.musicMS.model.Artist;
+import com.music.musicMS.model.Song;
 import com.music.musicMS.repository.AlbumRepository;
 import com.music.musicMS.repository.ArtistRepository;
 import com.music.musicMS.repository.SongRepository;
@@ -82,6 +85,42 @@ public class AlbumService {
 		} else {
 			throw new NotFoundException("Album", id);
 		}
+	}
+	
+	@Transactional
+	public AlbumResponseDTO addSong(Integer id, AddSongDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
+		Optional<Album> optional = repository.findById(id);
+		Optional<Song> songOptional = songRepository.findById(request.getSongId());
+		
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Album", id);
+		}
+		if (!songOptional.isPresent()) {
+			throw new NotFoundException("Song", request.getSongId());
+		}
+		
+		Album album = optional.get();
+		Song song = songOptional.get();
+	
+		if (song.getAlbum() != null) {
+			throw new SongIsAlreadyInAnAlbumException(song.getName());
+		}
+		
+		song.setAlbum(album);
+		song = songRepository.save(song);
+		
+		album.addSong(song);
+		
+		for (Artist artist : song.getArtists()) {
+			if (!album.getArtists().contains(artist)) {
+				artist.addAlbum(album);
+				artist = artistRepository.save(artist);
+				
+				album.addArtist(artist);
+			}
+		}
+		
+		return new AlbumResponseDTO(album);
 	}
 	
 	@Transactional
