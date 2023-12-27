@@ -44,7 +44,11 @@ public class Artist {
 		this.password = request.getPassword();
 	}
 	
-	public void addSong(Song song) {
-		this.songs.add(song);
+	public void addAlbum(Album album) {
+		albums.add(album);
+	}
+	
+	public void removeAlbum(Album album) {
+		albums.remove(album);
 	}
 }

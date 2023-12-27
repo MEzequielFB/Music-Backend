@@ -4,9 +4,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.music.musicMS.model.Album;
+import com.music.musicMS.model.Artist;
 import com.music.musicMS.model.Playlist;
 import com.music.musicMS.model.Song;
 
@@ -63,15 +66,6 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 			+ " FROM Song s"
 			+ " WHERE s.name LIKE :name%")
 	public List<Song> findByName(String name);
-	
-//	@Query("SELECT s"
-//			+ " FROM Song s"
-//			+ " WHERE s.name = :name"
-//			+ " AND s.artists = ("
-//				+ " SELECT a"
-//				+ " FROM Artist a"
-//				+ " WHERE a.id IN :artists)")
-//	public Optional<Song> findByArtistsAndName(List<Integer> artists, String name);
 
 	@Query("SELECT s"
 			+ " FROM Song s"
@@ -79,4 +73,15 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 			+ " WHERE s.name = :name"
 			+ " AND a.id IN :artists")
 	public Optional<Song> findByArtistsAndName(List<Integer> artists, String name);
+	
+	@Query("SELECT DISTINCT s.artists"
+			+ " FROM Song s"
+			+ " WHERE s IN :songs")
+	public List<Artist> findSongsArtists(List<Song> songs);
+	
+	@Modifying
+	@Query("UPDATE Song s"
+			+ " SET s.album = null"
+			+ " WHERE s.album = album")
+	public void setAlbumNullOfSongs(Album album);
 }

@@ -1,6 +1,8 @@
 package com.music.musicMS.model;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.music.musicMS.dto.SongRequestDTO;
@@ -39,13 +41,13 @@ public class Song {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "song_id")},
 			inverseJoinColumns = {@JoinColumn(name = "artist_id")})
-	private List<Artist> artists;
+	private List<Artist> artists = new ArrayList<>();
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "song_id")},
 			inverseJoinColumns = {@JoinColumn(name = "genre_id")})
-	private List<Genre> genres;
+	private List<Genre> genres = new ArrayList<>();
 	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "songs")
 	private List<Playlist> playlists;
@@ -53,5 +55,6 @@ public class Song {
 	public Song(SongRequestDTO request) {
 		this.name = request.getName();
 		this.album = request.getAlbum();
+//		this.artists = new LinkedList<>();
 	}
 }

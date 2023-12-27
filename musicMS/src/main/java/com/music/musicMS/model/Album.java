@@ -1,5 +1,6 @@
 package com.music.musicMS.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.music.musicMS.dto.AlbumRequestDTO;
@@ -27,13 +28,12 @@ public class Album {
 	private String name;
 	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "albums")
-	private List<Artist> artists;
+	private List<Artist> artists = new ArrayList<>();
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "album")
-	private List<Song> songs;
+	private List<Song> songs = new ArrayList<>();
 	
 	public Album(AlbumRequestDTO request) {
 		this.name = request.getName();
-		this.songs = request.getSongs();
 	}
 }
