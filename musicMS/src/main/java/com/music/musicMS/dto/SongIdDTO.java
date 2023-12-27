@@ -5,6 +5,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AddSongDTO {
+public class SongIdDTO {
 	private Integer songId;
 }

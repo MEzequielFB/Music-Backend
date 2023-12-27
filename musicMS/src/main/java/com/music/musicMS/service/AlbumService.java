@@ -7,10 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.music.musicMS.dto.AddSongDTO;
+import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
+import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
@@ -88,7 +89,7 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO addSong(Integer id, AddSongDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
+	public AlbumResponseDTO addSong(Integer id, SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
 		Optional<Album> optional = repository.findById(id);
 		Optional<Song> songOptional = songRepository.findById(request.getSongId());
 		
@@ -118,6 +119,37 @@ public class AlbumService {
 				
 				album.addArtist(artist);
 			}
+		}
+		
+		return new AlbumResponseDTO(album);
+	}
+	
+	@Transactional
+	public AlbumResponseDTO removeSong(Integer id, SongIdDTO request) throws NotFoundException, DoNotContainsTheSongException {
+		Optional<Album> optional = repository.findById(id);
+		Optional<Song> songOptional = songRepository.findById(request.getSongId());
+		
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Album", id);
+		}
+		if (!songOptional.isPresent()) {
+			throw new NotFoundException("Song", request.getSongId());
+		}
+		
+		Album album = optional.get();
+		Song song = songOptional.get();
+		
+		if (song.getAlbum().equals(album)) {
+			song.setAlbum(null);
+			album.removeSong(song);
+		} else {
+			throw new DoNotContainsTheSongException(album.getName(), song.getName());
+		}
+		
+		// ESTO ES MUCHO MAS COMODO CON EL ALBUM COMO DUENIO DE LA RELACION - VERIFICAR SI HAY QUE ELIMINAR ALGUN ARTISTA DEL ALBUM
+		List<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());
+		for (Artist artist : artists) {
+			
 		}
 		
 		return new AlbumResponseDTO(album);

@@ -42,6 +42,11 @@ public class Album {
 		songs.add(song);
 	}
 	
+	// Method used to show the songs in an album response
+	public void removeSong(Song song) {
+		songs.remove(song);
+	}
+	
 	// Method used to show the artists in an album response
 	public void addArtist(Artist artist) {
 		artists.add(artist);

@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(DoNotContainsTheSongException.class)
+	public ResponseEntity<String> handleDoNotContainsTheSongException(DoNotContainsTheSongException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(SongIsAlreadyInAnAlbumException.class)
 	public ResponseEntity<String> handleSongIsAlreadyInAnAlbumException(SongIsAlreadyInAnAlbumException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

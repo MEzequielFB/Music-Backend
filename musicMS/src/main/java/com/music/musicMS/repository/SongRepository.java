@@ -77,7 +77,7 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 	@Query("SELECT DISTINCT s.artists"
 			+ " FROM Song s"
 			+ " WHERE s IN :songs")
-	public List<Artist> findSongsArtists(List<Song> songs);
+	public List<Artist> findArtistsBySongs(List<Song> songs);
 	
 	@Modifying
 	@Query("UPDATE Song s"

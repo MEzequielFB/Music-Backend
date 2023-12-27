@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.music.musicMS.dto.AddSongDTO;
+import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
+import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
@@ -53,8 +54,13 @@ public class AlbumController {
 	}
 	
 	@PutMapping("/{id}/addSong")
-	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody AddSongDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
+	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
 		return ResponseEntity.ok(service.addSong(id, request));
+	}
+	
+	@PutMapping("/{id}/removeSong")
+	public ResponseEntity<AlbumResponseDTO> removeSong(@PathVariable Integer id, @RequestBody SongIdDTO request) throws NotFoundException, DoNotContainsTheSongException {
+		return ResponseEntity.ok(service.removeSong(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
