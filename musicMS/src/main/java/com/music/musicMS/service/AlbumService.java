@@ -1,7 +1,5 @@
 package com.music.musicMS.service;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +14,6 @@ import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.model.Album;
 import com.music.musicMS.model.Artist;
-import com.music.musicMS.model.Song;
 import com.music.musicMS.repository.AlbumRepository;
 import com.music.musicMS.repository.ArtistRepository;
 import com.music.musicMS.repository.SongRepository;
