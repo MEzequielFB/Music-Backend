@@ -2,11 +2,13 @@ package com.music.musicMS.dto;
 
 import com.music.musicMS.model.Genre;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class GenreResponseDTO {
 	private int id;
 	private String name;

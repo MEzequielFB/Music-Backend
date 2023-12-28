@@ -35,7 +35,7 @@ public class GenreController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<GenreResponseDTO> findById(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<GenreResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
@@ -45,12 +45,12 @@ public class GenreController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<GenreResponseDTO> updateGenre(@PathVariable int id, @RequestBody @Valid GenreRequestDTO request) throws NotFoundException {
+	public ResponseEntity<GenreResponseDTO> updateGenre(@PathVariable Integer id, @RequestBody @Valid GenreRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updateGenre(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<GenreResponseDTO> deleteGenre(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<GenreResponseDTO> deleteGenre(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteGenre(id));
 	}
 }
