@@ -12,6 +12,7 @@ import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
+import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
@@ -51,8 +52,21 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request) {
+	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
+		Optional<Artist> artistOptional = artistRepository.findById(request.getOwnerId());
+		if (!artistOptional.isPresent()) {
+			throw new NotFoundException("Artist", request.getOwnerId());
+		}
+		
+		Artist owner = artistOptional.get();
+		
+		Optional<Album> albumOptional = repository.findByNameAndOwner(request.getName(), owner);
+		if (albumOptional.isPresent()) {
+			throw new NameAlreadyUsedException("Album", request.getName());
+		}
+		
 		Album album = new Album(request);
+		album.setOwner(owner);
 		
 		return new AlbumResponseDTO(repository.save(album));
 	}
@@ -139,7 +153,7 @@ public class AlbumService {
 		Album album = optional.get();
 		Song song = songOptional.get();
 		
-		if (song.getAlbum().equals(album)) {
+		if (song.getAlbum() != null && song.getAlbum().equals(album)) {
 			song.setAlbum(null);
 			album.removeSong(song);
 		} else {
@@ -161,7 +175,7 @@ public class AlbumService {
 		if (optional.isPresent()) {
 			Album album = optional.get();
 			
-			songRepository.setAlbumNullOfSongs(album);
+			songRepository.removeSongsFromAlbum(album);
 			for (Artist artist : album.getArtists()) {
 				artist.removeAlbum(album);
 			}

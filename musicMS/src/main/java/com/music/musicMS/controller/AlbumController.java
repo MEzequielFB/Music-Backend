@@ -19,6 +19,7 @@ import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
+import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
@@ -44,7 +45,7 @@ public class AlbumController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<AlbumResponseDTO> saveAlbum(@RequestBody @Valid AlbumRequestDTO request) {
+	public ResponseEntity<AlbumResponseDTO> saveAlbum(@RequestBody @Valid AlbumRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
 		return new ResponseEntity<>(service.saveAlbum(request), HttpStatus.CREATED);
 	}
 	

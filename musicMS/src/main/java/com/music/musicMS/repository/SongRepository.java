@@ -83,5 +83,5 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 	@Query("UPDATE Song s"
 			+ " SET s.album = null"
 			+ " WHERE s.album = album")
-	public void setAlbumNullOfSongs(Album album);
+	public void removeSongsFromAlbum(Album album);
 }

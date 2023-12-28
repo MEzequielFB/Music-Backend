@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,9 @@ public class Album {
 	
 	@Column(nullable = false)
 	private String name;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Artist owner;
 	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "albums")
 	private List<Artist> artists = new ArrayList<>();
