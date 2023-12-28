@@ -84,4 +84,21 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 			+ " SET s.album = null"
 			+ " WHERE s.album = album")
 	public void removeSongsFromAlbum(Album album);
+	
+	@Query("SELECT"
+			+ " CASE"
+				+ " WHEN :artist MEMBER OF s.artists THEN TRUE"
+				+ " ELSE FALSE"
+			+ " END"
+			+ " FROM Song s"
+			+ " WHERE s = :song")
+	public Boolean songContainsArtist(Song song, Artist artist);
+	
+//	SELECT OrderID, Quantity,
+//	CASE
+//	    WHEN Quantity > 30 THEN 'The quantity is greater than 30'
+//	    WHEN Quantity = 30 THEN 'The quantity is 30'
+//	    ELSE 'The quantity is under 30'
+//	END AS QuantityText
+//	FROM OrderDetails;
 }

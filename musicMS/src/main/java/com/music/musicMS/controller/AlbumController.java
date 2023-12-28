@@ -18,6 +18,7 @@ import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
+import com.music.musicMS.exception.AlbumOwnerNotInSongException;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
@@ -55,7 +56,7 @@ public class AlbumController {
 	}
 	
 	@PutMapping("/{id}/addSong")
-	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
+	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
 		return ResponseEntity.ok(service.addSong(id, request));
 	}
 	

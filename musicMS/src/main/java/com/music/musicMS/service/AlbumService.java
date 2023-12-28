@@ -11,6 +11,7 @@ import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
+import com.music.musicMS.exception.AlbumOwnerNotInSongException;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
@@ -85,7 +86,7 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO addSong(Integer id, SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException {
+	public AlbumResponseDTO addSong(Integer id, SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
 		Optional<Album> optional = repository.findById(id);
 		Optional<Song> songOptional = songRepository.findById(request.getSongId());
 		
@@ -101,6 +102,9 @@ public class AlbumService {
 	
 		if (song.getAlbum() != null) {
 			throw new SongIsAlreadyInAnAlbumException(song.getName());
+		}
+		if (!songRepository.songContainsArtist(song, album.getOwner())) {
+			throw new AlbumOwnerNotInSongException(song.getName(), album.getOwner().getName());
 		}
 		
 		song.setAlbum(album);
