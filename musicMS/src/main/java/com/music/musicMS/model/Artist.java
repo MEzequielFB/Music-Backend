@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +36,9 @@ public class Artist {
 	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "artists")
 	private List<Album> albums;
+	
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "owner")
+	private List<Album> ownedAlbums;
 	
 	public Artist(ArtistRequestDTO request) {
 		this.name = request.getName();

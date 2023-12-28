@@ -52,6 +52,21 @@ public class AlbumService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	public List<AlbumResponseDTO> findAllByOwner(Integer ownerId) throws NotFoundException {
+		Optional<Artist> artistOptional = artistRepository.findById(ownerId);
+		if (artistOptional.isPresent()) {
+			Artist artist = artistOptional.get();
+			List<Album> albums = repository.findAllByOwner(artist);
+			
+			return albums
+					.stream()
+					.map( AlbumResponseDTO::new ).toList();
+		} else {
+			throw new NotFoundException("Artist", ownerId);
+		}
+	}
+	
 	@Transactional
 	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
 		Optional<Artist> artistOptional = artistRepository.findById(request.getOwnerId());

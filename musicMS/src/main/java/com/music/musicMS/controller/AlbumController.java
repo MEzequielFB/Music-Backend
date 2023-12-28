@@ -45,6 +45,11 @@ public class AlbumController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
+	@GetMapping("/owner/{ownerId}")
+	public ResponseEntity<List<AlbumResponseDTO>> findAllByOwner(@PathVariable Integer ownerId) throws NotFoundException {
+		return ResponseEntity.ok(service.findAllByOwner(ownerId));
+	}
+	
 	@PostMapping("")
 	public ResponseEntity<AlbumResponseDTO> saveAlbum(@RequestBody @Valid AlbumRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
 		return new ResponseEntity<>(service.saveAlbum(request), HttpStatus.CREATED);
