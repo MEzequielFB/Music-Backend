@@ -78,24 +78,6 @@ public class AlbumService {
 			Album album = optional.get();
 			album.setName(request.getName());
 			
-//			List<Song> songs = songRepository.findAllById(request.getSongs());
-//			if (songs.size() != request.getSongs().size()) {
-//				throw new SomeEntityDoesNotExistException("songs");
-//			}
-//			
-//			for (Song song : songs) {
-//				song.setAlbum(album);
-//			}
-//			
-//			List<Artist> artists = songRepository.findSongsArtists(songs);
-//			for (Artist artist : artists) {
-//				artist.addAlbum(album);
-//			}
-//			
-//			// Set the songs and artists for the DTO response
-//			album.setSongs(songs);
-//			album.setArtists(artists);
-			
 			return new AlbumResponseDTO(repository.save(album));
 		} else {
 			throw new NotFoundException("Album", id);
@@ -126,16 +108,10 @@ public class AlbumService {
 		
 		album.addSong(song);
 		
-		for (Artist artist : song.getArtists()) {
-			if (!album.getArtists().contains(artist)) {
-				artist.addAlbum(album);
-				artist = artistRepository.save(artist);
-				
-				album.addArtist(artist);
-			}
-		}
+		List<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());
+		album.setArtists(artists);
 		
-		return new AlbumResponseDTO(album);
+		return new AlbumResponseDTO(repository.save(album));
 	}
 	
 	@Transactional
@@ -159,14 +135,11 @@ public class AlbumService {
 		} else {
 			throw new DoNotContainsTheSongException(album.getName(), song.getName());
 		}
-		
-		// ESTO ES MUCHO MAS COMODO CON EL ALBUM COMO DUENIO DE LA RELACION - VERIFICAR SI HAY QUE ELIMINAR ALGUN ARTISTA DEL ALBUM
+
 		List<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());
-		for (Artist artist : artists) {
-			
-		}
+		album.setArtists(artists);
 		
-		return new AlbumResponseDTO(album);
+		return new AlbumResponseDTO(repository.save(album));
 	}
 	
 	@Transactional

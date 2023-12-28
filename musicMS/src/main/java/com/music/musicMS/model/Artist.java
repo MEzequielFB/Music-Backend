@@ -33,10 +33,7 @@ public class Artist {
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "artists")
 	private List<Song> songs;
 	
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-			joinColumns = {@JoinColumn(name = "artist_id")},
-			inverseJoinColumns = {@JoinColumn(name = "album_id")})
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "artists")
 	private List<Album> albums;
 	
 	public Artist(ArtistRequestDTO request) {

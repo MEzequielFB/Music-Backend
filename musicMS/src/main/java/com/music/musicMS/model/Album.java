@@ -11,6 +11,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -31,7 +33,10 @@ public class Album {
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Artist owner;
 	
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "albums")
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			joinColumns = {@JoinColumn(name = "album_id")},
+			inverseJoinColumns = {@JoinColumn(name = "artist_id")})
 	private List<Artist> artists = new ArrayList<>();
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "album")
