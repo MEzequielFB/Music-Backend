@@ -57,9 +57,7 @@ public class AlbumService {
 		Optional<Artist> artistOptional = artistRepository.findById(ownerId);
 		if (artistOptional.isPresent()) {
 			Artist artist = artistOptional.get();
-			List<Album> albums = repository.findAllByOwner(artist);
-			
-			return albums
+			return artist.getOwnedAlbums()
 					.stream()
 					.map( AlbumResponseDTO::new ).toList();
 		} else {
