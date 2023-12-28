@@ -164,11 +164,7 @@ public class AlbumService {
 		Optional<Album> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Album album = optional.get();
-			
-			songRepository.removeSongsFromAlbum(album);
-			for (Artist artist : album.getArtists()) {
-				artist.removeAlbum(album);
-			}
+			album.getArtists().clear();
 			
 			repository.deleteById(id);
 			
