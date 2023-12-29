@@ -39,12 +39,12 @@ public class PlaylistController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@GetMapping("/{id}/songs")
-	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.getSongsFromPlaylist(id));
 	}
 	
@@ -54,17 +54,17 @@ public class PlaylistController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable int id, @RequestBody @Valid PlaylistUpdateDTO request) throws NotFoundException {
+	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Integer id, @RequestBody @Valid PlaylistUpdateDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updatePlaylist(id, request));
 	}
 	
 	@PutMapping("/{id}/song")
-	public ResponseEntity<SongResponseDTO> addSong(@PathVariable int id, @RequestBody @Valid AddSongRequestDTO request) throws NotFoundException, AlreadyContainsSongException {
+	public ResponseEntity<SongResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid AddSongRequestDTO request) throws NotFoundException, AlreadyContainsSongException {
 		return ResponseEntity.ok(service.addSong(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deletePlaylist(id));
 	}
 }

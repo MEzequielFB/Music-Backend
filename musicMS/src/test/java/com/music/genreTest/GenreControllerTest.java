@@ -63,39 +63,39 @@ public class GenreControllerTest {
 	
 	@Test
 	public void saveGenreTest() throws NameAlreadyUsedException {
-		GenreRequestDTO mockGenreRequest = new GenreRequestDTO("rock");
-		GenreResponseDTO mockGenreResponse = new GenreResponseDTO(1, "rock");
+		GenreRequestDTO genreRequestMock = new GenreRequestDTO("rock");
+		GenreResponseDTO genreResponseMock = new GenreResponseDTO(1, "rock");
 		
-		when(service.saveGenre(mockGenreRequest)).thenReturn(mockGenreResponse);
+		when(service.saveGenre(genreRequestMock)).thenReturn(genreResponseMock);
 		
-		ResponseEntity<GenreResponseDTO> responseEntity = controller.saveGenre(mockGenreRequest);
+		ResponseEntity<GenreResponseDTO> responseEntity = controller.saveGenre(genreRequestMock);
 		
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-		assertEquals(mockGenreResponse, responseEntity.getBody());
+		assertEquals(genreResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
 	public void updateGenreTest() throws NotFoundException {
-		GenreRequestDTO mockGenreRequest = new GenreRequestDTO("rock");
-		GenreResponseDTO mockGenreResponse = new GenreResponseDTO(1, "rock");
+		GenreRequestDTO genreRequestMock = new GenreRequestDTO("rock");
+		GenreResponseDTO genreResponseMock = new GenreResponseDTO(1, "rock");
 		
-		when(service.updateGenre(1, mockGenreRequest)).thenReturn(mockGenreResponse);
+		when(service.updateGenre(1, genreRequestMock)).thenReturn(genreResponseMock);
 		
-		ResponseEntity<GenreResponseDTO> responseEntity = controller.updateGenre(1, mockGenreRequest);
+		ResponseEntity<GenreResponseDTO> responseEntity = controller.updateGenre(1, genreRequestMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		assertEquals(mockGenreResponse, responseEntity.getBody());
+		assertEquals(genreResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
 	public void deleteGenreTest() throws NotFoundException {
-		GenreResponseDTO mockGenreResponse = new GenreResponseDTO(1, "rock");
+		GenreResponseDTO genreResponseMock = new GenreResponseDTO(1, "rock");
 		
-		when(service.deleteGenre(1)).thenReturn(mockGenreResponse);
+		when(service.deleteGenre(1)).thenReturn(genreResponseMock);
 		
 		ResponseEntity<GenreResponseDTO> responseEntity = controller.deleteGenre(1);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		assertEquals(mockGenreResponse, responseEntity.getBody());
+		assertEquals(genreResponseMock, responseEntity.getBody());
 	}
 }
