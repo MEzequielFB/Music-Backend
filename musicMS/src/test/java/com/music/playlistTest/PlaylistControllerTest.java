@@ -16,11 +16,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.music.musicMS.controller.PlaylistController;
+import com.music.musicMS.dto.AddSongRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.GenreResponseDTO;
+import com.music.musicMS.dto.PlaylistRequestDTO;
 import com.music.musicMS.dto.PlaylistResponseDTO;
+import com.music.musicMS.dto.PlaylistUpdateDTO;
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.dto.UserDTO;
+import com.music.musicMS.exception.AlreadyContainsSongException;
+import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Album;
 import com.music.musicMS.model.Artist;
@@ -79,5 +84,61 @@ public class PlaylistControllerTest {
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(songsResponseMock, responseEntity.getBody());
+	}
+	
+	@Test
+	public void savePlaylistTest() throws NameAlreadyUsedException, NotFoundException {
+		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", 1);
+		PlaylistRequestDTO playlistRequestMock = new PlaylistRequestDTO("playlist1", false, 1);
+		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "playlist1", false, userDTO);
+		
+		when(service.savePlaylist(playlistRequestMock)).thenReturn(playlistResponseMock);
+		
+		ResponseEntity<PlaylistResponseDTO> responseEntity = controller.savePlaylist(playlistRequestMock);
+		
+		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+		assertEquals(playlistResponseMock, responseEntity.getBody());
+	}
+	
+	@Test
+	public void updatePlaylistTest() throws NotFoundException {
+		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", 1);
+		PlaylistUpdateDTO playlistUpdateMock = new PlaylistUpdateDTO("new name", false);
+		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "new name", false, userDTO);
+		
+		when(service.updatePlaylist(1, playlistUpdateMock)).thenReturn(playlistResponseMock);
+		
+		ResponseEntity<PlaylistResponseDTO> responseEntity = controller.updatePlaylist(1, playlistUpdateMock);
+		
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(playlistResponseMock, responseEntity.getBody());
+	}
+	
+	@Test
+	public void addSongTest() throws NotFoundException, AlreadyContainsSongException {
+		Genre genre = new Genre(1, "rock", List.of());
+		Artist artist = new Artist(1, "artist1", "pass123", List.of(), List.of(), List.of());
+		AddSongRequestDTO songRequestMock = new AddSongRequestDTO(1);
+		SongResponseDTO songResponseMock = new SongResponseDTO(1, "song1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre)));
+		
+		when(service.addSong(1, songRequestMock)).thenReturn(songResponseMock);
+		
+		ResponseEntity<SongResponseDTO> responseEntity = controller.addSong(1, songRequestMock);
+		
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(songResponseMock, responseEntity.getBody());
+	}
+	
+	@Test
+	public void deletePlaylistTest() throws NotFoundException {
+		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", 1);
+		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "playlist1", false, userDTO);
+		
+		when(service.deletePlaylist(1)).thenReturn(playlistResponseMock);
+		
+		ResponseEntity<PlaylistResponseDTO> responseEntity = controller.deletePlaylist(1);
+		
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(playlistResponseMock, responseEntity.getBody());
 	}
 }
