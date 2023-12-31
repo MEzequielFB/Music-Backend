@@ -3,8 +3,6 @@ package com.music.playlistTest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,10 +25,8 @@ import com.music.musicMS.dto.UserDTO;
 import com.music.musicMS.exception.AlreadyContainsSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
-import com.music.musicMS.model.Album;
 import com.music.musicMS.model.Artist;
 import com.music.musicMS.model.Genre;
-import com.music.musicMS.model.Song;
 import com.music.musicMS.service.PlaylistService;
 
 public class PlaylistControllerTest {
