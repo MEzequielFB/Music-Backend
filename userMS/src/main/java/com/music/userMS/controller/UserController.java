@@ -35,12 +35,12 @@ public class UserController {
 	private UserFollowerService userFollowerService;
 	
 	@GetMapping("/{id}/followedUsers")
-	public ResponseEntity<List<UserResponseDTO>> findFollowedUsersById(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<List<UserResponseDTO>> findFollowedUsersById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findFollowedUsersById(id));
 	}
 	
 	@GetMapping("/{id}/followers")
-	public ResponseEntity<List<UserResponseDTO>> findFollowersById(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<List<UserResponseDTO>> findFollowersById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findFollowersById(id)); 
 	}
 	
@@ -55,27 +55,27 @@ public class UserController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<UserResponseDTO> findById(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<UserResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<UserResponseDTO> saveUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException {
+	public ResponseEntity<UserResponseDTO> saveUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		return new ResponseEntity<>(service.saveUser(request), HttpStatus.CREATED);
 	}
 	
 	@PostMapping("/artist")
-	public ResponseEntity<UserResponseDTO> saveArtistUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException {
+	public ResponseEntity<UserResponseDTO> saveArtistUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		return new ResponseEntity<>(service.saveArtistUser(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable int id, @RequestBody @Valid UserRequestDTO request) throws NotFoundException {
+	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updateUser(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<UserResponseDTO> deleteUser(@PathVariable int id) throws NotFoundException {
+	public ResponseEntity<UserResponseDTO> deleteUser(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteUser(id));
 	}
 }
