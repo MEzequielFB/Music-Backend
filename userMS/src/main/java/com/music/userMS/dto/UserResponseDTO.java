@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 public class UserResponseDTO {
-	private int id;
+	private Integer id;
 	private String username;
 	private String email;
-	private int role;
+	private Integer role;
 	
 	public UserResponseDTO(User user) {
 		this.id = user.getId();

@@ -44,7 +44,6 @@ public class UserController {
 		return ResponseEntity.ok(service.findFollowersById(id)); 
 	}
 	
-	//@PostMapping("/user/{userId}/follow/{followedUserId}")
 	@PostMapping("/follow")
 	public ResponseEntity<UserFollowerResponseDTO> followUser(@RequestBody @Valid FollowRequestDTO request) throws NotFoundException {
 		return new ResponseEntity<>(userFollowerService.followUser(request), HttpStatus.CREATED);
@@ -63,6 +62,11 @@ public class UserController {
 	@PostMapping("")
 	public ResponseEntity<UserResponseDTO> saveUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException {
 		return new ResponseEntity<>(service.saveUser(request), HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/artist")
+	public ResponseEntity<UserResponseDTO> saveArtistUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException {
+		return new ResponseEntity<>(service.saveArtistUser(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")

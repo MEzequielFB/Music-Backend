@@ -1,4 +1,4 @@
-package com.music.musicMS.dto;
+package com.music.userMS.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

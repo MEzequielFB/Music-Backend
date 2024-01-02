@@ -53,13 +53,12 @@ public class ArtistService {
 		return new ArtistResponseDTO(repository.save(artist));
 	}
 	
+	// REMOVE IT (?
 	@Transactional
 	public ArtistResponseDTO updateArtist(int id, ArtistRequestDTO request) throws NotFoundException {
 		Optional<Artist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Artist artist = optional.get();
-			artist.setName(request.getName());
-			artist.setPassword(request.getPassword());
 			
 			return new ArtistResponseDTO(repository.save(artist));
 		} else {

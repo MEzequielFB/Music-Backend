@@ -71,7 +71,7 @@ public class PlaylistControllerTest {
 	@Test
 	public void getSongsFromPlaylistTest() throws NotFoundException {
 		Genre genre = new Genre(1, "rock", List.of());
-		Artist artist = new Artist(1, "artist1", "pass123", List.of(), List.of(), List.of());
+		Artist artist = new Artist(1, 1, "artist1", List.of(), List.of(), List.of());
 		List<SongResponseDTO> songsResponseMock = List.of(new SongResponseDTO(1, "song1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre))));
 		
 		when(service.getSongsFromPlaylist(1)).thenReturn(songsResponseMock);
@@ -113,7 +113,7 @@ public class PlaylistControllerTest {
 	@Test
 	public void addSongTest() throws NotFoundException, AlreadyContainsSongException {
 		Genre genre = new Genre(1, "rock", List.of());
-		Artist artist = new Artist(1, "artist1", "pass123", List.of(), List.of(), List.of());
+		Artist artist = new Artist(1, 1, "artist1", List.of(), List.of(), List.of());
 		AddSongRequestDTO songRequestMock = new AddSongRequestDTO(1);
 		SongResponseDTO songResponseMock = new SongResponseDTO(1, "song1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre)));
 		

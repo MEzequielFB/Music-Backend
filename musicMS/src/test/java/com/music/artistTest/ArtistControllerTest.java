@@ -40,7 +40,6 @@ public class ArtistControllerTest {
 			.build();
 		this.artistRequestMock = ArtistRequestDTO.builder()
 			.name("artist1")
-			.password("asd123")
 			.build();
 	}
 	

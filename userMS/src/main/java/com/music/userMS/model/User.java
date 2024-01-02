@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	
 	@Column(nullable = false)
 	private String username;
@@ -33,7 +33,7 @@ public class User {
 	private String password;
 	
 	@Column(nullable = false)
-	private int role;
+	private Integer role;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "user")
 	private List<UserFollowers> followers;
