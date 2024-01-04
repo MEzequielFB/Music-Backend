@@ -45,7 +45,7 @@ public class SongControllerTest {
 				.build();
 		this.songRequestMock = SongRequestDTO.builder()
 				.name("song1")
-				.album(null)
+				.albumId(null)
 				.artists(List.of(1))
 				.genres(List.of(1))
 				.build();
@@ -73,7 +73,7 @@ public class SongControllerTest {
 	}
 	
 	@Test
-	public void saveSongTest() throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
+	public void saveSongTest() throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException {
 		when(service.saveSong(songRequestMock)).thenReturn(songResponseMock);
 		
 		ResponseEntity<SongResponseDTO> responseEntity = controller.saveSong(songRequestMock);

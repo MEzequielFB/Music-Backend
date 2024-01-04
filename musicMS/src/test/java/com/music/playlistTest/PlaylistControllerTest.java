@@ -72,7 +72,7 @@ public class PlaylistControllerTest {
 	public void getSongsFromPlaylistTest() throws NotFoundException {
 		Genre genre = new Genre(1, "rock", List.of());
 		Artist artist = new Artist(1, 1, "artist1", List.of(), List.of(), List.of());
-		List<SongResponseDTO> songsResponseMock = List.of(new SongResponseDTO(1, "song1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre))));
+		List<SongResponseDTO> songsResponseMock = List.of(new SongResponseDTO(1, "song1", 5, 120, "album1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre))));
 		
 		when(service.getSongsFromPlaylist(1)).thenReturn(songsResponseMock);
 		
@@ -115,7 +115,7 @@ public class PlaylistControllerTest {
 		Genre genre = new Genre(1, "rock", List.of());
 		Artist artist = new Artist(1, 1, "artist1", List.of(), List.of(), List.of());
 		AddSongRequestDTO songRequestMock = new AddSongRequestDTO(1);
-		SongResponseDTO songResponseMock = new SongResponseDTO(1, "song1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre)));
+		SongResponseDTO songResponseMock = new SongResponseDTO(1, "song1", 5, 120, "album1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre)));
 		
 		when(service.addSong(1, songRequestMock)).thenReturn(songResponseMock);
 		

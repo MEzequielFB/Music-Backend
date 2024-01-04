@@ -48,7 +48,7 @@ public class SongController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<SongResponseDTO> saveSong(@RequestBody @Valid SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
+	public ResponseEntity<SongResponseDTO> saveSong(@RequestBody @Valid SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException {
 		return new ResponseEntity<>(service.saveSong(request), HttpStatus.CREATED);
 	}
 	

@@ -2,7 +2,6 @@ package com.music.musicMS.model;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.music.musicMS.dto.SongRequestDTO;
@@ -36,6 +35,12 @@ public class Song {
 	@Column(nullable = false)
 	private Date releaseDate;
 	
+	@Column(nullable = false)
+	private Integer reproductions;
+	
+	@Column(nullable = false)
+	private Integer duration;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Album album;
 	
@@ -54,9 +59,10 @@ public class Song {
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "songs")
 	private List<Playlist> playlists;
 	
-	public Song(SongRequestDTO request) {
+	public Song(SongRequestDTO request, Album album) {
 		this.name = request.getName();
-		this.album = request.getAlbum();
-//		this.artists = new LinkedList<>();
+		this.reproductions = 0;
+		this.duration = request.getDuration();
+		this.album = album;
 	}
 }

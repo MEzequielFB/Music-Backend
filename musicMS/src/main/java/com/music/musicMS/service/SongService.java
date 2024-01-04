@@ -13,9 +13,11 @@ import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
+import com.music.musicMS.model.Album;
 import com.music.musicMS.model.Artist;
 import com.music.musicMS.model.Genre;
 import com.music.musicMS.model.Song;
+import com.music.musicMS.repository.AlbumRepository;
 import com.music.musicMS.repository.ArtistRepository;
 import com.music.musicMS.repository.GenreRepository;
 import com.music.musicMS.repository.SongRepository;
@@ -31,6 +33,9 @@ public class SongService {
 	
 	@Autowired
 	private ArtistRepository artistRepository;
+	
+	@Autowired
+	private AlbumRepository albumRepository;
 	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> searchSongs(String name, List<String> genres, List<Integer> years) {
@@ -88,8 +93,20 @@ public class SongService {
 	}
 	
 	@Transactional
-	public SongResponseDTO saveSong(SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
+	public SongResponseDTO saveSong(SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException {
 		Optional<Song> optional = repository.findByArtistsAndName(request.getArtists(), request.getName());
+		Optional<Album> albumOptional = null;
+		Album album = null;
+		
+		if (request.getAlbumId() != null) {
+			albumOptional = albumRepository.findById(request.getAlbumId());
+			
+			if (!albumOptional.isPresent()) {
+				throw new NotFoundException("Album", request.getAlbumId());
+			}
+			
+			album = albumOptional.get();
+		}
 		
 		if (optional.isPresent()) {
 			throw new NameAlreadyUsedException("Song", request.getName());
@@ -107,7 +124,7 @@ public class SongService {
 			throw new SomeEntityDoesNotExistException("genres");
 		}
 		
-		Song song = new Song(request);
+		Song song = new Song(request, album);
 		song.setGenres(genres);
 		song.setArtists(artists);
 		
@@ -122,33 +139,38 @@ public class SongService {
 	@Transactional
 	public SongResponseDTO updateSong(int id, SongRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
 		Optional<Song> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Song song = optional.get();
-			song.setName(request.getName());
-			song.setAlbum(request.getAlbum());
-			
-			List<Artist> artists = artistRepository.findAllById(request.getArtists());
-			
-			if (artists.size() != request.getArtists().size()) {
-				throw new SomeEntityDoesNotExistException("artists");
-			}
-			
-			song.setArtists(artists);
-			
-			List<Genre> genres = genreRepository.findAllById(request.getGenres());
-			
-			if (genres.size() != request.getGenres().size()) {
-				throw new SomeEntityDoesNotExistException("genres");
-			}
-			song.setGenres(genres);
-			
-			SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
-			
-			return responseDTO;
-
-		} else {
+		Optional<Album> albumOptional = albumRepository.findById(request.getAlbumId());
+		
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Song", id);
 		}
+		if (!albumOptional.isPresent()) {
+			throw new NotFoundException("Album", request.getAlbumId());
+		}
+
+		Song song = optional.get();
+		Album album = albumOptional.get();
+		song.setName(request.getName());
+		song.setAlbum(album);
+		
+		List<Artist> artists = artistRepository.findAllById(request.getArtists());
+		
+		if (artists.size() != request.getArtists().size()) {
+			throw new SomeEntityDoesNotExistException("artists");
+		}
+		
+		song.setArtists(artists);
+		
+		List<Genre> genres = genreRepository.findAllById(request.getGenres());
+		
+		if (genres.size() != request.getGenres().size()) {
+			throw new SomeEntityDoesNotExistException("genres");
+		}
+		song.setGenres(genres);
+		
+		SongResponseDTO responseDTO = new SongResponseDTO(repository.save(song));
+		
+		return responseDTO;
 	}
 	
 	@Transactional
