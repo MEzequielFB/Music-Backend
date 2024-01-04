@@ -16,6 +16,7 @@ import com.music.userMS.dto.UserResponseDTO;
 import com.music.userMS.exception.EmailAlreadyUsedException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.model.Role;
+import com.music.userMS.model.Roles;
 import com.music.userMS.model.User;
 import com.music.userMS.repository.RoleRepository;
 import com.music.userMS.repository.UserRepository;
@@ -85,10 +86,10 @@ public class UserService {
 	@Transactional
 	public UserResponseDTO saveUser(UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());
-		Optional<Role> roleOptional = roleRepository.findByName(request.getRole());
+		Optional<Role> roleOptional = roleRepository.findByName(Roles.USER);
 		
 		if (!roleOptional.isPresent()) {
-			throw new NotFoundException("Role", request.getRole());
+			throw new NotFoundException("Role", Roles.USER.toLowerCase());
 		}
 		if (optional.isPresent()) {
 			throw new EmailAlreadyUsedException(request.getEmail());
@@ -103,10 +104,10 @@ public class UserService {
 	@Transactional
 	public UserResponseDTO saveArtistUser(UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());
-		Optional<Role> roleOptional = roleRepository.findByName(request.getRole());
+		Optional<Role> roleOptional = roleRepository.findByName(Roles.ARTIST);
 		
 		if (!roleOptional.isPresent()) {
-			throw new NotFoundException("Role", request.getRole());
+			throw new NotFoundException("Role", Roles.ARTIST.toLowerCase());
 		}
 		if (optional.isPresent()) {
 			throw new EmailAlreadyUsedException(request.getEmail());

@@ -1,6 +1,5 @@
 package com.music.userMS.dto;
 
-import com.music.userMS.model.Role;
 import com.music.userMS.model.User;
 
 import lombok.Data;
@@ -10,12 +9,12 @@ public class UserResponseDTO {
 	private Integer id;
 	private String username;
 	private String email;
-	private Role role;
+	private String role;
 	
 	public UserResponseDTO(User user) {
 		this.id = user.getId();
 		this.username = user.getUsername();
 		this.email = user.getEmail();
-		this.role = user.getRole();
+		this.role = user.getRole().getName();
 	}
 }
