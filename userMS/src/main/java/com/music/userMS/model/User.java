@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
@@ -41,6 +42,9 @@ public class User {
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "follower")
 	private List<UserFollowers> followedUsers;
+	
+	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
+	private List<Account> accounts;
 	
 	public User(UserRequestDTO request, Role role) {
 		this.username = request.getUsername();
