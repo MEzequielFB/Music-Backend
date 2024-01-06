@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.music.userMS.dto.AccountRequestDTO;
 import com.music.userMS.dto.AccountResponseDTO;
+import com.music.userMS.dto.BalanceDTO;
 import com.music.userMS.dto.UserIdDTO;
 import com.music.userMS.exception.AlreadyContainsException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
+import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.exception.SomeEntityDoesNotExistException;
 import com.music.userMS.service.AccountService;
@@ -54,6 +56,16 @@ public class AccountController {
 	@PutMapping("/{id}/removeUser")
 	public ResponseEntity<AccountResponseDTO> removeUser(@PathVariable Integer id, @RequestBody @Valid UserIdDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.removeUser(id, request.getUserId()));
+	}
+	
+	@PutMapping("/{id}/addBalance")
+	public ResponseEntity<AccountResponseDTO> addBalance(@PathVariable Integer id, @RequestBody @Valid BalanceDTO request) throws NotFoundException {
+		return ResponseEntity.ok(service.addBalance(id, request));
+	}
+	
+	@PutMapping("/{id}/removeBalance")
+	public ResponseEntity<AccountResponseDTO> removeBalance(@PathVariable Integer id, @RequestBody @Valid BalanceDTO request) throws NotFoundException, NotEnoughBalanceException {
+		return ResponseEntity.ok(service.removeBalance(id, request));
 	}
 	
 	@DeleteMapping("/{id}")

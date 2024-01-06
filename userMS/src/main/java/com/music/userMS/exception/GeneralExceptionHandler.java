@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(NotEnoughBalanceException.class)
+	public ResponseEntity<String> handleNotEnoughBalanceException(NotEnoughBalanceException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(MultipleUsersLinkedToAccountException.class)
 	public ResponseEntity<String> handleMultipleUsersLinkedToAccountException(MultipleUsersLinkedToAccountException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

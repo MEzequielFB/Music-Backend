@@ -10,14 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.music.userMS.dto.AccountRequestDTO;
 import com.music.userMS.dto.AccountResponseDTO;
+import com.music.userMS.dto.BalanceDTO;
 import com.music.userMS.exception.AlreadyContainsException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
+import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.exception.SomeEntityDoesNotExistException;
 import com.music.userMS.model.Account;
 import com.music.userMS.model.User;
 import com.music.userMS.repository.AccountRepository;
 import com.music.userMS.repository.UserRepository;
+
+import jakarta.validation.Valid;
 
 @Service(value = "accountService")
 public class AccountService {
@@ -102,6 +106,40 @@ public class AccountService {
 		account.removeUser(user);
 		
 		return new AccountResponseDTO(repository.save(account));
+	}
+	
+	@Transactional
+	public AccountResponseDTO addBalance(Integer id, BalanceDTO request) throws NotFoundException {
+		Optional<Account> optional = repository.findById(id);
+		if (optional.isPresent()) {
+			Account account = optional.get();
+			Double newBalance = Math.round(( account.getBalance() + request.getBalance() ) * 100.0) / 100.0;
+			
+			account.setBalance(newBalance);
+			
+			return new AccountResponseDTO(repository.save(account));
+		} else {
+			throw new NotFoundException("Account", id);
+		}
+	}
+	
+	@Transactional
+	public AccountResponseDTO removeBalance(Integer id, BalanceDTO request) throws NotFoundException, NotEnoughBalanceException {
+		Optional<Account> optional = repository.findById(id);
+		if (optional.isPresent()) {
+			Account account = optional.get();
+			
+			if (account.getBalance() > 0) {
+				Double newBalance = Math.round(( account.getBalance() - request.getBalance() ) * 100.0) / 100.0;
+				account.setBalance(newBalance);
+			} else {
+				throw new NotEnoughBalanceException(id);
+			}
+			
+			return new AccountResponseDTO(repository.save(account));
+		} else {
+			throw new NotFoundException("Account", id);
+		}
 	}
 	
 	// Delete just when it has zero or one users linked
