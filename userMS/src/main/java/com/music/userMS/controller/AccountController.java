@@ -3,6 +3,7 @@ package com.music.userMS.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +46,7 @@ public class AccountController {
 	
 	@PostMapping("")
 	public ResponseEntity<AccountResponseDTO> saveAccount(@RequestBody @Valid AccountRequestDTO request) throws SomeEntityDoesNotExistException {
-		return ResponseEntity.ok(service.saveAccount(request));
+		return new ResponseEntity<AccountResponseDTO>(service.saveAccount(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}/addUser")

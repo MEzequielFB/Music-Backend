@@ -2,9 +2,15 @@ package com.music.userMS.dto;
 
 import com.music.userMS.model.User;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserResponseDTO {
 	private Integer id;
 	private String username;

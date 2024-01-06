@@ -21,8 +21,6 @@ import com.music.userMS.model.User;
 import com.music.userMS.repository.AccountRepository;
 import com.music.userMS.repository.UserRepository;
 
-import jakarta.validation.Valid;
-
 @Service(value = "accountService")
 public class AccountService {
 
