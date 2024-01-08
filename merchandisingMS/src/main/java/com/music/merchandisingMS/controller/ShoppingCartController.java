@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.merchandisingMS.dto.ProductIdDTO;
+import com.music.merchandisingMS.dto.ProductQuantityRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
@@ -46,9 +47,12 @@ public class ShoppingCartController {
 		return new ResponseEntity<>(service.saveShoppingCart(request), HttpStatus.CREATED);
 	}
 	
-	// ADD PRODUCT CON CANTIDAD DTO
+	@PutMapping("/{id}/addProduct")
+	public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Integer id, @RequestBody @Valid ProductQuantityRequestDTO request) throws NotFoundException {
+		return ResponseEntity.ok(service.addProduct(id, request));
+	}
 	
-	@PutMapping("/{id}")
+	@PutMapping("/{id}/removeProduct")
 	public ResponseEntity<ShoppingCartResponseDTO> removeProduct(@PathVariable Integer id, @RequestBody @Valid ProductIdDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.removeProduct(id, request.getProductId()));
 	}

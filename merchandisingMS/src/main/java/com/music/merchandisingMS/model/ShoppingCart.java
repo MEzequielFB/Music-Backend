@@ -46,11 +46,18 @@ public class ShoppingCart {
 		this.products = products;
 	}
 	
-	public void addProduct(Product product) {
-		products.add(product);
+	public void addProduct(Product product, Integer quantity) {
+		for (int i = 0; i < quantity; i++) {
+			products.add(product);
+		}
 	}
 	
-	public void removeProduct(Product product) {
-		products.remove(product);
+	public Integer removeProduct(Product product) {
+		Integer i = 0;
+		while (products.contains(product)) {
+			products.remove(product);
+			i++;
+		}
+		return i;
 	}
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.music.merchandisingMS.dto.ProductQuantityRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
@@ -64,21 +65,22 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO addProduct(Integer id, Integer productId) throws NotFoundException {
+	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request) throws NotFoundException {
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
 		}
 		
-		Optional<Product> productOptional = productRepository.findById(productId);
+		Optional<Product> productOptional = productRepository.findById(request.getProductId());
 		if (!productOptional.isPresent()) {
-			throw new NotFoundException("Product", productId);
+			throw new NotFoundException("Product", request.getProductId());
 		}
 		
 		ShoppingCart shoppingCart = optional.get();
 		Product product = productOptional.get();
 		
-		shoppingCart.addProduct(product); // CUANDO TENGA LAS CANTIDADES CONTROLAR QUE YA EXISTA E INCREMENTAR
+		shoppingCart.addProduct(product, request.getQuantity());
+		shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() + product.getPrice() * request.getQuantity());
 		
 		return new ShoppingCartResponseDTO(repository.save(shoppingCart));
 	}
@@ -98,7 +100,8 @@ public class ShoppingCartService {
 		ShoppingCart shoppingCart = optional.get();
 		Product product = productOptional.get();
 		
-		shoppingCart.removeProduct(product); // BORRA DE UNA, SIN TENER EN CUENTA LAS CANTIDADES DE UN PRODUCTO
+		Integer removedQuantity = shoppingCart.removeProduct(product);
+		shoppingCart.setTotalPrice(shoppingCart.getTotalPrice() - product.getPrice() * removedQuantity);
 		
 		return new ShoppingCartResponseDTO(repository.save(shoppingCart));
 	}
