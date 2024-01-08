@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.music.merchandisingMS.dto.TagRequestDTO;
 import com.music.merchandisingMS.dto.TagResponseDTO;
@@ -19,12 +20,14 @@ public class TagService {
 	@Autowired
 	private TagRepository repository;
 	
+	@Transactional(readOnly = true)
 	public List<TagResponseDTO> findAll() {
 		return repository.findAll()
 				.stream()
 				.map( TagResponseDTO::new ).toList();
 	}
 	
+	@Transactional(readOnly = true)
 	public TagResponseDTO findById(Integer id) throws NotFoundException {
 		Optional<Tag> optional = repository.findById(id);
 		if (optional.isPresent()) {
@@ -35,6 +38,7 @@ public class TagService {
 		}
 	}
 	
+	@Transactional
 	public TagResponseDTO saveTag(TagRequestDTO request) throws NameAlreadyUsedException {
 		Optional<Tag> optional = repository.findByName(request.getName());
 		if (!optional.isPresent()) {
@@ -45,6 +49,7 @@ public class TagService {
 		}
 	}
 	
+	@Transactional
 	public TagResponseDTO updateTag(Integer id, TagRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
 		Optional<Tag> optional = repository.findById(id);
 		if (!optional.isPresent()) {
@@ -62,6 +67,7 @@ public class TagService {
 		return new TagResponseDTO(repository.save(tag));
 	}
 	
+	@Transactional
 	public TagResponseDTO deleteTag(Integer id) throws NotFoundException {
 		Optional<Tag> optional = repository.findById(id);
 		if (optional.isPresent()) {

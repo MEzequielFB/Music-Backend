@@ -3,6 +3,8 @@ package com.music.merchandisingMS.model;
 import java.util.Date;
 import java.util.List;
 
+import com.music.merchandisingMS.dto.OrderRequestDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,7 +35,7 @@ public class Order {
 	private Integer userId;
 	
 	@Column(nullable = false)
-	private Date date;
+	private Date createdAt;
 	
 	@Column(nullable = false)
 	private String shippingAddress;
@@ -52,4 +54,14 @@ public class Order {
 			joinColumns = {@JoinColumn(name = "order_id")},
 			inverseJoinColumns = {@JoinColumn(name = "product_id")})
 	private List<Product> products;
+	
+	public Order(OrderRequestDTO request, Status status, List<Product> products) {
+		this.userId = request.getUserId();
+		this.createdAt = new Date(System.currentTimeMillis());
+		this.shippingAddress = request.getShippingAddress();
+		this.deliveredDate = null;
+		this.totalPrice = request.getTotalPrice();
+		this.status = status;
+		this.products = products;
+	}
 }
