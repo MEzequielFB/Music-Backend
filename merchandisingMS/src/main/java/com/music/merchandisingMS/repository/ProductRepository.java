@@ -12,6 +12,11 @@ import com.music.merchandisingMS.model.Product;
 @Repository("productRepository")
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
+	@Query("SELECT SUM(p.price)"
+			+ " FROM Product p"
+			+ " WHERE p IN :products")
+	public Double getPriceOfProducts(List<Product> products);
+	
 	@Query("SELECT new com.music.merchandisingMS.dto.ProductResponseDTO(p)"
 			+ " FROM Product p"
 			+ " WHERE p.id IN :ids")

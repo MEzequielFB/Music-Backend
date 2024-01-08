@@ -19,6 +19,11 @@ public class GeneralExceptionHandler {
 		});
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(EntityWithUserIdAlreadyUsedException.class)
+	public ResponseEntity<String> handleEntityWithUserIdAlreadyUsedException(EntityWithUserIdAlreadyUsedException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 
 	@ExceptionHandler(NotFoundException.class)
 	public ResponseEntity<String> handleNotFoundException(NotFoundException e) {

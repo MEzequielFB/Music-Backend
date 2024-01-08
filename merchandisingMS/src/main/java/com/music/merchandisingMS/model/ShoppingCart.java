@@ -2,6 +2,8 @@ package com.music.merchandisingMS.model;
 
 import java.util.List;
 
+import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,4 +40,17 @@ public class ShoppingCart {
 			joinColumns = {@JoinColumn(name = "shopping_cart_id")},
 			inverseJoinColumns = {@JoinColumn(name = "product_id")})
 	private List<Product> products;
+	
+	public ShoppingCart(ShoppingCartRequestDTO request, List<Product> products) {
+		this.userId = request.getUserId();
+		this.products = products;
+	}
+	
+	public void addProduct(Product product) {
+		products.add(product);
+	}
+	
+	public void removeProduct(Product product) {
+		products.remove(product);
+	}
 }
