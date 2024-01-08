@@ -2,6 +2,8 @@ package com.music.merchandisingMS.model;
 
 import java.util.List;
 
+import com.music.merchandisingMS.dto.ProductRequestDTO;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -47,4 +49,12 @@ public class Product {
 	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "products")
 	private List<Order> orders;
+	
+	public Product(ProductRequestDTO request, List<Tag> tags) {
+		this.name = request.getName();
+		this.price = request.getPrice();
+		this.discount = 0;
+		this.stock = request.getStock();
+		this.tags = tags;
+	}
 }
