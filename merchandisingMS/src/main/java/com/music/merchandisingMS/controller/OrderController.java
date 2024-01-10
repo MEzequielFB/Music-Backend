@@ -46,8 +46,8 @@ public class OrderController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable Integer id, @RequestBody @Valid OrderStatusUpdateDTO request) {
-		return ResponseEntity.ok(null);
+	public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable Integer id, @RequestBody @Valid OrderStatusUpdateDTO request) throws NotFoundException {
+		return ResponseEntity.ok(service.updateOrderStatus(id, request));
 	}
 	
 	@DeleteMapping("/{id}")

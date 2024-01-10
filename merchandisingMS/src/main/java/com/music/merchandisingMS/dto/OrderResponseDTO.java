@@ -18,6 +18,7 @@ public class OrderResponseDTO {
 	private Integer id;
 	private UserDTO user;
 	private Date createdAt;
+	private Date deliveredDate;
 	private Double totalPrice;
 	private StatusResponseDTO status;
 	private List<ProductResponseDTO> products;
@@ -26,6 +27,7 @@ public class OrderResponseDTO {
 		this.id = order.getId();
 		this.user = user;
 		this.createdAt = order.getCreatedAt();
+		this.deliveredDate = order.getDeliveredDate();
 		this.totalPrice = order.getTotalPrice();
 		this.status = new StatusResponseDTO(order.getStatus());
 		this.products = order.getProducts().stream().map( ProductResponseDTO::new ).toList();
