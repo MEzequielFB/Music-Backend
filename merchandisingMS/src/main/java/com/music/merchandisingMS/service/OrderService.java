@@ -106,7 +106,8 @@ public class OrderService {
 			throw new NotFoundException("User", request.getUserId());
 		}
 		
-		Order order = new Order(request, status, products);
+		Double totalPrice = productRepository.getPriceOfProducts(products);
+		Order order = new Order(request, totalPrice, status, products);
 		return new OrderResponseDTO(repository.save(order), user);
 	}
 	

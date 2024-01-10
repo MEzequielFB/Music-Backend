@@ -15,12 +15,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "order_table") // Not 'order' because is a reserved keyword in most SQL databases, including MariaDB
 @Data
 @Builder
 @NoArgsConstructor
@@ -55,12 +57,12 @@ public class Order {
 			inverseJoinColumns = {@JoinColumn(name = "product_id")})
 	private List<Product> products;
 	
-	public Order(OrderRequestDTO request, Status status, List<Product> products) {
+	public Order(OrderRequestDTO request, Double totalPrice, Status status, List<Product> products) {
 		this.userId = request.getUserId();
 		this.createdAt = new Date(System.currentTimeMillis());
 		this.shippingAddress = request.getShippingAddress();
 		this.deliveredDate = null;
-		this.totalPrice = request.getTotalPrice();
+		this.totalPrice = totalPrice;
 		this.status = status;
 		this.products = products;
 	}

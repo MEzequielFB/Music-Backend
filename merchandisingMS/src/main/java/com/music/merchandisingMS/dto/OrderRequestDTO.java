@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,10 +24,6 @@ public class OrderRequestDTO {
 	@NotNull(message = "shippingAddress shouldn't be null")
 	@NotBlank(message = "shippingAddress shouldn't be blank")
 	private String shippingAddress;
-	
-	@NotNull(message = "totalPrice shouldn't be null")
-	@PositiveOrZero(message = "totalPrice should be positive or zero")
-	private Double totalPrice;
 	
 	@NotNull(message = "products shouldn't be null")
 	@NotEmpty(message = "products shouldn't be empty")
