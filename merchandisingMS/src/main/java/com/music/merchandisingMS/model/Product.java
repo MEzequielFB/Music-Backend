@@ -61,4 +61,8 @@ public class Product {
 		this.isDeleted = false;
 		this.tags = tags;
 	}
+	
+	public void removeTag(Tag tag) {
+		tags.remove(tag);
+	}
 }

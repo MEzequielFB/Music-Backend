@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.music.merchandisingMS.dto.TagRequestDTO;
 import com.music.merchandisingMS.dto.TagResponseDTO;
 import com.music.merchandisingMS.exception.NameAlreadyUsedException;
+import com.music.merchandisingMS.exception.NoTagsException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.service.TagService;
 
@@ -50,7 +51,7 @@ public class TagController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<TagResponseDTO> deleteTag(@PathVariable Integer id) throws NotFoundException {
+	public ResponseEntity<TagResponseDTO> deleteTag(@PathVariable Integer id) throws NotFoundException, NoTagsException {
 		return ResponseEntity.ok(service.deleteTag(id));
 	}
 }

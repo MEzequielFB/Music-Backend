@@ -10,8 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.music.merchandisingMS.dto.TagRequestDTO;
 import com.music.merchandisingMS.dto.TagResponseDTO;
 import com.music.merchandisingMS.exception.NameAlreadyUsedException;
+import com.music.merchandisingMS.exception.NoTagsException;
 import com.music.merchandisingMS.exception.NotFoundException;
+import com.music.merchandisingMS.model.Product;
 import com.music.merchandisingMS.model.Tag;
+import com.music.merchandisingMS.repository.ProductRepository;
 import com.music.merchandisingMS.repository.TagRepository;
 
 @Service("tagService")
@@ -19,6 +22,9 @@ public class TagService {
 
 	@Autowired
 	private TagRepository repository;
+	
+	@Autowired
+	private ProductRepository productRepository;
 	
 	@Transactional(readOnly = true)
 	public List<TagResponseDTO> findAll() {
@@ -68,10 +74,21 @@ public class TagService {
 	}
 	
 	@Transactional
-	public TagResponseDTO deleteTag(Integer id) throws NotFoundException {
+	public TagResponseDTO deleteTag(Integer id) throws NotFoundException, NoTagsException {
 		Optional<Tag> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Tag tag = optional.get();
+			
+			Integer productsQuantity = productRepository.getProductQuantityByTagAndTagsSize(tag, 1);
+			if (productsQuantity > 0) {
+				throw new NoTagsException(tag.getName());
+			}
+			
+			List<Product> products = productRepository.findAllByTag(tag);
+			for (Product product : products) {
+				product.removeTag(tag);
+			}
+			
 			repository.deleteById(id);
 			
 			return new TagResponseDTO(tag);
