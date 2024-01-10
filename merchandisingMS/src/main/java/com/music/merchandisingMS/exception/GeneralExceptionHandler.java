@@ -20,6 +20,11 @@ public class GeneralExceptionHandler {
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(DeletedEntityException.class)
+	public ResponseEntity<String> handleDeletedEntityException(DeletedEntityException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+	}
+	
 	@ExceptionHandler(EntityWithUserIdAlreadyUsedException.class)
 	public ResponseEntity<String> handleEntityWithUserIdAlreadyUsedException(EntityWithUserIdAlreadyUsedException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

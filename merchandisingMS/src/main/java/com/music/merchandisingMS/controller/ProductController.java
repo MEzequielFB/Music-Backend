@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.music.merchandisingMS.dto.ProductRequestDTO;
 import com.music.merchandisingMS.dto.ProductResponseDTO;
+import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.NameAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
@@ -35,8 +36,13 @@ public class ProductController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
+	@GetMapping("/deleted")
+	public ResponseEntity<List<ProductResponseDTO>> findAllDeletedProducts() {
+		return ResponseEntity.ok(service.findAllDeletedProducts());
+	}
+	
 	@GetMapping("/{id}")
-	public ResponseEntity<ProductResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
+	public ResponseEntity<ProductResponseDTO> findById(@PathVariable Integer id) throws NotFoundException, DeletedEntityException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
@@ -46,12 +52,12 @@ public class ProductController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id, @RequestBody @Valid ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
+	public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id, @RequestBody @Valid ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, DeletedEntityException {
 		return ResponseEntity.ok(service.updateProduct(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ProductResponseDTO> deleteProduct(@PathVariable Integer id) throws NotFoundException {
+	public ResponseEntity<ProductResponseDTO> deleteProduct(@PathVariable Integer id) throws NotFoundException, DeletedEntityException {
 		return ResponseEntity.ok(service.deleteProduct(id));
 	}
 }

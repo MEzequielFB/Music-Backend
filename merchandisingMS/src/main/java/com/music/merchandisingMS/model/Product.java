@@ -41,6 +41,9 @@ public class Product {
 	@Column(nullable = false)
 	private Integer stock;
 	
+	@Column(nullable = false)
+	private Boolean isDeleted;
+	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "product_id")},
@@ -55,6 +58,7 @@ public class Product {
 		this.price = request.getPrice();
 		this.discount = 0;
 		this.stock = request.getStock();
+		this.isDeleted = false;
 		this.tags = tags;
 	}
 }

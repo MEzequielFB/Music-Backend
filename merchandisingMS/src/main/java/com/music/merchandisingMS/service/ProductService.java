@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.music.merchandisingMS.dto.ProductRequestDTO;
 import com.music.merchandisingMS.dto.ProductResponseDTO;
+import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.NameAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
@@ -28,20 +29,31 @@ public class ProductService {
 	
 	@Transactional(readOnly = true)
 	public List<ProductResponseDTO> findAll() {
-		return repository.findAll()
+		return repository.findAllByNotDeleted()
 				.stream()
 				.map( ProductResponseDTO::new ).toList();
 	}
 	
 	@Transactional(readOnly = true)
-	public ProductResponseDTO findById(Integer id) throws NotFoundException {
+	public List<ProductResponseDTO> findAllDeletedProducts() {
+		return repository.findAllByDeleted()
+				.stream()
+				.map( ProductResponseDTO::new ).toList();
+	}
+	
+	@Transactional(readOnly = true)
+	public ProductResponseDTO findById(Integer id) throws NotFoundException, DeletedEntityException {
 		Optional<Product> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Product product = optional.get();
-			return new ProductResponseDTO(product);
-		} else {
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Product", id);
 		}
+		
+		Product product = optional.get();
+		if (product.getIsDeleted()) {
+			throw new DeletedEntityException("Product", product.getName());
+		}
+		
+		return new ProductResponseDTO(product);
 	}
 	
 	@Transactional
@@ -61,10 +73,15 @@ public class ProductService {
 	}
 	
 	@Transactional
-	public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
+	public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, DeletedEntityException {
 		Optional<Product> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Product", id);
+		}
+		
+		Product product = optional.get();
+		if (product.getIsDeleted()) {
+			throw new DeletedEntityException("Product", product.getName());
 		}
 		
 		List<Tag> tags = tagRepository.findAllByIds(request.getTags());
@@ -72,7 +89,6 @@ public class ProductService {
 			throw new SomeEntityDoesNotExistException("tags");
 		}
 		
-		Product product = optional.get();
 		product.setName(request.getName());
 		product.setPrice(request.getPrice());
 		product.setStock(request.getStock());
@@ -81,16 +97,20 @@ public class ProductService {
 		return new ProductResponseDTO(repository.save(product));
 	}
 	
-	@Transactional
-	public ProductResponseDTO deleteProduct(Integer id) throws NotFoundException {
+	@Transactional // Logic delete because cannot delete referenced products on Order
+	public ProductResponseDTO deleteProduct(Integer id) throws NotFoundException, DeletedEntityException {
 		Optional<Product> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Product product = optional.get();
-			repository.deleteById(id);
-			
-			return new ProductResponseDTO(product);
-		} else {
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Product", id);
 		}
+		
+		Product product = optional.get();
+		if (product.getIsDeleted()) {
+			throw new DeletedEntityException("Product", product.getName());
+		}
+		
+		product.setIsDeleted(true);
+		
+		return new ProductResponseDTO(repository.save(product));
 	}
 }
