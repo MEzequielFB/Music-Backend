@@ -42,6 +42,21 @@ public class ProductService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<ProductResponseDTO> findAllByTag(String tagName) throws NotFoundException {
+		Optional<Tag> tagOptional = tagRepository.findByName(tagName);
+		if (tagOptional.isPresent()) {
+			Tag tag = tagOptional.get();
+			
+			return repository.findAllByTag(tag)
+					.stream()
+					.map( ProductResponseDTO::new )
+					.toList();
+		} else {
+			throw new NotFoundException("Tag", tagName);
+		}
+	}
+	
+	@Transactional(readOnly = true)
 	public ProductResponseDTO findById(Integer id) throws NotFoundException, DeletedEntityException {
 		Optional<Product> optional = repository.findById(id);
 		if (!optional.isPresent()) {

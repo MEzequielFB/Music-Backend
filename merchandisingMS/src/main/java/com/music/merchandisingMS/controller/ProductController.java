@@ -46,6 +46,11 @@ public class ProductController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
+	@GetMapping("/tag/{tagName}")
+	public ResponseEntity<List<ProductResponseDTO>> findAllByTag(@PathVariable String tagName) throws NotFoundException {
+		return ResponseEntity.ok(service.findAllByTag(tagName));
+	}
+	
 	@PostMapping("")
 	public ResponseEntity<ProductResponseDTO> saveProduct(@RequestBody @Valid ProductRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException {
 		return new ResponseEntity<>(service.saveProduct(request), HttpStatus.CREATED);

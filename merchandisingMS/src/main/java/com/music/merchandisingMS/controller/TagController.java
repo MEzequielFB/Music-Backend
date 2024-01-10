@@ -36,7 +36,7 @@ public class TagController {
 	}
 	
 	@GetMapping("/{id}")
-	public  ResponseEntity<TagResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
+	public ResponseEntity<TagResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
