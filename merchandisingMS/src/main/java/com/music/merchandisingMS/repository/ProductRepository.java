@@ -17,7 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			+ " WHERE p IN :products")
 	public Double getPriceOfProducts(List<Product> products);
 	
-	@Query("SELECT new com.music.merchandisingMS.dto.ProductResponseDTO(p)"
+	@Query("SELECT p"
 			+ " FROM Product p"
 			+ " WHERE p.id IN :ids")
 	public List<Product> findAllByIds(List<Integer> ids);
