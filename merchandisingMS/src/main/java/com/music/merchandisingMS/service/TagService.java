@@ -51,14 +51,14 @@ public class TagService {
 	
 	@Transactional
 	public TagResponseDTO updateTag(Integer id, TagRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
-		Optional<Tag> optional = repository.findById(id);
-		if (!optional.isPresent()) {
-			throw new NotFoundException("Tag", id);
-		}
-		
-		optional = repository.findByName(request.getName());
+		Optional<Tag> optional = repository.findByName(request.getName());
 		if (optional.isPresent()) {
 			throw new NameAlreadyUsedException("Tag", request.getName());
+		}
+		
+		optional = repository.findById(id);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Tag", id);
 		}
 		
 		Tag tag = optional.get();
