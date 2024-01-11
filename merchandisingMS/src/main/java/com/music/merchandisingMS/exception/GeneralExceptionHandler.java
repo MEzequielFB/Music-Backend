@@ -1,5 +1,6 @@
 package com.music.merchandisingMS.exception;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,11 @@ public class GeneralExceptionHandler {
 			errors.put(error.getField(), error.getDefaultMessage());
 		});
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+	public ResponseEntity<String> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoTagsException.class)

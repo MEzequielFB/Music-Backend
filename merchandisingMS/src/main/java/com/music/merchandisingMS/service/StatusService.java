@@ -1,5 +1,6 @@
 package com.music.merchandisingMS.service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +69,7 @@ public class StatusService {
 	}
 	
 	@Transactional
-	public StatusResponseDTO deleteStatus(Integer id) throws NotFoundException {
+	public StatusResponseDTO deleteStatus(Integer id) throws NotFoundException, SQLIntegrityConstraintViolationException {
 		Optional<Status> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Status status = optional.get();

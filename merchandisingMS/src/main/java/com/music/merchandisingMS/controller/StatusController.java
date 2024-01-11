@@ -1,5 +1,6 @@
 package com.music.merchandisingMS.controller;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class StatusController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<StatusResponseDTO> deleteStatus(@PathVariable Integer id) throws NotFoundException {
+	public ResponseEntity<StatusResponseDTO> deleteStatus(@PathVariable Integer id) throws NotFoundException, SQLIntegrityConstraintViolationException {
 		return ResponseEntity.ok(service.deleteStatus(id));
 	}
 }
