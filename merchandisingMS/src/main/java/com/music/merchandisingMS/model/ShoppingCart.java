@@ -47,17 +47,28 @@ public class ShoppingCart {
 	}
 	
 	public void addProduct(Product product, Integer quantity) {
+		Double totalPlusPrice = 0.0;
+		
 		for (int i = 0; i < quantity; i++) {
 			products.add(product);
+			totalPlusPrice += product.getPrice() * (1.0 - (product.getDiscount() / 100));
 		}
+		
+		setTotalPrice(Math.round((totalPrice + totalPlusPrice) * 100.0) / 100.0);
 	}
 	
 	public Integer removeProduct(Product product) {
 		Integer i = 0;
+		Double totalMinusPrice = 0.0;
+		
 		while (products.contains(product)) {
 			products.remove(product);
+			
+			totalMinusPrice += product.getPrice() * (1.0 - (product.getDiscount() / 100));
 			i++;
 		}
+		
+		setTotalPrice(Math.round((totalPrice - totalMinusPrice) * 100.0) / 100.0);
 		return i;
 	}
 	

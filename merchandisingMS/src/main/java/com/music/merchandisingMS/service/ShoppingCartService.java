@@ -162,11 +162,11 @@ public class ShoppingCartService {
 			throw new NotFoundException("User", shoppingCart.getUserId());
 		}
 		
-		Double plusPrice = (product.getPrice() * request.getQuantity()) * (1.0 - (product.getDiscount() / 100));
-		Double totalPrice =  Math.round((shoppingCart.getTotalPrice() + plusPrice) * 100.0) / 100.0;
+//		Double plusPrice = (product.getPrice() * request.getQuantity()) * (1.0 - (product.getDiscount() / 100));
+//		Double totalPrice =  Math.round((shoppingCart.getTotalPrice() + plusPrice) * 100.0) / 100.0;
 		
 		shoppingCart.addProduct(product, request.getQuantity());
-		shoppingCart.setTotalPrice(totalPrice);
+//		shoppingCart.setTotalPrice(totalPrice);
 		
 		return new ShoppingCartResponseDTO(repository.save(shoppingCart), user);
 	}
@@ -198,12 +198,13 @@ public class ShoppingCartService {
 			throw new NotFoundException("User", shoppingCart.getUserId());
 		}
 		
-		Integer removedQuantity = shoppingCart.removeProduct(product);
-		
-		Double minusPrice = (product.getPrice() * removedQuantity) * (1.0 - (product.getDiscount() / 100));
-		Double totalPrice =  Math.round((shoppingCart.getTotalPrice() - minusPrice) * 100.0) / 100.0;
-		
-		shoppingCart.setTotalPrice(totalPrice);
+		shoppingCart.removeProduct(product);
+//		Integer removedQuantity = shoppingCart.removeProduct(product);
+//		
+//		Double minusPrice = (product.getPrice() * removedQuantity) * (1.0 - (product.getDiscount() / 100));
+//		Double totalPrice =  Math.round((shoppingCart.getTotalPrice() - minusPrice) * 100.0) / 100.0;
+//		
+//		shoppingCart.setTotalPrice(totalPrice);
 		
 		return new ShoppingCartResponseDTO(repository.save(shoppingCart), user);
 	}

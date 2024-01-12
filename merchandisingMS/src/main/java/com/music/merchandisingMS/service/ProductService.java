@@ -130,8 +130,9 @@ public class ProductService {
 		}
 		
 		List<ShoppingCart> shoppingCarts = shoppingCartRepository.findAllByProduct(product);
-		for (ShoppingCart shoppinCart : shoppingCarts) {
-			shoppinCart.removeProduct(product);
+		for (ShoppingCart shoppingCart : shoppingCarts) {
+			shoppingCart.removeProduct(product);
+			shoppingCartRepository.save(shoppingCart);
 		}
 		
 		product.setIsDeleted(true);
