@@ -14,8 +14,10 @@ import com.music.merchandisingMS.exception.NameAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
 import com.music.merchandisingMS.model.Product;
+import com.music.merchandisingMS.model.ShoppingCart;
 import com.music.merchandisingMS.model.Tag;
 import com.music.merchandisingMS.repository.ProductRepository;
+import com.music.merchandisingMS.repository.ShoppingCartRepository;
 import com.music.merchandisingMS.repository.TagRepository;
 
 @Service("productService")
@@ -26,6 +28,9 @@ public class ProductService {
 	
 	@Autowired
 	private TagRepository tagRepository;
+	
+	@Autowired
+	private ShoppingCartRepository shoppingCartRepository;
 	
 	@Transactional(readOnly = true)
 	public List<ProductResponseDTO> findAll() {
@@ -122,6 +127,11 @@ public class ProductService {
 		Product product = optional.get();
 		if (product.getIsDeleted()) {
 			throw new DeletedEntityException("Product", product.getName());
+		}
+		
+		List<ShoppingCart> shoppingCarts = shoppingCartRepository.findAllByProduct(product);
+		for (ShoppingCart shoppinCart : shoppingCarts) {
+			shoppinCart.removeProduct(product);
 		}
 		
 		product.setIsDeleted(true);
