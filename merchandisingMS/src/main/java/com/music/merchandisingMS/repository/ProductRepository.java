@@ -20,8 +20,16 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	
 	@Query("SELECT p"
 			+ " FROM Product p"
-			+ " WHERE p.id IN :ids")
+			+ " WHERE p.id IN :ids"
+			+ " AND p.isDeleted = false")
 	public List<Product> findAllByIds(List<Integer> ids);
+	
+	@Query("SELECT p"
+			+ " FROM Product p"
+			+ " WHERE p.id IN :ids"
+			+ " AND p.isDeleted = false"
+			+ " AND p.stock > 0")
+	public List<Product> findAllByIdsAndWithStock(List<Integer> ids);
 	
 	@Query("SELECT p"
 			+ " FROM Product p"

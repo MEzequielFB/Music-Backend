@@ -16,11 +16,13 @@ import lombok.NoArgsConstructor;
 public class ShoppingCartResponseDTO {
 	private Integer id;
 	private Double totalPrice;
+	private UserDTO user;
 	private List<ProductResponseDTO> products;
 	
-	public ShoppingCartResponseDTO(ShoppingCart shoppingCart) {
+	public ShoppingCartResponseDTO(ShoppingCart shoppingCart, UserDTO user) {
 		this.id = shoppingCart.getId();
 		this.totalPrice = shoppingCart.getTotalPrice();
+		this.user = user;
 		this.products = shoppingCart.getProducts().stream().map( ProductResponseDTO::new ).toList();
 	}
 }

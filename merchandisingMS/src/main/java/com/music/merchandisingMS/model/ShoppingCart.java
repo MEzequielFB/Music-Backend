@@ -60,4 +60,14 @@ public class ShoppingCart {
 		}
 		return i;
 	}
+	
+	public Integer getQuantityOfProduct(Product product) {
+		Integer quantity = 0;
+		for (Product actualProduct : products) {
+			if (actualProduct.equals(product)) {
+				quantity++;
+			}
+		}
+		return quantity;
+	}
 }

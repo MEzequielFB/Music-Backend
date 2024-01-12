@@ -18,9 +18,11 @@ import com.music.merchandisingMS.dto.ProductIdDTO;
 import com.music.merchandisingMS.dto.ProductQuantityRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
+import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
+import com.music.merchandisingMS.exception.StockException;
 import com.music.merchandisingMS.service.ShoppingCartService;
 
 import jakarta.validation.Valid;
@@ -43,12 +45,12 @@ public class ShoppingCartController {
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<ShoppingCartResponseDTO> saveShoppingCart(@RequestBody @Valid ShoppingCartRequestDTO request) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException {
+	public ResponseEntity<ShoppingCartResponseDTO> saveShoppingCart(@RequestBody @Valid ShoppingCartRequestDTO request) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException {
 		return new ResponseEntity<>(service.saveShoppingCart(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}/addProduct")
-	public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Integer id, @RequestBody @Valid ProductQuantityRequestDTO request) throws NotFoundException {
+	public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Integer id, @RequestBody @Valid ProductQuantityRequestDTO request) throws NotFoundException, DeletedEntityException, StockException {
 		return ResponseEntity.ok(service.addProduct(id, request));
 	}
 	

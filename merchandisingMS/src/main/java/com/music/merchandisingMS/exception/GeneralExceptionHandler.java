@@ -21,6 +21,11 @@ public class GeneralExceptionHandler {
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(StockException.class)
+	public ResponseEntity<String> handleStockException(StockException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(SQLIntegrityConstraintViolationException.class)
 	public ResponseEntity<String> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
