@@ -38,6 +38,9 @@ public class User {
 	@Column(nullable = false)
 	private String password;
 	
+	@Column(nullable = false)
+	private Boolean isDeleted;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Role role;
 	
@@ -54,6 +57,7 @@ public class User {
 		this.username = request.getUsername();
 		this.email = request.getEmail();
 		this.password = request.getPassword();
+		this.isDeleted = false;
 		this.role = role;
 	}
 }

@@ -70,7 +70,7 @@ public class UserController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request) throws NotFoundException {
+	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request) throws NotFoundException, EmailAlreadyUsedException {
 		return ResponseEntity.ok(service.updateUser(id, request));
 	}
 	

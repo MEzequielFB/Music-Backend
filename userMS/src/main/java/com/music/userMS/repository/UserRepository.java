@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.music.userMS.model.Account;
 import com.music.userMS.model.User;
 
 @Repository(value = "userRepository")
@@ -34,4 +33,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 			+ " FROM User u"
 			+ " WHERE u.id IN :ids")
 	public List<User> findAllByIds(List<Integer> ids);
+	
+	@Query("SELECT u"
+			+ " FROM User u"
+			+ " WHERE u.id = :id"
+			+ " AND u.isDeleted = false")
+	public Optional<User> findByIdAndNotDeleted(Integer id);
 }
