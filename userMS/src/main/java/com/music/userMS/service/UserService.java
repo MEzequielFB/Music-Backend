@@ -144,7 +144,7 @@ public class UserService {
 	@Transactional
 	public UserResponseDTO updateUser(Integer id, UserRequestDTO request) throws NotFoundException, EmailAlreadyUsedException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());
-		if (optional.isPresent()) {
+		if (optional.isPresent() && optional.get().getId() != id) {
 			throw new EmailAlreadyUsedException(request.getEmail());
 		}
 		
