@@ -12,6 +12,16 @@ import com.music.userMS.model.User;
 @Repository(value = "userRepository")
 public interface UserRepository extends JpaRepository<User, Integer> {
 	
+	@Query("SELECT u"
+			+ " FROM User u"
+			+ " WHERE u.isDeleted = false")
+	public List<User> findAllNotDeletedUsers();
+	
+	@Query("SELECT u"
+			+ " FROM User u"
+			+ " WHERE u.isDeleted = true")
+	public List<User> findAllDeletedUsers();
+	
 	@Query("SELECT fu"
 			+ " FROM User u"
 			+ " JOIN u.followedUsers fu"

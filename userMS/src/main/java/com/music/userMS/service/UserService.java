@@ -65,11 +65,18 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findAll() {
-		return repository.findAll()
+		return repository.findAllNotDeletedUsers()
 				.stream()
-				.map( user -> {
-					return new UserResponseDTO(user);
-				}).toList();
+				.map( UserResponseDTO::new )
+				.toList();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<UserResponseDTO> findAllDeletedUsers() {
+		return repository.findAllDeletedUsers()
+				.stream()
+				.map( UserResponseDTO::new )
+				.toList();
 	}
 	
 	@Transactional(readOnly = true)

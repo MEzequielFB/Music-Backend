@@ -54,6 +54,11 @@ public class UserController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
+	@GetMapping("/deleted")
+	public ResponseEntity<List<UserResponseDTO>> findAllDeletedProducts() {
+		return ResponseEntity.ok(service.findAllDeletedUsers());
+	}
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
