@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.music.musicMS.dto.AddSongRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.PlaylistRequestDTO;
 import com.music.musicMS.dto.PlaylistResponseDTO;
@@ -56,7 +55,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional(readOnly = true)
-	public PlaylistResponseDTO findById(int id) throws NotFoundException {
+	public PlaylistResponseDTO findById(Integer id) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();
@@ -78,7 +77,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<SongResponseDTO> getSongsFromPlaylist(int id) throws NotFoundException {
+	public List<SongResponseDTO> getSongsFromPlaylist(Integer id) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Playlist", id);
@@ -118,6 +117,7 @@ public class PlaylistService {
 					.block();
 		} catch (Exception e) {
 			throw new NotFoundException("User", request.getUserId());
+//			System.out.println(e.getStackTrace());
 		}
 		
 		//Doesn't allow playlists with the same name from the same user
@@ -135,48 +135,56 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public SongResponseDTO addSong(int id, AddSongRequestDTO request) throws NotFoundException, AlreadyContainsSongException {
+	public SongResponseDTO addSong(Integer id, Integer songId) throws NotFoundException, AlreadyContainsSongException {
 		Optional<Playlist> optional = repository.findById(id);
-		Optional<Song> songOptional = songRepository.findById(request.getSongId());
+		Optional<Song> songOptional = songRepository.findById(songId);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Playlist", id);
 		}
 		if (!songOptional.isPresent()) {
-			throw new NotFoundException("Song", request.getSongId());
+			throw new NotFoundException("Song", songId);
 		}
 		
 		Playlist playlist = optional.get();
 		Song song = songOptional.get();
 		
-		Optional<Song> songOptional2 = songRepository.findByPlaylist(request.getSongId(), playlist);
-		if (songOptional2.isPresent()) {
+		songOptional = songRepository.findByPlaylist(songId, playlist);
+		if (songOptional.isPresent()) {
 			throw new AlreadyContainsSongException("Playlist");
 		}
 		
 		playlist.addSong(song);
 		repository.save(playlist);
 		
-		List<ArtistResponseDTO> artists = webClientBuilder.build()
-				.get()
-				.uri(uriBuilder -> uriBuilder
-						.scheme("http")
-				        .host("localhost")
-				        .port(8001)
-				        .path("/api/artist/allByIds")
-						.queryParam("ids", song.getArtists())
-						.build())
-				.retrieve()
-				.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
-				.block();
-		
 		SongResponseDTO responseDTO =  new SongResponseDTO(song);
-		responseDTO.setArtists(artists);
 		
 		return responseDTO;
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO updatePlaylist(int id, PlaylistUpdateDTO request) throws NotFoundException {
+	public SongResponseDTO removeSong(Integer id, Integer songId) throws NotFoundException, AlreadyContainsSongException {
+		Optional<Playlist> optional = repository.findById(id);
+		Optional<Song> songOptional = songRepository.findById(songId);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Playlist", id);
+		}
+		if (!songOptional.isPresent()) {
+			throw new NotFoundException("Song", songId);
+		}
+		
+		Playlist playlist = optional.get();
+		Song song = songOptional.get();
+		
+		playlist.removeSong(song);
+		repository.save(playlist);
+		
+		SongResponseDTO responseDTO =  new SongResponseDTO(song);
+		
+		return responseDTO;
+	}
+	
+	@Transactional
+	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();
@@ -200,7 +208,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO deletePlaylist(int id) throws NotFoundException {
+	public PlaylistResponseDTO deletePlaylist(Integer id) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();

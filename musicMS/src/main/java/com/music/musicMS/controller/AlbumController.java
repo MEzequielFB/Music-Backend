@@ -62,12 +62,12 @@ public class AlbumController {
 	
 	@PutMapping("/{id}/addSong")
 	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
-		return ResponseEntity.ok(service.addSong(id, request));
+		return ResponseEntity.ok(service.addSong(id, request.getSongId()));
 	}
 	
 	@PutMapping("/{id}/removeSong")
 	public ResponseEntity<AlbumResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, DoNotContainsTheSongException {
-		return ResponseEntity.ok(service.removeSong(id, request));
+		return ResponseEntity.ok(service.removeSong(id, request.getSongId()));
 	}
 	
 	@DeleteMapping("/{id}")

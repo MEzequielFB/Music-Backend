@@ -20,5 +20,5 @@ public interface GenreRepository extends JpaRepository<Genre, Integer> {
 	@Query("SELECT g"
 			+ " FROM Genre g"
 			+ " WHERE g.id IN :ids")
-	public List<Genre> findAllById(List<Integer> ids);
+	public List<Genre> findAllByIds(List<Integer> ids);
 }

@@ -122,7 +122,7 @@ public class AlbumControllerTest {
 	
 	@Test
 	public void addSongTest() throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
-		when(service.addSong(albumResponseMock.getId(), songIdMock)).thenReturn(albumResponseMock);
+		when(service.addSong(albumResponseMock.getId(), songIdMock.getSongId())).thenReturn(albumResponseMock);
 		
 		ResponseEntity<AlbumResponseDTO> responseEntity = controller.addSong(albumResponseMock.getId(), songIdMock);
 		
@@ -132,7 +132,7 @@ public class AlbumControllerTest {
 	
 	@Test
 	public void removeSongTest() throws NotFoundException, DoNotContainsTheSongException {
-		when(service.removeSong(albumResponseMock.getId(), songIdMock)).thenReturn(albumResponseMock);
+		when(service.removeSong(albumResponseMock.getId(), songIdMock.getSongId())).thenReturn(albumResponseMock);
 		
 		ResponseEntity<AlbumResponseDTO> responseEntity = controller.removeSong(albumResponseMock.getId(), songIdMock);
 		

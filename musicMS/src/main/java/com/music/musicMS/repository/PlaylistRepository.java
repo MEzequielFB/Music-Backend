@@ -9,9 +9,15 @@ import org.springframework.stereotype.Repository;
 
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.model.Playlist;
+import com.music.musicMS.model.Song;
 
 @Repository(value = "playlistRepository")
 public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
+	
+	@Query("SELECT p"
+			+ " FROM Playlist p"
+			+ " WHERE :song IN elements(p.songs)")
+	public List<Playlist> findAllBySong(Song song);
 
 	@Query("SELECT p"
 			+ " FROM Playlist p"
