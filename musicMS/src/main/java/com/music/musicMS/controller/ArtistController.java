@@ -35,7 +35,7 @@ public class ArtistController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
-	@GetMapping("")
+	@GetMapping("/deleted")
 	public ResponseEntity<List<ArtistResponseDTO>> findAllDeletedArtists() {
 		return ResponseEntity.ok(service.findAllDeleted());
 	}

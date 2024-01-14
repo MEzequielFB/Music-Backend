@@ -14,9 +14,13 @@ import lombok.NoArgsConstructor;
 public class ArtistResponseDTO {
 	private int id;
 	private String name;
+	private Boolean isDeleted;
+	private Integer userId;
 	
 	public ArtistResponseDTO(Artist artist) {
 		this.id = artist.getId();
 		this.name = artist.getName();
+		this.isDeleted = artist.getIsDeleted();
+		this.userId = artist.getUserId();
 	}
 }

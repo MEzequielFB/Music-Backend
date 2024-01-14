@@ -174,12 +174,13 @@ public class UserService {
 		try {
 			webClientBuilder.build()
 				.delete()
-				.uri("http://localhost:8003/api/artist/user/" + id)
+				.uri("http://localhost:8002/api/artist/user/" + id)
 				.retrieve()
 				.bodyToMono(ArtistResponseDTO.class)
 				.block();	
 		} catch (Exception e) {
 			System.err.println(String.format("Artist with userId %s doesn't exist", id));
+//			e.getStackTrace();
 		}
 		
 		return new UserResponseDTO(repository.save(user));
