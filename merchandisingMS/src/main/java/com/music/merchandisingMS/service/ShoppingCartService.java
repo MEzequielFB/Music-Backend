@@ -1,6 +1,7 @@
 package com.music.merchandisingMS.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
 import com.music.merchandisingMS.dto.UserDTO;
 import com.music.merchandisingMS.exception.DeletedEntityException;
+import com.music.merchandisingMS.exception.EmptyShoppingCartException;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
@@ -126,6 +128,35 @@ public class ShoppingCartService {
 		
 		return new ShoppingCartResponseDTO(repository.save(shoppingCart), user);
 	}
+	
+//	@Transactional
+//	public ShoppingCartResponseDTO buyProducts(Integer id, Integer accountId) throws NotFoundException, EmptyShoppingCartException, StockException {
+//		Optional<ShoppingCart> optional = repository.findById(id);
+//		if (!optional.isPresent()) {
+//			throw new NotFoundException("ShoppingCart", id);
+//		}
+//		
+//		ShoppingCart shoppingCart = optional.get();
+//		if (shoppingCart.getProducts().isEmpty()) {
+//			throw new EmptyShoppingCartException(id);
+//		}
+//		
+//		HashMap<String, Integer> visitedProducts = new HashMap<>();
+//		for (Product product : shoppingCart.getProducts()) {
+//			if (!visitedProducts.containsKey(product.getName())) {
+//				Integer productQuantity = shoppingCart.getQuantityOfProduct(product);
+//				if (productQuantity > product.getStock()) {
+//					throw new StockException(product);
+//				}
+//				
+//				visitedProducts.put(product.getName(), productQuantity);
+//				product.setStock(productQuantity);
+//				productRepository.save(product);
+//			}
+//		}
+//		
+//		
+//	}
 	
 	@Transactional
 	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request) throws NotFoundException, DeletedEntityException, StockException {

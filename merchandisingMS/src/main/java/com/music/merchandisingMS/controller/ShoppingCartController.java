@@ -18,7 +18,9 @@ import com.music.merchandisingMS.dto.ProductIdDTO;
 import com.music.merchandisingMS.dto.ProductQuantityRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
+import com.music.merchandisingMS.exception.AccountIdRequest;
 import com.music.merchandisingMS.exception.DeletedEntityException;
+import com.music.merchandisingMS.exception.EmptyShoppingCartException;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
@@ -48,6 +50,11 @@ public class ShoppingCartController {
 	public ResponseEntity<ShoppingCartResponseDTO> saveShoppingCart(@RequestBody @Valid ShoppingCartRequestDTO request) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException {
 		return new ResponseEntity<>(service.saveShoppingCart(request), HttpStatus.CREATED);
 	}
+	
+//	@PutMapping("/{id}/buy")
+//	public ResponseEntity<ShoppingCartResponseDTO> buyProducts(@PathVariable Integer id, @RequestBody @Valid AccountIdRequest request) throws NotFoundException, EmptyShoppingCartException, StockException {
+//		return ResponseEntity.ok(service.buyProducts(id, request.getAccountId()));
+//	}
 	
 	@PutMapping("/{id}/addProduct")
 	public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Integer id, @RequestBody @Valid ProductQuantityRequestDTO request) throws NotFoundException, DeletedEntityException, StockException {

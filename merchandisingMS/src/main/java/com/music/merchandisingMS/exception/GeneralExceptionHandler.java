@@ -21,6 +21,11 @@ public class GeneralExceptionHandler {
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(EmptyShoppingCartException.class)
+	public ResponseEntity<String> handleEmptyShoppingCartException(EmptyShoppingCartException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(StockException.class)
 	public ResponseEntity<String> handleStockException(StockException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
