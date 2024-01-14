@@ -35,6 +35,11 @@ public class ArtistController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
+	@GetMapping("")
+	public ResponseEntity<List<ArtistResponseDTO>> findAllDeletedArtists() {
+		return ResponseEntity.ok(service.findAllDeleted());
+	}
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<ArtistResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
@@ -58,5 +63,10 @@ public class ArtistController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ArtistResponseDTO> deleteArtist(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteArtist(id));
+	}
+	
+	@DeleteMapping("/user/{userId}")
+	public ResponseEntity<ArtistResponseDTO> deleteArtistByUserId(@PathVariable Integer userId) throws NotFoundException {
+		return ResponseEntity.ok(service.deleteArtistByUserId(userId));
 	}
 }

@@ -15,8 +15,24 @@ public interface ArtistRepository extends JpaRepository<Artist, Integer> {
 	
 	@Query("SELECT a"
 			+ " FROM Artist a"
-			+ " WHERE a.id IN :ids")
-	public List<Artist> findAllById(List<Integer> ids);
+			+ " WHERE a.isDeleted = false")
+	public List<Artist> findAllNotDeleted();
+	
+	@Query("SELECT a"
+			+ " FROM Artist a"
+			+ " WHERE a.isDeleted = true")
+	public List<Artist> findAllDeleted();
+	
+	@Query("SELECT a"
+			+ " FROM Artist a"
+			+ " WHERE a.userId = :userId")
+	public Optional<Artist> findByUserId(Integer userId);
+	
+	@Query("SELECT a"
+			+ " FROM Artist a"
+			+ " WHERE a.id IN :ids"
+			+ " AND a.isDeleted = false")
+	public List<Artist> findAllByIds(List<Integer> ids);
 	
 	@Query("SELECT new com.music.musicMS.dto.ArtistResponseDTO(a)"
 			+ " FROM Artist a"

@@ -149,7 +149,7 @@ public class UserService {
 		}
 		
 		optional = repository.findById(id);
-		if (!optional.isPresent()) {
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("User", id);
 		}
 		
@@ -170,6 +170,17 @@ public class UserService {
 		
 		User user = optional.get();
 		user.setIsDeleted(true);
+		
+		try {
+			webClientBuilder.build()
+				.delete()
+				.uri("http://localhost:8003/api/artist/user/" + id)
+				.retrieve()
+				.bodyToMono(ArtistResponseDTO.class)
+				.block();	
+		} catch (Exception e) {
+			System.err.println(String.format("Artist with userId %s doesn't exist", id));
+		}
 		
 		return new UserResponseDTO(repository.save(user));
 	}

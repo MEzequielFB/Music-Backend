@@ -22,13 +22,24 @@ public class ArtistService {
 	
 	@Transactional(readOnly = true)
 	public List<ArtistResponseDTO> findAll() {
-		return repository.findAll().stream().map( ArtistResponseDTO::new ).toList();
+		return repository.findAllNotDeleted()
+				.stream()
+				.map( ArtistResponseDTO::new )
+				.toList();
 	}
 	
 	@Transactional(readOnly = true)
-	public ArtistResponseDTO findById(int id) throws NotFoundException {
+	public List<ArtistResponseDTO> findAllDeleted() {
+		return repository.findAllDeleted()
+				.stream()
+				.map( ArtistResponseDTO::new )
+				.toList();
+	}
+	
+	@Transactional(readOnly = true)
+	public ArtistResponseDTO findById(Integer id) throws NotFoundException {
 		Optional<Artist> optional = repository.findById(id);
-		if (optional.isPresent()) {
+		if (optional.isPresent() && !optional.get().getIsDeleted()) {
 			return new ArtistResponseDTO(optional.get());
 		} else {
 			throw new NotFoundException("Artist", id);
@@ -37,7 +48,7 @@ public class ArtistService {
 	
 	@Transactional(readOnly = true)
 	public List<ArtistResponseDTO> findAllByids(List<Integer> ids) {
-		return repository.findAllById(ids)
+		return repository.findAllByIds(ids)
 				.stream()
 				.map( ArtistResponseDTO::new ).toList();
 	}
@@ -55,9 +66,9 @@ public class ArtistService {
 	
 	// REMOVE IT (?
 	@Transactional
-	public ArtistResponseDTO updateArtist(int id, ArtistRequestDTO request) throws NotFoundException {
+	public ArtistResponseDTO updateArtist(Integer id, ArtistRequestDTO request) throws NotFoundException {
 		Optional<Artist> optional = repository.findById(id);
-		if (optional.isPresent()) {
+		if (optional.isPresent() && !optional.get().getIsDeleted()) {
 			Artist artist = optional.get();
 			
 			return new ArtistResponseDTO(repository.save(artist));
@@ -67,15 +78,27 @@ public class ArtistService {
 	}
 	
 	@Transactional
-	public ArtistResponseDTO deleteArtist(int id) throws NotFoundException {
+	public ArtistResponseDTO deleteArtist(Integer id) throws NotFoundException {
 		Optional<Artist> optional = repository.findById(id);
-		if (optional.isPresent()) {
+		if (optional.isPresent() && !optional.get().getIsDeleted()) {
 			Artist artist = optional.get();
-			repository.deleteById(id);
+			artist.setIsDeleted(true);
 			
-			return new ArtistResponseDTO(artist);
+			return new ArtistResponseDTO(repository.save(artist));
 		} else {
 			throw new NotFoundException("Artist", id);
+		}
+	}
+
+	public ArtistResponseDTO deleteArtistByUserId(Integer userId) throws NotFoundException {
+		Optional<Artist> optional = repository.findByUserId(userId);
+		if (optional.isPresent() && !optional.get().getIsDeleted()) {
+			Artist artist = optional.get();
+			artist.setIsDeleted(true);
+			
+			return new ArtistResponseDTO(repository.save(artist));
+		} else {
+			throw new NotFoundException("Artist", userId);
 		}
 	}
 }

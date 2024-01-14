@@ -31,6 +31,9 @@ public class Artist {
 	@Column(nullable = false)
 	private String name;
 	
+	@Column(nullable = false)
+	private Boolean isDeleted;
+	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "artists")
 	private List<Song> songs;
 	
@@ -43,6 +46,7 @@ public class Artist {
 	public Artist(ArtistRequestDTO request) {
 		this.userId = request.getUserId();
 		this.name = request.getName();
+		this.isDeleted = false;
 	}
 	
 	public void addAlbum(Album album) {
