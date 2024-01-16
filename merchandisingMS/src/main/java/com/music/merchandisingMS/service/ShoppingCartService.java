@@ -26,10 +26,15 @@ import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
 import com.music.merchandisingMS.exception.StockException;
+import com.music.merchandisingMS.model.Order;
+import com.music.merchandisingMS.model.OrderStatus;
 import com.music.merchandisingMS.model.Product;
 import com.music.merchandisingMS.model.ShoppingCart;
+import com.music.merchandisingMS.model.Status;
+import com.music.merchandisingMS.repository.OrderRepository;
 import com.music.merchandisingMS.repository.ProductRepository;
 import com.music.merchandisingMS.repository.ShoppingCartRepository;
+import com.music.merchandisingMS.repository.StatusRepository;
 
 @Service("shoppingCartService")
 public class ShoppingCartService {
@@ -39,6 +44,12 @@ public class ShoppingCartService {
 	
 	@Autowired
 	private ProductRepository productRepository;
+	
+	@Autowired
+	private StatusRepository statusRepository;
+	
+	@Autowired
+	private OrderRepository orderRepository;
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
@@ -190,6 +201,15 @@ public class ShoppingCartService {
 			
 			product.setStock(product.getStock() - quantity);
 		}
+		
+		Optional<Status> statusOptional = statusRepository.findByName(OrderStatus.PENDING);
+		if (!statusOptional.isPresent()) {
+			throw new NotFoundException("Status", OrderStatus.PENDING);
+		}
+		
+		Order order = new Order(user.getId(), user.getAddress(), shoppingCart.getTotalPrice(), statusOptional.get(), shoppingCart.getProducts());
+		orderRepository.save(order);
+		
 		repository.deleteById(id);
 		return new ShoppingCartResponseDTO(shoppingCart, user);
 	}

@@ -57,6 +57,16 @@ public class Order {
 			inverseJoinColumns = {@JoinColumn(name = "product_id")})
 	private List<Product> products;
 	
+	public Order(Integer userId, String shippingAddress, Double totalPrice, Status status, List<Product> products) {
+		this.userId = userId;
+		this.createdAt = new Date(System.currentTimeMillis());
+		this.shippingAddress = shippingAddress;
+		this.deliveredDate = null;
+		this.totalPrice = totalPrice;
+		this.status = status;
+		this.products = products;
+	}
+	
 	public Order(OrderRequestDTO request, Double totalPrice, Status status, List<Product> products) {
 		this.userId = request.getUserId();
 		this.createdAt = new Date(System.currentTimeMillis());
