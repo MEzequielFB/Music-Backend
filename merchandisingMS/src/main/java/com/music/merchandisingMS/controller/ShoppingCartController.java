@@ -51,10 +51,10 @@ public class ShoppingCartController {
 		return new ResponseEntity<>(service.saveShoppingCart(request), HttpStatus.CREATED);
 	}
 	
-//	@PutMapping("/{id}/buy")
-//	public ResponseEntity<ShoppingCartResponseDTO> buyProducts(@PathVariable Integer id, @RequestBody @Valid AccountIdRequest request) throws NotFoundException, EmptyShoppingCartException, StockException {
-//		return ResponseEntity.ok(service.buyProducts(id, request.getAccountId()));
-//	}
+	@PutMapping("/{id}/buy")
+	public ResponseEntity<ShoppingCartResponseDTO> buyProducts(@PathVariable Integer id, @RequestBody @Valid AccountIdRequest request) throws NotFoundException, EmptyShoppingCartException, StockException {
+		return ResponseEntity.ok(service.buyProducts(id, request.getAccountId()));
+	}
 	
 	@PutMapping("/{id}/addProduct")
 	public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Integer id, @RequestBody @Valid ProductQuantityRequestDTO request) throws NotFoundException, DeletedEntityException, StockException {

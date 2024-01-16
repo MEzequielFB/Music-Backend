@@ -3,13 +3,19 @@ package com.music.merchandisingMS.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.music.merchandisingMS.dto.AccountDTO;
+import com.music.merchandisingMS.dto.BalanceDTO;
 import com.music.merchandisingMS.dto.ProductQuantityRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
@@ -129,34 +135,64 @@ public class ShoppingCartService {
 		return new ShoppingCartResponseDTO(repository.save(shoppingCart), user);
 	}
 	
-//	@Transactional
-//	public ShoppingCartResponseDTO buyProducts(Integer id, Integer accountId) throws NotFoundException, EmptyShoppingCartException, StockException {
-//		Optional<ShoppingCart> optional = repository.findById(id);
-//		if (!optional.isPresent()) {
-//			throw new NotFoundException("ShoppingCart", id);
-//		}
-//		
-//		ShoppingCart shoppingCart = optional.get();
-//		if (shoppingCart.getProducts().isEmpty()) {
-//			throw new EmptyShoppingCartException(id);
-//		}
-//		
-//		HashMap<String, Integer> visitedProducts = new HashMap<>();
-//		for (Product product : shoppingCart.getProducts()) {
-//			if (!visitedProducts.containsKey(product.getName())) {
-//				Integer productQuantity = shoppingCart.getQuantityOfProduct(product);
-//				if (productQuantity > product.getStock()) {
-//					throw new StockException(product);
-//				}
-//				
-//				visitedProducts.put(product.getName(), productQuantity);
-//				product.setStock(productQuantity);
-//				productRepository.save(product);
-//			}
-//		}
-//		
-//		
-//	}
+	@Transactional
+	public ShoppingCartResponseDTO buyProducts(Integer id, Integer accountId) throws NotFoundException, EmptyShoppingCartException, StockException {
+		Optional<ShoppingCart> optional = repository.findById(id);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("ShoppingCart", id);
+		}
+		
+		ShoppingCart shoppingCart = optional.get();
+		if (shoppingCart.getProducts().isEmpty()) {
+			throw new EmptyShoppingCartException(id);
+		}
+		
+		HashMap<Product, Integer> visitedProducts = new HashMap<>();
+		for (Product product : shoppingCart.getProducts()) {
+			if (!visitedProducts.containsKey(product)) {
+				Integer productQuantity = shoppingCart.getQuantityOfProduct(product);
+				if (productQuantity > product.getStock()) {
+					throw new StockException(product);
+				}
+				
+				visitedProducts.put(product, productQuantity);
+			}
+		}
+		
+		try {
+			webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE AND ACCOUNT NOT FOUND
+					.put()
+					.uri("http://localhost:8001/api/account/" + accountId + "/removeBalance")
+					.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+					.body(BodyInserters.fromValue(new BalanceDTO(shoppingCart.getTotalPrice())))
+					.retrieve()
+					.bodyToMono(AccountDTO.class)
+					.block();
+		} catch (Exception e) {
+			throw new NotFoundException("Account", accountId);
+		}
+		
+		UserDTO user = null;
+		try {
+			user = webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE AND ACCOUNT NOT FOUND
+					.get()
+					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+		} catch (Exception e) {
+			throw new NotFoundException("User", shoppingCart.getUserId());
+		}
+		
+		for (Entry<Product, Integer> entry : visitedProducts.entrySet()) {
+			Product product = entry.getKey();
+			Integer quantity =  entry.getValue();
+			
+			product.setStock(product.getStock() - quantity);
+		}
+		repository.deleteById(id);
+		return new ShoppingCartResponseDTO(shoppingCart, user);
+	}
 	
 	@Transactional
 	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request) throws NotFoundException, DeletedEntityException, StockException {
