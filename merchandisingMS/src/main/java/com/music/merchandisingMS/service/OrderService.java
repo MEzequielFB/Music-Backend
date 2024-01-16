@@ -45,7 +45,7 @@ public class OrderService {
 				.map(order -> {
 					UserDTO user = webClientBuilder.build()
 							.get()
-							.uri("http://localhost:8001/api/user/" + order.getUserId())
+							.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
 							.retrieve()
 							.bodyToMono(UserDTO.class)
 							.block();
@@ -69,7 +69,7 @@ public class OrderService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + order.getUserId())
+					.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -135,7 +135,7 @@ public class OrderService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + order.getUserId())
+					.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -157,7 +157,7 @@ public class OrderService {
 			try {
 				user = webClientBuilder.build()
 						.get()
-						.uri("http://localhost:8001/api/user/" + order.getUserId())
+						.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
 						.retrieve()
 						.bodyToMono(UserDTO.class)
 						.block();

@@ -90,6 +90,17 @@ public class UserService {
 		return new UserResponseDTO(user);
 	}
 	
+	@Transactional(readOnly = true)
+	public UserResponseDTO findByIdEvenDeleted(Integer id) throws NotFoundException {
+		Optional<User> optional = repository.findById(id);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("User", id);
+		}
+		
+		User user = optional.get();
+		return new UserResponseDTO(user);
+	}
+	
 	@Transactional // not allowed to save an user with the same email, even if the user with that email is deleted
 	public UserResponseDTO saveUser(UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());

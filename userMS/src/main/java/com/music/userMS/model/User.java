@@ -60,6 +60,7 @@ public class User {
 		this.username = request.getUsername();
 		this.email = request.getEmail();
 		this.password = request.getPassword();
+		this.address = request.getAddress();
 		this.isDeleted = false;
 		this.role = role;
 	}

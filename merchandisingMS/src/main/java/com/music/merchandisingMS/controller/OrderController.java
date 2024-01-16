@@ -25,7 +25,7 @@ import jakarta.validation.Valid;
 
 @RestController("orderController")
 @RequestMapping("/api/order")
-public class OrderController {
+public class OrderController { // ONLY ADMINS AND DELIVERIES
 
 	@Autowired
 	private OrderService service;

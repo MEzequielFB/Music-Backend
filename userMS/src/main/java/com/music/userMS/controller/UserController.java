@@ -62,6 +62,10 @@ public class UserController {
 	@GetMapping("/{id}")
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
+		
+	}@GetMapping("/{id}/evenDeleted") // ONLY ADMINS
+	public ResponseEntity<UserResponseDTO> findByIdEvenDeleted(@PathVariable Integer id) throws NotFoundException {
+		return ResponseEntity.ok(service.findByIdEvenDeleted(id));
 	}
 	
 	@PostMapping("")
