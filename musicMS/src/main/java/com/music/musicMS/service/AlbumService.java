@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
@@ -99,15 +98,15 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO addSong(Integer id, SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
+	public AlbumResponseDTO addSong(Integer id, Integer songId) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
 		Optional<Album> optional = repository.findById(id);
-		Optional<Song> songOptional = songRepository.findById(request.getSongId());
+		Optional<Song> songOptional = songRepository.findById(songId);
 		
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Album", id);
 		}
 		if (!songOptional.isPresent()) {
-			throw new NotFoundException("Song", request.getSongId());
+			throw new NotFoundException("Song", songId);
 		}
 		
 		Album album = optional.get();
@@ -132,15 +131,15 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO removeSong(Integer id, SongIdDTO request) throws NotFoundException, DoNotContainsTheSongException {
+	public AlbumResponseDTO removeSong(Integer id, Integer songId) throws NotFoundException, DoNotContainsTheSongException {
 		Optional<Album> optional = repository.findById(id);
-		Optional<Song> songOptional = songRepository.findById(request.getSongId());
+		Optional<Song> songOptional = songRepository.findById(songId);
 		
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Album", id);
 		}
 		if (!songOptional.isPresent()) {
-			throw new NotFoundException("Song", request.getSongId());
+			throw new NotFoundException("Song", songId);
 		}
 		
 		Album album = optional.get();

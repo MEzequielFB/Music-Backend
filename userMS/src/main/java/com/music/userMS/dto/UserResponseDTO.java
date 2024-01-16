@@ -15,12 +15,14 @@ public class UserResponseDTO {
 	private Integer id;
 	private String username;
 	private String email;
+	private String address;
 	private String role;
 	
 	public UserResponseDTO(User user) {
 		this.id = user.getId();
 		this.username = user.getUsername();
 		this.email = user.getEmail();
+		this.address = user.getAddress();
 		this.role = user.getRole().getName();
 	}
 }

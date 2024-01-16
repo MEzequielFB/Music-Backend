@@ -36,7 +36,7 @@ public class UserService {
 	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
-	public List<UserResponseDTO> findFollowedUsersById(int id) throws NotFoundException {
+	public List<UserResponseDTO> findFollowedUsersById(Integer id) throws NotFoundException {
 		Optional<User> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			return repository.findFollowedUsersById(id)
@@ -50,7 +50,7 @@ public class UserService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<UserResponseDTO> findFollowersById(int id) throws NotFoundException {
+	public List<UserResponseDTO> findFollowersById(Integer id) throws NotFoundException {
 		Optional<User> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			return repository.findFollowersById(id)
@@ -65,25 +65,43 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findAll() {
-		return repository.findAll()
+		return repository.findAllNotDeletedUsers()
 				.stream()
-				.map( user -> {
-					return new UserResponseDTO(user);
-				}).toList();
+				.map( UserResponseDTO::new )
+				.toList();
 	}
 	
 	@Transactional(readOnly = true)
-	public UserResponseDTO findById(int id) throws NotFoundException {
-		Optional<User> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			User user = optional.get();
-			return new UserResponseDTO(user);
-		} else {
-			throw new NotFoundException("User", id);
-		}
+	public List<UserResponseDTO> findAllDeletedUsers() {
+		return repository.findAllDeletedUsers()
+				.stream()
+				.map( UserResponseDTO::new )
+				.toList();
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
+	public UserResponseDTO findById(Integer id) throws NotFoundException {
+		Optional<User> optional = repository.findById(id);
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
+			throw new NotFoundException("User", id);
+		}
+		
+		User user = optional.get();
+		return new UserResponseDTO(user);
+	}
+	
+	@Transactional(readOnly = true)
+	public UserResponseDTO findByIdEvenDeleted(Integer id) throws NotFoundException {
+		Optional<User> optional = repository.findById(id);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("User", id);
+		}
+		
+		User user = optional.get();
+		return new UserResponseDTO(user);
+	}
+	
+	@Transactional // not allowed to save an user with the same email, even if the user with that email is deleted
 	public UserResponseDTO saveUser(UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());
 		Optional<Role> roleOptional = roleRepository.findByName(Roles.USER);
@@ -101,7 +119,7 @@ public class UserService {
 		return new UserResponseDTO(repository.save(user));
 	}
 	
-	@Transactional
+	@Transactional // not allowed to save an user with the same email, even if the user with that email is deleted
 	public UserResponseDTO saveArtistUser(UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());
 		Optional<Role> roleOptional = roleRepository.findByName(Roles.ARTIST);
@@ -135,30 +153,48 @@ public class UserService {
 	}
 	
 	@Transactional
-	public UserResponseDTO updateUser(int id, UserRequestDTO request) throws NotFoundException {
-		Optional<User> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			User user = optional.get();
-			user.setUsername(request.getUsername());
-			user.setEmail(request.getEmail());
-			user.setPassword(request.getPassword());
-			
-			return new UserResponseDTO(repository.save(user));
-		} else {
+	public UserResponseDTO updateUser(Integer id, UserRequestDTO request) throws NotFoundException, EmailAlreadyUsedException {
+		Optional<User> optional = repository.findByEmail(request.getEmail());
+		if (optional.isPresent() && optional.get().getId() != id) {
+			throw new EmailAlreadyUsedException(request.getEmail());
+		}
+		
+		optional = repository.findById(id);
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("User", id);
 		}
+		
+		User user = optional.get();
+		user.setUsername(request.getUsername());
+		user.setEmail(request.getEmail());
+		user.setAddress(request.getAddress());
+		user.setPassword(request.getPassword());
+		
+		return new UserResponseDTO(repository.save(user));
 	}
 	
 	@Transactional
-	public UserResponseDTO deleteUser(int id) throws NotFoundException {
+	public UserResponseDTO deleteUser(Integer id) throws NotFoundException {
 		Optional<User> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			User user = optional.get();
-			repository.deleteById(id);
-			
-			return new UserResponseDTO(user);
-		} else {
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("User", id);
 		}
+		
+		User user = optional.get();
+		user.setIsDeleted(true);
+		
+		try {
+			webClientBuilder.build()
+				.delete()
+				.uri("http://localhost:8002/api/artist/user/" + id)
+				.retrieve()
+				.bodyToMono(ArtistResponseDTO.class)
+				.block();	
+		} catch (Exception e) {
+			System.err.println(String.format("Artist with userId %s doesn't exist", id));
+//			e.getStackTrace();
+		}
+		
+		return new UserResponseDTO(repository.save(user));
 	}
 }

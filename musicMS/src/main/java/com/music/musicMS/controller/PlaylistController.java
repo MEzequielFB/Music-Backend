@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.music.musicMS.dto.AddSongRequestDTO;
 import com.music.musicMS.dto.PlaylistRequestDTO;
 import com.music.musicMS.dto.PlaylistResponseDTO;
 import com.music.musicMS.dto.PlaylistUpdateDTO;
+import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.exception.AlreadyContainsSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
@@ -58,9 +58,14 @@ public class PlaylistController {
 		return ResponseEntity.ok(service.updatePlaylist(id, request));
 	}
 	
-	@PutMapping("/{id}/song")
-	public ResponseEntity<SongResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid AddSongRequestDTO request) throws NotFoundException, AlreadyContainsSongException {
-		return ResponseEntity.ok(service.addSong(id, request));
+	@PutMapping("/{id}/addSong")
+	public ResponseEntity<SongResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, AlreadyContainsSongException {
+		return ResponseEntity.ok(service.addSong(id, request.getSongId()));
+	}
+	
+	@PutMapping("/{id}/removeSong")
+	public ResponseEntity<SongResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, AlreadyContainsSongException {
+		return ResponseEntity.ok(service.removeSong(id, request.getSongId()));
 	}
 	
 	@DeleteMapping("/{id}")

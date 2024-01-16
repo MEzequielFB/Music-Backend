@@ -28,7 +28,7 @@ public class SongResponseDTO {
 		this.reproductions = song.getReproductions();
 		this.duration = song.getDuration();
 		this.album = song.getAlbum() != null ? song.getAlbum().getName() : "";
-		this.artists = song.getArtists().stream().map(ArtistResponseDTO::new).toList();
-		this.genres = song.getGenres().stream().map(GenreResponseDTO::new).toList();
+		this.artists = song.getArtists().stream().map( ArtistResponseDTO::new ).toList();
+		this.genres = song.getGenres().stream().map( GenreResponseDTO::new ).toList();
 	}
 }

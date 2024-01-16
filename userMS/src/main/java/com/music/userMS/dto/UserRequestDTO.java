@@ -16,6 +16,10 @@ public class UserRequestDTO {
 	@Email(message = "invalid email")
 	private String email;
 	
+	@NotNull(message = "address shouldn't be null")
+	@NotBlank(message = "address shouldn't be empty")
+	private String address;
+	
 	@NotNull(message = "password shouldn't be null")
 	@NotBlank(message = "password shouldn't be empty")
 	private String password;

@@ -124,20 +124,20 @@ public class AccountService {
 	@Transactional
 	public AccountResponseDTO removeBalance(Integer id, BalanceDTO request) throws NotFoundException, NotEnoughBalanceException {
 		Optional<Account> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Account account = optional.get();
-			
-			if (account.getBalance() > 0) {
-				Double newBalance = Math.round(( account.getBalance() - request.getBalance() ) * 100.0) / 100.0;
-				account.setBalance(newBalance);
-			} else {
-				throw new NotEnoughBalanceException(id);
-			}
-			
-			return new AccountResponseDTO(repository.save(account));
-		} else {
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Account", id);
 		}
+			
+		Account account = optional.get();
+		
+		if (account.getBalance() < request.getBalance()) {
+			throw new NotEnoughBalanceException(id);
+		}
+		
+		Double newBalance = Math.round(( account.getBalance() - request.getBalance() ) * 100.0) / 100.0;
+		account.setBalance(newBalance);
+		
+		return new AccountResponseDTO(repository.save(account));
 	}
 	
 	// Delete just when it has zero or one users linked
