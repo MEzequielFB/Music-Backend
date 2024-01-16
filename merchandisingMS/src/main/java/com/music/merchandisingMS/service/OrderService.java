@@ -80,36 +80,36 @@ public class OrderService {
 		return new OrderResponseDTO(order, user);
 	}
 	
-	@Transactional
-	public OrderResponseDTO saveOrder(OrderRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
-		Optional<Status> statusOptional = statusRepository.findByName(OrderStatus.PENDING);
-		if (!statusOptional.isPresent()) {
-			throw new NotFoundException("Status", OrderStatus.PENDING);
-		}
-		
-		Status status = statusOptional.get();
-		
-		List<Product> products = productRepository.findAllByIds(request.getProducts());
-		if (request.getProducts().size() != products.size()) {
-			throw new SomeEntityDoesNotExistException("products");
-		}
-		
-		UserDTO user = null;
-		try {
-			user = webClientBuilder.build()
-					.get()
-					.uri("http://localhost:8001/api/user/" + request.getUserId())
-					.retrieve()
-					.bodyToMono(UserDTO.class)
-					.block();
-		} catch (Exception e) {
-			throw new NotFoundException("User", request.getUserId());
-		}
-		
-		Double totalPrice = productRepository.getPriceOfProducts(products);
-		Order order = new Order(request, totalPrice, status, products);
-		return new OrderResponseDTO(repository.save(order), user);
-	}
+//	@Transactional
+//	public OrderResponseDTO saveOrder(OrderRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
+//		Optional<Status> statusOptional = statusRepository.findByName(OrderStatus.PENDING);
+//		if (!statusOptional.isPresent()) {
+//			throw new NotFoundException("Status", OrderStatus.PENDING);
+//		}
+//		
+//		Status status = statusOptional.get();
+//		
+//		List<Product> products = productRepository.findAllByIds(request.getProducts());
+//		if (request.getProducts().size() != products.size()) {
+//			throw new SomeEntityDoesNotExistException("products");
+//		}
+//		
+//		UserDTO user = null;
+//		try {
+//			user = webClientBuilder.build()
+//					.get()
+//					.uri("http://localhost:8001/api/user/" + request.getUserId())
+//					.retrieve()
+//					.bodyToMono(UserDTO.class)
+//					.block();
+//		} catch (Exception e) {
+//			throw new NotFoundException("User", request.getUserId());
+//		}
+//		
+//		Double totalPrice = productRepository.getPriceOfProducts(products);
+//		Order order = new Order(request, totalPrice, status, products);
+//		return new OrderResponseDTO(repository.save(order), user);
+//	}
 	
 	@Transactional
 	public OrderResponseDTO updateOrderStatus(Integer id, OrderStatusUpdateDTO request) throws NotFoundException {

@@ -40,10 +40,10 @@ public class OrderController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
-	@PostMapping("")
-	public ResponseEntity<OrderResponseDTO> saveOrder(@RequestBody @Valid OrderRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
-		return new ResponseEntity<>(service.saveOrder(request), HttpStatus.CREATED);
-	}
+//	@PostMapping("")
+//	public ResponseEntity<OrderResponseDTO> saveOrder(@RequestBody @Valid OrderRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
+//		return new ResponseEntity<>(service.saveOrder(request), HttpStatus.CREATED);
+//	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable Integer id, @RequestBody @Valid OrderStatusUpdateDTO request) throws NotFoundException {
