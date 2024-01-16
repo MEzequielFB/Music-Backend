@@ -156,6 +156,7 @@ public class UserService {
 		User user = optional.get();
 		user.setUsername(request.getUsername());
 		user.setEmail(request.getEmail());
+		user.setAddress(request.getAddress());
 		user.setPassword(request.getPassword());
 		
 		return new UserResponseDTO(repository.save(user));

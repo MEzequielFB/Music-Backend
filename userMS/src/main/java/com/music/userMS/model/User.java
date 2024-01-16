@@ -39,6 +39,9 @@ public class User {
 	private String password;
 	
 	@Column(nullable = false)
+	private String address;
+	
+	@Column(nullable = false)
 	private Boolean isDeleted;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
