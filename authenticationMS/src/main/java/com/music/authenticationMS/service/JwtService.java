@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.music.authenticationMS.exception.InvalidTokenException;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -17,11 +19,15 @@ public class JwtService {
 
 	public static final String SECRET = "3HF82HJ2JKLNDSMB353382HN029MCMN2";
 	
-	public void validateToken(final String token) {
-		Jwts.parserBuilder()
+	public void validateToken(final String token) throws InvalidTokenException {
+		try {
+			Jwts.parserBuilder()
 				.setSigningKey(getSignKey())
 				.build()
 				.parseClaimsJws(token);
+		} catch (Exception e) {
+			throw new InvalidTokenException();
+		}
 	}
 	
 	public String generateToken(String userName) {

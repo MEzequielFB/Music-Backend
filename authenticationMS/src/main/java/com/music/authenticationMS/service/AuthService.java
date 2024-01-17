@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.music.authenticationMS.dto.AuthRequestDTO;
 import com.music.authenticationMS.dto.UserDTO;
 import com.music.authenticationMS.dto.UserRequestDTO;
+import com.music.authenticationMS.exception.InvalidTokenException;
 import com.music.authenticationMS.exception.NotFoundException;
 
 @Service("authService")
@@ -53,7 +54,7 @@ public class AuthService {
 		}
 	}
 	
-	public void validateToken(String token) {
+	public void validateToken(String token) throws InvalidTokenException {
 		jwtService.validateToken(token);
 	}
 }

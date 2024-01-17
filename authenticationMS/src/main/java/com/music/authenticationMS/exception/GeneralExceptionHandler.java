@@ -24,4 +24,9 @@ public class GeneralExceptionHandler {
 	public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 	}
+	
+	@ExceptionHandler(InvalidTokenException.class)
+	public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+	}
 }
