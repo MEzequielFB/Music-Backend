@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.userMS.dto.FollowRequestDTO;
+import com.music.userMS.dto.UserDetailsResponseDTO;
 import com.music.userMS.dto.UserFollowerResponseDTO;
 import com.music.userMS.dto.UserRequestDTO;
 import com.music.userMS.dto.UserResponseDTO;
@@ -63,9 +64,16 @@ public class UserController {
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 		
-	}@GetMapping("/{id}/evenDeleted") // ONLY ADMINS
+	}
+	
+	@GetMapping("/{id}/evenDeleted") // ONLY ADMINS
 	public ResponseEntity<UserResponseDTO> findByIdEvenDeleted(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findByIdEvenDeleted(id));
+	}
+	
+	@GetMapping("/email/{email}")
+	public ResponseEntity<UserDetailsResponseDTO> findByEmail(@PathVariable String email) throws NotFoundException {
+		return ResponseEntity.ok(service.findByEmail(email));
 	}
 	
 	@PostMapping("")

@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.userMS.dto.ArtistRequestDTO;
 import com.music.userMS.dto.ArtistResponseDTO;
+import com.music.userMS.dto.UserDetailsResponseDTO;
 import com.music.userMS.dto.UserRequestDTO;
 import com.music.userMS.dto.UserResponseDTO;
 import com.music.userMS.exception.EmailAlreadyUsedException;
@@ -99,6 +100,16 @@ public class UserService {
 		
 		User user = optional.get();
 		return new UserResponseDTO(user);
+	}
+	
+	@Transactional(readOnly = true)
+	public UserDetailsResponseDTO findByEmail(String email) throws NotFoundException {
+		Optional<User> optional = repository.findByEmailAndNotDeleted(email);
+		if (optional.isPresent()) {
+			return new UserDetailsResponseDTO(optional.get());
+		} else {
+			throw new NotFoundException("User", email);
+		}
 	}
 	
 	@Transactional // not allowed to save an user with the same email, even if the user with that email is deleted
@@ -196,5 +207,5 @@ public class UserService {
 		}
 		
 		return new UserResponseDTO(repository.save(user));
-	}
+	}	
 }
