@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		try {
 			UserDTO user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/email" + email)
+					.uri("http://localhost:8001/api/user/email/" + email)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
