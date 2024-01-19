@@ -25,7 +25,7 @@ public class AuthController {
 	private AuthService service;
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody @Valid UserRequestDTO request) {
+	public ResponseEntity<String> register(@RequestBody @Valid UserRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.register(request));
 	}
 	
