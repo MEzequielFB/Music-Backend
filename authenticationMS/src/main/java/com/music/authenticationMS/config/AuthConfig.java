@@ -54,29 +54,12 @@ public class AuthConfig {
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//		return http.csrf().disable()
-//				.authorizeHttpRequests()
-//				.requestMatchers("api/auth/register", "api/auth/login", "api/auth/validate").permitAll()
-//				.and()
-//				.build();
-//		return http
-//                .authorizeExchange(authorizeExchange ->
-//                        authorizeExchange
-//                                .pathMatchers("/api/auth/register", "/api/auth/login", "/api/auth/validate").permitAll()
-//                                .anyExchange().authenticated()
-//                )
-//                .csrf().disable()
-//                .build();
-		
-//		http
-//        	.apply(securityConfigurerAdapter());
 		http
 			.addFilterBefore(new JWTFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 		http
 		    .csrf( AbstractHttpConfigurer::disable )
 		    .authorizeHttpRequests( auth -> auth
 		    		.anyRequest().permitAll()
-		    		//.anyRequest().authenticated()
 		    )
 		    .anonymous( AbstractHttpConfigurer::disable )
 		    .sessionManagement( s -> s.sessionCreationPolicy( SessionCreationPolicy.STATELESS ) );
@@ -85,14 +68,4 @@ public class AuthConfig {
 		
 		return http.build();
 	}
-	
-//	private JwtConfigurer securityConfigurerAdapter() {
-//        return new JwtConfigurer(tokenProvider);
-//    }
-
-//	@Bean
-//	public PasswordEncoder passwordEncoder() {
-//		return new BCryptPasswordEncoder();
-//	}
-//	
 }

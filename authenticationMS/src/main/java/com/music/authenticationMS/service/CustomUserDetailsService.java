@@ -2,7 +2,6 @@ package com.music.authenticationMS.service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.music.authenticationMS.config.CustomUserDetails;
 import com.music.authenticationMS.dto.UserDTO;
 
 public class CustomUserDetailsService implements UserDetailsService {
@@ -32,7 +30,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 					.block();
 			
 			return createSpringSecurityUser(user);
-//			return new CustomUserDetails(user);
 		} catch (Exception e) {
 			throw new UsernameNotFoundException(String.format("An user with email %s does not exists", email));
 		}

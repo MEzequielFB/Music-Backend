@@ -21,9 +21,6 @@ import com.music.authenticationMS.security.TokenProvider;
 @Service("authService")
 public class AuthService {
 	
-//	@Autowired
-//	private JwtService jwtService;
-	
 	@Autowired
 	private TokenProvider tokenProvider;
 
@@ -35,12 +32,6 @@ public class AuthService {
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
-	
-//	private AuthenticationManagerBuilder authenticationManagerBuilder;
-//	
-//	public AuthService(AuthenticationManagerBuilder authenticationManagerBuilder) {
-//		this.authenticationManagerBuilder = authenticationManagerBuilder;
-//	}
 	
 	@Transactional
 	public String register(UserRequestDTO request) throws NotFoundException {
@@ -57,20 +48,16 @@ public class AuthService {
 			.block();
 		
 		return login(new AuthRequestDTO(user.getEmail(), decodePassword));
-//		return jwtService.generateToken(user.getEmail());
 	}
 	
 	@Transactional
 	public String login(AuthRequestDTO request) throws NotFoundException {
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-//		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
-//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken); 
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())); 
 		if (authentication.isAuthenticated()) {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			String jwt = tokenProvider.createToken(authentication);
 			
 			return jwt;
-//			return jwtService.generateToken(request.getEmail());
 		} else {
 			throw new NotFoundException("User", request.getEmail());
 		}
@@ -83,6 +70,5 @@ public class AuthService {
 			return "The token is valid";
 		}
 		return "Invalid token!";
-//		jwtService.validateToken(token);
 	}
 }
