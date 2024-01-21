@@ -18,6 +18,8 @@ import com.music.authenticationMS.exception.InvalidTokenException;
 import com.music.authenticationMS.exception.NotFoundException;
 import com.music.authenticationMS.security.TokenProvider;
 
+import jakarta.validation.Valid;
+
 @Service("authService")
 public class AuthService {
 	
@@ -41,6 +43,23 @@ public class AuthService {
 		UserDTO user = webClientBuilder.build()
 			.post()
 			.uri("http://localhost:8001/api/user")
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(request)
+			.retrieve()
+			.bodyToMono(UserDTO.class)
+			.block();
+		
+		return login(new AuthRequestDTO(user.getEmail(), decodePassword));
+	}
+	
+	@Transactional
+	public String registerArtist(UserRequestDTO request) throws NotFoundException {
+		String decodePassword = request.getPassword();
+		request.setPassword(passwordEncoder.encode(request.getPassword()));
+		
+		UserDTO user = webClientBuilder.build()
+			.post()
+			.uri("http://localhost:8001/api/user/artist")
 			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(request)
 			.retrieve()

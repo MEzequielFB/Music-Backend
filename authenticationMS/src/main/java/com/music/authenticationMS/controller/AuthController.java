@@ -29,6 +29,11 @@ public class AuthController {
 		return ResponseEntity.ok(service.register(request));
 	}
 	
+	@PostMapping("/register/artist")
+	public ResponseEntity<String> registerArtist(@RequestBody @Valid UserRequestDTO request) throws NotFoundException {
+		return ResponseEntity.ok(service.registerArtist(request));
+	}
+	
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.login(request));

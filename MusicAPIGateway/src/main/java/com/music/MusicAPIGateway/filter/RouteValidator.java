@@ -11,9 +11,7 @@ public class RouteValidator {
 
 	// Bypass endpoints
 	public static final List<String> openApiEndpoints = List.of(
-		"/api/auth/register",
-		"/api/auth/login",
-		"/api/auth/validate",
+		"/api/auth/**",
 		"/api/user/email/**",
 		"/api/user",
 		"/api/user/artist"
