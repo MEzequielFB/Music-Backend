@@ -39,13 +39,14 @@ public class OrderService {
 	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
-	public List<OrderResponseDTO> findAll() {
+	public List<OrderResponseDTO> findAll(String token) {
 		return repository.findAll()
 				.stream()
 				.map(order -> {
 					UserDTO user = webClientBuilder.build()
 							.get()
 							.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
 							.block();
@@ -57,7 +58,7 @@ public class OrderService {
 	}
 	
 	@Transactional(readOnly = true)
-	public OrderResponseDTO findById(Integer id) throws NotFoundException {
+	public OrderResponseDTO findById(Integer id, String token) throws NotFoundException {
 		Optional<Order> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Order", id);
@@ -70,6 +71,7 @@ public class OrderService {
 			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -112,7 +114,7 @@ public class OrderService {
 //	}
 	
 	@Transactional
-	public OrderResponseDTO updateOrderStatus(Integer id, OrderStatusUpdateDTO request) throws NotFoundException {
+	public OrderResponseDTO updateOrderStatus(Integer id, OrderStatusUpdateDTO request, String token) throws NotFoundException {
 		Optional<Order> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Order", id);
@@ -136,6 +138,7 @@ public class OrderService {
 			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -147,7 +150,7 @@ public class OrderService {
 	}
 	
 	@Transactional
-	public OrderResponseDTO deleteOrder(Integer id) throws NotFoundException {
+	public OrderResponseDTO deleteOrder(Integer id, String token) throws NotFoundException {
 		Optional<Order> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Order order = optional.get();
@@ -158,6 +161,7 @@ public class OrderService {
 				user = webClientBuilder.build()
 						.get()
 						.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+						.header("Authorization", token)
 						.retrieve()
 						.bodyToMono(UserDTO.class)
 						.block();

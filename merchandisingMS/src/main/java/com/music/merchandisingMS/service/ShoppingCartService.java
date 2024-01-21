@@ -55,7 +55,7 @@ public class ShoppingCartService {
 	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
-	public List<ShoppingCartResponseDTO> findAll() {
+	public List<ShoppingCartResponseDTO> findAll(String token) {
 		return repository.findAll()
 				.stream()
 				.map(shoppingCart -> {
@@ -63,6 +63,7 @@ public class ShoppingCartService {
 					user = webClientBuilder.build()
 							.get()
 							.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
 							.block();
@@ -73,7 +74,7 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional(readOnly = true)
-	public ShoppingCartResponseDTO findById(Integer id) throws NotFoundException {
+	public ShoppingCartResponseDTO findById(Integer id, String token) throws NotFoundException {
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			ShoppingCart shoppingCart = optional.get();
@@ -83,6 +84,7 @@ public class ShoppingCartService {
 				user = webClientBuilder.build()
 						.get()
 						.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+						.header("Authorization", token)
 						.retrieve()
 						.bodyToMono(UserDTO.class)
 						.block();
@@ -97,7 +99,7 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO saveShoppingCart(ShoppingCartRequestDTO request) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException {
+	public ShoppingCartResponseDTO saveShoppingCart(ShoppingCartRequestDTO request, String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException {
 		Optional<ShoppingCart> optional = repository.findByUserId(request.getUserId());
 		if (optional.isPresent()) {
 			throw new EntityWithUserIdAlreadyUsedException("ShoppingCart", request.getUserId());
@@ -108,6 +110,7 @@ public class ShoppingCartService {
 			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + request.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -147,7 +150,7 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO buyProducts(Integer id, Integer accountId) throws NotFoundException, EmptyShoppingCartException, StockException {
+	public ShoppingCartResponseDTO buyProducts(Integer id, Integer accountId, String token) throws NotFoundException, EmptyShoppingCartException, StockException {
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
@@ -175,6 +178,7 @@ public class ShoppingCartService {
 					.put()
 					.uri("http://localhost:8001/api/account/" + accountId + "/removeBalance")
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+					.header("Authorization", token)
 					.body(BodyInserters.fromValue(new BalanceDTO(shoppingCart.getTotalPrice())))
 					.retrieve()
 					.bodyToMono(AccountDTO.class)
@@ -188,6 +192,7 @@ public class ShoppingCartService {
 			user = webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE AND ACCOUNT NOT FOUND
 					.get()
 					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -215,7 +220,7 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request) throws NotFoundException, DeletedEntityException, StockException {
+	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request, String token) throws NotFoundException, DeletedEntityException, StockException {
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
@@ -242,6 +247,7 @@ public class ShoppingCartService {
 			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -259,7 +265,7 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO removeProduct(Integer id, Integer productId) throws NotFoundException {
+	public ShoppingCartResponseDTO removeProduct(Integer id, Integer productId, String token) throws NotFoundException {
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
@@ -278,6 +284,7 @@ public class ShoppingCartService {
 			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -297,7 +304,7 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO deleteShoppingCart(Integer id) throws NotFoundException {
+	public ShoppingCartResponseDTO deleteShoppingCart(Integer id, String token) throws NotFoundException {
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			ShoppingCart shoppingCart = optional.get();
@@ -307,6 +314,7 @@ public class ShoppingCartService {
 				user = webClientBuilder.build()
 						.get()
 						.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+						.header("Authorization", token)
 						.retrieve()
 						.bodyToMono(UserDTO.class)
 						.block();

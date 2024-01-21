@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.music.musicMS.dto.ArtistRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
+import com.music.musicMS.dto.NameRequestDTO;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Roles;
@@ -63,7 +64,7 @@ public class ArtistController {
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<ArtistResponseDTO> updateArtist(@PathVariable Integer id, @RequestBody @Valid ArtistRequestDTO request) throws NotFoundException {
+	public ResponseEntity<ArtistResponseDTO> updateArtist(@PathVariable Integer id, @RequestBody @Valid NameRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updateArtist(id, request));
 	}
 	

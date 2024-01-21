@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.music.musicMS.dto.ArtistRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
+import com.music.musicMS.dto.NameRequestDTO;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Artist;
@@ -66,10 +67,11 @@ public class ArtistService {
 	
 	// REMOVE IT (?
 	@Transactional
-	public ArtistResponseDTO updateArtist(Integer id, ArtistRequestDTO request) throws NotFoundException {
+	public ArtistResponseDTO updateArtist(Integer id, NameRequestDTO request) throws NotFoundException {
 		Optional<Artist> optional = repository.findById(id);
 		if (optional.isPresent() && !optional.get().getIsDeleted()) {
 			Artist artist = optional.get();
+			artist.setName(request.getName());
 			
 			return new ArtistResponseDTO(repository.save(artist));
 		} else {
