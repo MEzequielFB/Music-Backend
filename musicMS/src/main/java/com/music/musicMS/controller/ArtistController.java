@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import com.music.musicMS.dto.ArtistRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.model.Roles;
 import com.music.musicMS.service.ArtistService;
 
 import jakarta.validation.Valid;
@@ -31,41 +33,48 @@ public class ArtistController {
 	private ArtistService service;
 	
 	@GetMapping("")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<ArtistResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/deleted")
+	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
 	public ResponseEntity<List<ArtistResponseDTO>> findAllDeletedArtists() {
 		return ResponseEntity.ok(service.findAllDeleted());
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<ArtistResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@GetMapping("/allByIds")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<ArtistResponseDTO>> findAllByIds(@RequestParam List<Integer> ids) {
 		return ResponseEntity.ok(service.findAllByids(ids));
 	}
 	
-	@PostMapping("")
+	@PostMapping("") // permit all
 	public ResponseEntity<ArtistResponseDTO> saveArtist(@RequestBody @Valid ArtistRequestDTO request) throws NameAlreadyUsedException {
 		return new ResponseEntity<>(service.saveArtist(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<ArtistResponseDTO> updateArtist(@PathVariable Integer id, @RequestBody @Valid ArtistRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updateArtist(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
+	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
 	public ResponseEntity<ArtistResponseDTO> deleteArtist(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteArtist(id));
 	}
 	
 	@DeleteMapping("/user/{userId}")
+	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
 	public ResponseEntity<ArtistResponseDTO> deleteArtistByUserId(@PathVariable Integer userId) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteArtistByUserId(userId));
 	}

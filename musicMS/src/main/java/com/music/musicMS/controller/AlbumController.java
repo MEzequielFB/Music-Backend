@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
+import com.music.musicMS.model.Roles;
 import com.music.musicMS.service.AlbumService;
 
 import jakarta.validation.Valid;
@@ -36,42 +38,50 @@ public class AlbumController {
 	private AlbumService service;
 	
 	@GetMapping("")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<AlbumResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<AlbumResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@GetMapping("/owner/{ownerId}")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<AlbumResponseDTO>> findAllByOwner(@PathVariable Integer ownerId) throws NotFoundException {
 		return ResponseEntity.ok(service.findAllByOwner(ownerId));
 	}
 	
 	@PostMapping("")
+	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<AlbumResponseDTO> saveAlbum(@RequestBody @Valid AlbumRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
 		return new ResponseEntity<>(service.saveAlbum(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<AlbumResponseDTO> updateAlbum(@PathVariable Integer id, @RequestBody @Valid AlbumUpdateDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
 		return ResponseEntity.ok(service.updateAlbum(id, request));
 	}
 	
 	@PutMapping("/{id}/addSong")
+	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
 		return ResponseEntity.ok(service.addSong(id, request.getSongId()));
 	}
 	
 	@PutMapping("/{id}/removeSong")
+	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<AlbumResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, DoNotContainsTheSongException {
 		return ResponseEntity.ok(service.removeSong(id, request.getSongId()));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<AlbumResponseDTO> deleteAlbum(@PathVariable int id) throws NotFoundException {
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.ARTIST + "')")
+	public ResponseEntity<AlbumResponseDTO> deleteAlbum(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteAlbum(id));
 	}
 }
