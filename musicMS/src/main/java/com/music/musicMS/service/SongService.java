@@ -144,19 +144,25 @@ public class SongService {
 	@Transactional
 	public SongResponseDTO updateSong(Integer id, SongRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
 		Optional<Song> optional = repository.findById(id);
-		Optional<Album> albumOptional = albumRepository.findById(request.getAlbumId());
+		Optional<Album> albumOptional = null;
+		
+		if (request.getAlbumId() != null) {
+			albumOptional = albumRepository.findById(request.getAlbumId());
+		}
 		
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Song", id);
 		}
-		if (!albumOptional.isPresent()) {
+		if (albumOptional != null && !albumOptional.isPresent()) {
 			throw new NotFoundException("Album", request.getAlbumId());
 		}
 
 		Song song = optional.get();
-		Album album = albumOptional.get();
+		if (albumOptional != null) {
+			Album album = albumOptional.get();
+			song.setAlbum(album);
+		}
 		song.setName(request.getName());
-		song.setAlbum(album);
 		
 		List<Artist> artists = artistRepository.findAllByIds(request.getArtists());
 		
