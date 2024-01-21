@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,32 +38,32 @@ public class PlaylistController {
 	
 	@GetMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<List<PlaylistResponseDTO>> findAll() {
-		return ResponseEntity.ok(service.findAll());
+	public ResponseEntity<List<PlaylistResponseDTO>> findAll(@RequestHeader("Authorization") String token) {
+		return ResponseEntity.ok(service.findAll(token));
 	}
 	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.findById(id));
+	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.findById(id, token));
 	}
 	
 	@GetMapping("/{id}/songs")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.getSongsFromPlaylist(id));
+	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.getSongsFromPlaylist(id, token));
 	}
 	
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
-		return new ResponseEntity<>(service.savePlaylist(request), HttpStatus.CREATED);
+	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request, @RequestHeader("Authorization") String token) throws NameAlreadyUsedException, NotFoundException {
+		return new ResponseEntity<>(service.savePlaylist(request, token), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "')")
-	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Integer id, @RequestBody @Valid PlaylistUpdateDTO request) throws NotFoundException {
-		return ResponseEntity.ok(service.updatePlaylist(id, request));
+	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Integer id, @RequestBody @Valid PlaylistUpdateDTO request, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.updatePlaylist(id, request, token));
 	}
 	
 	@PutMapping("/{id}/addSong")
@@ -79,7 +80,7 @@ public class PlaylistController {
 	
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "')")
-	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.deletePlaylist(id));
+	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.deletePlaylist(id, token));
 	}
 }

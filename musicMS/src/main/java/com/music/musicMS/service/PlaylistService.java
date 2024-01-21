@@ -36,13 +36,14 @@ public class PlaylistService {
 	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
-	public List<PlaylistResponseDTO> findAll() {
+	public List<PlaylistResponseDTO> findAll(String token) {
 		return repository.findAll()
 				.stream()
 				.map(playlist -> {
 					UserDTO user = webClientBuilder.build()
 							.get()
 							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
 							.block();
@@ -55,7 +56,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional(readOnly = true)
-	public PlaylistResponseDTO findById(Integer id) throws NotFoundException {
+	public PlaylistResponseDTO findById(Integer id, String token) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();
@@ -63,6 +64,7 @@ public class PlaylistService {
 			UserDTO user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -77,7 +79,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<SongResponseDTO> getSongsFromPlaylist(Integer id) throws NotFoundException {
+	public List<SongResponseDTO> getSongsFromPlaylist(Integer id, String token) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Playlist", id);
@@ -95,6 +97,7 @@ public class PlaylistService {
 			        .path("/api/artist/allByIds")
 					.queryParam("ids", songRepository.findById(song.getId()).get().getArtists())
 					.build())
+			.header("Authorization", token)
 			.retrieve()
 			.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
 			.block();
@@ -106,12 +109,13 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
+	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request, String token) throws NameAlreadyUsedException, NotFoundException {
 		UserDTO user = null;
 		try {
 			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + request.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -184,7 +188,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request) throws NotFoundException {
+	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request, String token) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();
@@ -194,6 +198,7 @@ public class PlaylistService {
 			UserDTO user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
@@ -208,7 +213,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO deletePlaylist(Integer id) throws NotFoundException {
+	public PlaylistResponseDTO deletePlaylist(Integer id, String token) throws NotFoundException {
 		Optional<Playlist> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Playlist playlist = optional.get();
@@ -217,6 +222,7 @@ public class PlaylistService {
 			UserDTO user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
