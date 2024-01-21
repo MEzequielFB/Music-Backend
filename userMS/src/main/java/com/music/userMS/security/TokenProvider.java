@@ -1,4 +1,4 @@
-package com.music.authenticationMS.security;
+package com.music.userMS.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

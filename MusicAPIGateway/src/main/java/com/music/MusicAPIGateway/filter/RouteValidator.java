@@ -13,7 +13,10 @@ public class RouteValidator {
 	public static final List<String> openApiEndpoints = List.of(
 		"/api/auth/register",
 		"/api/auth/login",
-		"/api/auth/validate"
+		"/api/auth/validate",
+		"/api/user/email/**",
+		"/api/user",
+		"/api/user/artist"
 	);
 	
 	public Predicate<ServerHttpRequest> isSecured =

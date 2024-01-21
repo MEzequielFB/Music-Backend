@@ -36,6 +36,12 @@ public class AuthService {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
+//	private AuthenticationManagerBuilder authenticationManagerBuilder;
+//	
+//	public AuthService(AuthenticationManagerBuilder authenticationManagerBuilder) {
+//		this.authenticationManagerBuilder = authenticationManagerBuilder;
+//	}
+	
 	@Transactional
 	public String register(UserRequestDTO request) throws NotFoundException {
 		String decodePassword = request.getPassword();
@@ -57,6 +63,8 @@ public class AuthService {
 	@Transactional
 	public String login(AuthRequestDTO request) throws NotFoundException {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+//		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
+//        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken); 
 		if (authentication.isAuthenticated()) {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			String jwt = tokenProvider.createToken(authentication);
@@ -69,8 +77,12 @@ public class AuthService {
 	}
 	
 	@Transactional
-	public void validateToken(String token) throws InvalidTokenException {
-		tokenProvider.validateToken(token);
+	public String validateToken(String token) throws InvalidTokenException {
+		Boolean isValid = tokenProvider.validateToken(token);
+		if (isValid) {
+			return "The token is valid";
+		}
+		return "Invalid token!";
 //		jwtService.validateToken(token);
 	}
 }

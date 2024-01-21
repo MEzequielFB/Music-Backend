@@ -17,7 +17,7 @@ import io.jsonwebtoken.security.Keys;
 @Service("jwtService")
 public class JwtService {
 
-	public static final String SECRET = "3HF82HJ2JKLNDSMB353382HN029MCMN2FHSA98SF9A8M32H239MH2389FHM239F8HM29FH23";
+	public static final String SECRET = "QJeKx+s7XIv1WbBlj7vJ9CD3Ozj1rB3qjlNZY9ofWKJSaBNBo5r1q9Rru/OWlYb+UHV1n4/LJl1OBYYZZ7rhJEnn5peyHCd+eLJfRdArE37pc+QDIsJlabQtR7tYRa+SnvGRyL01uZsK33+gezV+/GPXBnPTj8fOojDUzJiPAvE=";
 	
 	public void validateToken(final String token) throws InvalidTokenException {
 		try {

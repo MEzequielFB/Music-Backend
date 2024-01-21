@@ -36,7 +36,6 @@ public class AuthController {
 	
 	@GetMapping("/validate")
 	public ResponseEntity<String> validate(@RequestParam String token) throws InvalidTokenException {
-		service.validateToken(token);
-		return ResponseEntity.ok("The token is valid");
+		return ResponseEntity.ok(service.validateToken(token));
 	}
 }
