@@ -5,16 +5,20 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.userMS.dto.ArtistRequestDTO;
 import com.music.userMS.dto.ArtistResponseDTO;
+import com.music.userMS.dto.NameRequestDTO;
+import com.music.userMS.dto.RoleUpdateRequestDTO;
 import com.music.userMS.dto.UserDetailsResponseDTO;
 import com.music.userMS.dto.UserRequestDTO;
 import com.music.userMS.dto.UserResponseDTO;
 import com.music.userMS.exception.EmailAlreadyUsedException;
+import com.music.userMS.exception.InvalidRoleException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.model.Role;
 import com.music.userMS.model.Roles;
@@ -32,6 +36,9 @@ public class UserService {
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
@@ -164,7 +171,7 @@ public class UserService {
 	}
 	
 	@Transactional
-	public UserResponseDTO updateUser(Integer id, UserRequestDTO request) throws NotFoundException, EmailAlreadyUsedException {
+	public UserResponseDTO updateUser(Integer id, UserRequestDTO request, String token) throws NotFoundException, EmailAlreadyUsedException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());
 		if (optional.isPresent() && optional.get().getId() != id) {
 			throw new EmailAlreadyUsedException(request.getEmail());
@@ -176,16 +183,69 @@ public class UserService {
 		}
 		
 		User user = optional.get();
+		String encodedPassword = passwordEncoder.encode(request.getPassword());
+		
+		if (!user.getUsername().equals(request.getUsername())) {
+			try {
+				webClientBuilder.build()
+					.put()
+					.uri("http://localhost:8002/api/artist/user/" + id)
+					.header("Authorization", token)
+					.contentType(MediaType.APPLICATION_JSON)
+					.bodyValue(new NameRequestDTO(request.getUsername()))
+					.retrieve()
+					.bodyToMono(ArtistResponseDTO.class)
+					.block();
+			} catch (Exception e) {
+				System.err.println(String.format("Artist with userId %s doesn't exist", id));
+			}
+		}
+		
 		user.setUsername(request.getUsername());
 		user.setEmail(request.getEmail());
 		user.setAddress(request.getAddress());
-		user.setPassword(request.getPassword());
+		user.setPassword(encodedPassword);
 		
 		return new UserResponseDTO(repository.save(user));
 	}
 	
 	@Transactional
-	public UserResponseDTO deleteUser(Integer id) throws NotFoundException {
+	public UserResponseDTO updateUserRole(Integer id, RoleUpdateRequestDTO request) throws NotFoundException, InvalidRoleException {
+		Optional<User> optional = repository.findById(id);
+		Optional<Role> requestOptional = roleRepository.findByName(request.getRole());
+		Optional<Role> roleOptional = roleRepository.findByName(Roles.USER);
+		Optional<Role> roleOptional2 = roleRepository.findByName(Roles.ADMIN);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("User", id);
+		}
+		
+		if (!requestOptional.isPresent()) {
+			throw new NotFoundException("Role", request.getRole());
+		}
+		
+		if (!roleOptional.isPresent()) {
+			throw new NotFoundException("Role", Roles.USER);
+		}
+		
+		if (!roleOptional2.isPresent()) {
+			throw new NotFoundException("Role", Roles.ADMIN);
+		}
+		
+		User user = optional.get();
+		Role requestRole = requestOptional.get();
+		Role role = roleOptional.get();
+		Role role2 = roleOptional2.get();
+		
+		if (!user.getRole().equals(role) || !user.getRole().equals(role2)) {
+			throw new InvalidRoleException(user.getRole().getName());
+		}
+		
+		user.setRole(requestRole);
+		return new UserResponseDTO(repository.save(user));
+	}
+	
+	@Transactional
+	public UserResponseDTO deleteUser(Integer id, String token) throws NotFoundException {
 		Optional<User> optional = repository.findById(id);
 		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("User", id);
@@ -198,6 +258,7 @@ public class UserService {
 			webClientBuilder.build()
 				.delete()
 				.uri("http://localhost:8002/api/artist/user/" + id)
+				.header("Authorization", token)
 				.retrieve()
 				.bodyToMono(ArtistResponseDTO.class)
 				.block();	
@@ -207,5 +268,5 @@ public class UserService {
 		}
 		
 		return new UserResponseDTO(repository.save(user));
-	}	
+	}
 }

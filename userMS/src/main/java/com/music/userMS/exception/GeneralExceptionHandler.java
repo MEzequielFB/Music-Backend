@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(InvalidRoleException.class)
+	public ResponseEntity<String> handleInvalidRoleException(InvalidRoleException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(NotEnoughBalanceException.class)
 	public ResponseEntity<String> handleNotEnoughBalanceException(NotEnoughBalanceException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

@@ -15,6 +15,8 @@ import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Artist;
 import com.music.musicMS.repository.ArtistRepository;
 
+import jakarta.validation.Valid;
+
 @Service(value = "artistService")
 public class ArtistService {
 	
@@ -65,7 +67,6 @@ public class ArtistService {
 		return new ArtistResponseDTO(repository.save(artist));
 	}
 	
-	// REMOVE IT (?
 	@Transactional
 	public ArtistResponseDTO updateArtist(Integer id, NameRequestDTO request) throws NotFoundException {
 		Optional<Artist> optional = repository.findById(id);
@@ -76,6 +77,18 @@ public class ArtistService {
 			return new ArtistResponseDTO(repository.save(artist));
 		} else {
 			throw new NotFoundException("Artist", id);
+		}
+	}
+	
+	public ArtistResponseDTO updateArtistByUserId(Integer userId, @Valid NameRequestDTO request) throws NotFoundException {
+		Optional<Artist> optional = repository.findByUserId(userId);
+		if (optional.isPresent() && !optional.get().getIsDeleted()) {
+			Artist artist = optional.get();
+			artist.setName(request.getName());
+			
+			return new ArtistResponseDTO(repository.save(artist));
+		} else {
+			throw new NotFoundException("Artist", userId);
 		}
 	}
 	
@@ -92,6 +105,7 @@ public class ArtistService {
 		}
 	}
 
+	@Transactional
 	public ArtistResponseDTO deleteArtistByUserId(Integer userId) throws NotFoundException {
 		Optional<Artist> optional = repository.findByUserId(userId);
 		if (optional.isPresent() && !optional.get().getIsDeleted()) {

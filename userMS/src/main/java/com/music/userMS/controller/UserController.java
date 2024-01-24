@@ -12,15 +12,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.userMS.dto.FollowRequestDTO;
+import com.music.userMS.dto.RoleUpdateRequestDTO;
 import com.music.userMS.dto.UserDetailsResponseDTO;
 import com.music.userMS.dto.UserFollowerResponseDTO;
 import com.music.userMS.dto.UserRequestDTO;
 import com.music.userMS.dto.UserResponseDTO;
 import com.music.userMS.exception.EmailAlreadyUsedException;
+import com.music.userMS.exception.InvalidRoleException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.model.Roles;
 import com.music.userMS.service.UserFollowerService;
@@ -97,13 +100,19 @@ public class UserController {
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
-	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request) throws NotFoundException, EmailAlreadyUsedException {
-		return ResponseEntity.ok(service.updateUser(id, request));
+	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, EmailAlreadyUsedException {
+		return ResponseEntity.ok(service.updateUser(id, request, token));
+	}
+	
+	@PutMapping("/role/{id}")
+	@PreAuthorize("hasAnyAuthority('" + Roles.SUPER_ADMIN + "')")
+	public ResponseEntity<UserResponseDTO> updateUserRole(@PathVariable Integer id, @RequestBody @Valid RoleUpdateRequestDTO request) throws NotFoundException, InvalidRoleException {
+		return ResponseEntity.ok(service.updateUserRole(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
-	public ResponseEntity<UserResponseDTO> deleteUser(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.deleteUser(id));
+	public ResponseEntity<UserResponseDTO> deleteUser(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.deleteUser(id, token));
 	}
 }

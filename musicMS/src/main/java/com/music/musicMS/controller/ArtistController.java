@@ -68,6 +68,12 @@ public class ArtistController {
 		return ResponseEntity.ok(service.updateArtist(id, request));
 	}
 	
+	@PutMapping("/user/{userId}")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.ARTIST + "')")
+	public ResponseEntity<ArtistResponseDTO> updateArtistByUserId(@PathVariable Integer userId, @RequestBody @Valid NameRequestDTO request) throws NotFoundException {
+		return ResponseEntity.ok(service.updateArtistByUserId(userId, request));
+	}
+	
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
 	public ResponseEntity<ArtistResponseDTO> deleteArtist(@PathVariable Integer id) throws NotFoundException {

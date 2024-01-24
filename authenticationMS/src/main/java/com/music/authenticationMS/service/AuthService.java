@@ -18,8 +18,6 @@ import com.music.authenticationMS.exception.InvalidTokenException;
 import com.music.authenticationMS.exception.NotFoundException;
 import com.music.authenticationMS.security.TokenProvider;
 
-import jakarta.validation.Valid;
-
 @Service("authService")
 public class AuthService {
 	
