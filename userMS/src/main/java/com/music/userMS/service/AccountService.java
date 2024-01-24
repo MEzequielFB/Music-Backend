@@ -85,7 +85,7 @@ public class AccountService {
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Account", id);
 		}
-		if (!userOptional.isPresent()) {
+		if (!userOptional.isPresent() || userOptional.get().getIsDeleted()) {
 			throw new NotFoundException("User", userId);
 		}
 		
