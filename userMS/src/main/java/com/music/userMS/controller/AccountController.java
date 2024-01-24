@@ -48,6 +48,12 @@ public class AccountController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
+	@GetMapping("/user/{userId}")
+	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	public ResponseEntity<List<AccountResponseDTO>> findByAllByUser(@PathVariable Integer userId) throws NotFoundException {
+		return ResponseEntity.ok(service.findByAllByUser(userId));
+	}
+	
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
 	public ResponseEntity<AccountResponseDTO> saveAccount(@RequestBody @Valid AccountRequestDTO request) throws SomeEntityDoesNotExistException {

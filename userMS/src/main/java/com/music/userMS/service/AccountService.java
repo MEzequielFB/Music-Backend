@@ -50,6 +50,21 @@ public class AccountService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	public List<AccountResponseDTO> findByAllByUser(Integer userId) throws NotFoundException {
+		Optional<User> optional = userRepository.findById(userId);
+		if (optional.isPresent()) {
+			User user = optional.get();
+			
+			return repository.findAllByUser(user)
+					.stream()
+					.map( AccountResponseDTO::new )
+					.toList();
+		} else {
+			throw new NotFoundException("User", userId);
+		}
+	}
+	
 	@Transactional
 	public AccountResponseDTO saveAccount(AccountRequestDTO request) throws SomeEntityDoesNotExistException {
 		List<User> users = userRepository.findAllByIds(request.getUsersId());
