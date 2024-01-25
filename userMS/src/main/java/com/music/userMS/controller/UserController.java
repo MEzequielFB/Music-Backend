@@ -59,26 +59,26 @@ public class UserController {
 	}
 	
 	@GetMapping("")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<UserResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/deleted")
-	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "')" )
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<List<UserResponseDTO>> findAllDeletedUsers() {
 		return ResponseEntity.ok(service.findAllDeletedUsers());
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<UserResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 		
 	}
 	
 	@GetMapping("/{id}/evenDeleted")
-	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "')" )
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<UserResponseDTO> findByIdEvenDeleted(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findByIdEvenDeleted(id));
 	}
@@ -99,7 +99,7 @@ public class UserController {
 	}
 	
 	@PutMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, EmailAlreadyUsedException {
 		return ResponseEntity.ok(service.updateUser(id, request, token));
 	}
@@ -111,7 +111,7 @@ public class UserController {
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<UserResponseDTO> deleteUser(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteUser(id, token));
 	}
