@@ -92,4 +92,14 @@ public class AuthService {
 		}
 		return "Invalid token!";
 	}
+	
+	public Integer getLoggedUserId() throws NotFoundException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication.isAuthenticated()) {
+			CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+			return user.getId();
+		} else {
+			throw new NotFoundException();
+		}
+	}
 }

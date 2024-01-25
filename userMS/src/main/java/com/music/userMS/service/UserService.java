@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ServerErrorException;
 
 import com.music.userMS.dto.ArtistRequestDTO;
 import com.music.userMS.dto.ArtistResponseDTO;
@@ -17,6 +18,7 @@ import com.music.userMS.dto.RoleUpdateRequestDTO;
 import com.music.userMS.dto.UserDetailsResponseDTO;
 import com.music.userMS.dto.UserRequestDTO;
 import com.music.userMS.dto.UserResponseDTO;
+import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.EmailAlreadyUsedException;
 import com.music.userMS.exception.InvalidRoleException;
 import com.music.userMS.exception.NotFoundException;
@@ -152,26 +154,30 @@ public class UserService {
 		Role role = roleOptional.get();
 		User user = new User(request, role);
 		
-		UserResponseDTO userDTO = new UserResponseDTO(repository.save(user));
-		
-		webClientBuilder.build()
+		try {
+			webClientBuilder.build()
 				.post()
 				.uri("http://localhost:8002/api/artist")
 				.contentType(MediaType.APPLICATION_JSON)
-				.bodyValue(new ArtistRequestDTO(userDTO.getUsername(), userDTO.getId()))
+				.bodyValue(new ArtistRequestDTO(user.getUsername(), user.getId()))
 				.retrieve()
 				.bodyToMono(ArtistResponseDTO.class)
 				.onErrorResume(Exception.class, ex -> {
 					System.err.println(ex);
 					return Mono.error(ex);
 				})
-				.block();
+				.block();	
+		} catch (Exception e) {
+			throw new ServerErrorException("Server not respond or the username is already in use", e);
+		}
+		
+		UserResponseDTO userDTO = new UserResponseDTO(repository.save(user));
 		
 		return userDTO;
 	}
 	
 	@Transactional
-	public UserResponseDTO updateUser(Integer id, UserRequestDTO request, String token) throws NotFoundException, EmailAlreadyUsedException {
+	public UserResponseDTO updateUser(Integer id, UserRequestDTO request, String token) throws NotFoundException, EmailAlreadyUsedException, AuthorizationException {
 		Optional<User> optional = repository.findByEmail(request.getEmail());
 		if (optional.isPresent() && optional.get().getId() != id) {
 			throw new EmailAlreadyUsedException(request.getEmail());
@@ -184,6 +190,30 @@ public class UserService {
 		
 		User user = optional.get();
 		String encodedPassword = passwordEncoder.encode(request.getPassword());
+		
+		try {
+			Integer loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+			
+			// if logged user updating has another id and is not an admin or super_admin throw exception
+			if (!id.equals(loggedUserId) && (!user.getRole().getName().equals(Roles.ADMIN) || !user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
+				throw new AuthorizationException();
+			}
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+//		Integer loggedUserId = authService.getLoggedUserId();
+		// if logged user updating has another id and is not an admin or super_admin throw exception
+//		if (!id.equals(loggedUserId) && (!user.getRole().getName().equals(Roles.ADMIN) || !user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
+//			throw new AuthorizationException();
+//		}
 		
 		if (!user.getUsername().equals(request.getUsername())) {
 			try {

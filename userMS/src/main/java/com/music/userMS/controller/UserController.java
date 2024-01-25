@@ -22,6 +22,7 @@ import com.music.userMS.dto.UserDetailsResponseDTO;
 import com.music.userMS.dto.UserFollowerResponseDTO;
 import com.music.userMS.dto.UserRequestDTO;
 import com.music.userMS.dto.UserResponseDTO;
+import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.EmailAlreadyUsedException;
 import com.music.userMS.exception.InvalidRoleException;
 import com.music.userMS.exception.NotFoundException;
@@ -100,7 +101,7 @@ public class UserController {
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
-	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, EmailAlreadyUsedException {
+	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, EmailAlreadyUsedException, AuthorizationException {
 		return ResponseEntity.ok(service.updateUser(id, request, token));
 	}
 	

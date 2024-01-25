@@ -2,6 +2,7 @@ package com.music.authenticationMS.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,5 +44,11 @@ public class AuthController {
 	@GetMapping("/validate")
 	public ResponseEntity<String> validate(@RequestParam String token) throws InvalidTokenException {
 		return ResponseEntity.ok(service.validateToken(token));
+	}
+	
+	@GetMapping("/id")
+	@PreAuthorize("authenticated")
+	public ResponseEntity<Integer> getLoggedUserId() throws NotFoundException {
+		return ResponseEntity.ok(service.getLoggedUserId());
 	}
 }
