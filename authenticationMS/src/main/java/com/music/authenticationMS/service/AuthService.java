@@ -6,12 +6,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.authenticationMS.dto.AuthRequestDTO;
+import com.music.authenticationMS.dto.AuthResponseDTO;
 import com.music.authenticationMS.dto.UserDTO;
 import com.music.authenticationMS.dto.UserRequestDTO;
 import com.music.authenticationMS.exception.InvalidTokenException;
@@ -34,7 +36,7 @@ public class AuthService {
 	private WebClient.Builder webClientBuilder;
 	
 	@Transactional
-	public String register(UserRequestDTO request) throws NotFoundException {
+	public AuthResponseDTO register(UserRequestDTO request) throws NotFoundException {
 		String decodePassword = request.getPassword();
 		request.setPassword(passwordEncoder.encode(request.getPassword()));
 		
@@ -51,7 +53,7 @@ public class AuthService {
 	}
 	
 	@Transactional
-	public String registerArtist(UserRequestDTO request) throws NotFoundException {
+	public AuthResponseDTO registerArtist(UserRequestDTO request) throws NotFoundException {
 		String decodePassword = request.getPassword();
 		request.setPassword(passwordEncoder.encode(request.getPassword()));
 		
@@ -68,13 +70,15 @@ public class AuthService {
 	}
 	
 	@Transactional
-	public String login(AuthRequestDTO request) throws NotFoundException {
+	public AuthResponseDTO login(AuthRequestDTO request) throws NotFoundException {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())); 
 		if (authentication.isAuthenticated()) {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
-			String jwt = tokenProvider.createToken(authentication);
 			
-			return jwt;
+			User user = (User) authentication.getPrincipal();
+			String jwt = tokenProvider.createToken(authentication);
+
+			return new AuthResponseDTO(new UserDTO(user), jwt);
 		} else {
 			throw new NotFoundException("User", request.getEmail());
 		}

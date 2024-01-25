@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.authenticationMS.dto.AuthRequestDTO;
+import com.music.authenticationMS.dto.AuthResponseDTO;
 import com.music.authenticationMS.dto.UserRequestDTO;
 import com.music.authenticationMS.exception.InvalidTokenException;
 import com.music.authenticationMS.exception.NotFoundException;
@@ -25,17 +26,17 @@ public class AuthController {
 	private AuthService service;
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody @Valid UserRequestDTO request) throws NotFoundException {
+	public ResponseEntity<AuthResponseDTO> register(@RequestBody @Valid UserRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.register(request));
 	}
 	
 	@PostMapping("/register/artist")
-	public ResponseEntity<String> registerArtist(@RequestBody @Valid UserRequestDTO request) throws NotFoundException {
+	public ResponseEntity<AuthResponseDTO> registerArtist(@RequestBody @Valid UserRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.registerArtist(request));
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody @Valid AuthRequestDTO request) throws NotFoundException {
+	public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.login(request));
 	}
 	
