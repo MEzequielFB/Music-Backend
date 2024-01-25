@@ -6,12 +6,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.music.authenticationMS.config.CustomUserDetails;
 import com.music.authenticationMS.dto.AuthRequestDTO;
 import com.music.authenticationMS.dto.AuthResponseDTO;
 import com.music.authenticationMS.dto.UserDTO;
@@ -75,7 +75,7 @@ public class AuthService {
 		if (authentication.isAuthenticated()) {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			
-			User user = (User) authentication.getPrincipal();
+			CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 			String jwt = tokenProvider.createToken(authentication);
 
 			return new AuthResponseDTO(new UserDTO(user), jwt);

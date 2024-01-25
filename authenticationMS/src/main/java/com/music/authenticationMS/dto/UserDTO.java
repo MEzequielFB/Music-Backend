@@ -1,6 +1,6 @@
 package com.music.authenticationMS.dto;
 
-import org.springframework.security.core.userdetails.User;
+import com.music.authenticationMS.config.CustomUserDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,11 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
+	private Integer id;
 	private String email;
 	private String password;
 	private String role;
 	
-	public UserDTO(User user) {
+	public UserDTO(CustomUserDetails user) {
+		this.id = user.getId();
 		this.email = user.getUsername();
 		this.password = null;
 		this.role = user.getAuthorities().toArray()[0].toString();
