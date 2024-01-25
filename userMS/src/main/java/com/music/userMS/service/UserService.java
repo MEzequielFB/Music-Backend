@@ -236,7 +236,7 @@ public class UserService {
 		Role role = roleOptional.get();
 		Role role2 = roleOptional2.get();
 		
-		if (!user.getRole().equals(role) || !user.getRole().equals(role2)) {
+		if ((!user.getRole().equals(role) && !user.getRole().equals(role2)) || (!requestRole.equals(role) && !requestRole.equals(role2))) {
 			throw new InvalidRoleException(user.getRole().getName());
 		}
 		
