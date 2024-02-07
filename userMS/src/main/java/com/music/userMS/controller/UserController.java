@@ -99,10 +99,10 @@ public class UserController {
 		return new ResponseEntity<>(service.saveArtistUser(request), HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/{id}")
+	@PutMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
-	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Integer id, @RequestBody @Valid UserRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, EmailAlreadyUsedException, AuthorizationException {
-		return ResponseEntity.ok(service.updateUser(id, request, token));
+	public ResponseEntity<UserResponseDTO> updateUser(@RequestBody @Valid UserRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, EmailAlreadyUsedException, AuthorizationException {
+		return ResponseEntity.ok(service.updateUser(request, token));
 	}
 	
 	@PutMapping("/role/{id}")

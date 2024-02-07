@@ -177,43 +177,39 @@ public class UserService {
 	}
 	
 	@Transactional
-	public UserResponseDTO updateUser(Integer id, UserRequestDTO request, String token) throws NotFoundException, EmailAlreadyUsedException, AuthorizationException {
-		Optional<User> optional = repository.findByEmail(request.getEmail());
-		if (optional.isPresent() && optional.get().getId() != id) {
-			throw new EmailAlreadyUsedException(request.getEmail());
-		}
-		
-		optional = repository.findById(id);
-		if (!optional.isPresent() || optional.get().getIsDeleted()) {
-			throw new NotFoundException("User", id);
-		}
-		
-		User user = optional.get();
-		String encodedPassword = passwordEncoder.encode(request.getPassword());
-		
+	public UserResponseDTO updateUser(UserRequestDTO request, String token) throws NotFoundException, EmailAlreadyUsedException, AuthorizationException {
+		Integer loggedUserId = null;
 		try {
-			Integer loggedUserId = webClientBuilder.build()
+			loggedUserId = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8004/api/auth/id")
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
 					.block();
-			
-			// if logged user updating has another id and is not an admin or super_admin throw exception
-			if (!id.equals(loggedUserId) && (!user.getRole().getName().equals(Roles.ADMIN) || !user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
-				throw new AuthorizationException();
-			}
 		} catch (Exception e) {
 			System.err.println(e);
 			throw new AuthorizationException();
 		}
 		
+		Optional<User> optional = repository.findByEmail(request.getEmail());
+		if (optional.isPresent() && optional.get().getId() != loggedUserId) {
+			throw new EmailAlreadyUsedException(request.getEmail());
+		}
+		
+		optional = repository.findById(loggedUserId);
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
+		User user = optional.get();
+		String encodedPassword = passwordEncoder.encode(request.getPassword());
+		
 		if (!user.getUsername().equals(request.getUsername())) {
 			try {
 				webClientBuilder.build()
 					.put()
-					.uri("http://localhost:8002/api/artist/user/" + id)
+					.uri("http://localhost:8002/api/artist/user/" + loggedUserId)
 					.header("Authorization", token)
 					.contentType(MediaType.APPLICATION_JSON)
 					.bodyValue(new NameRequestDTO(request.getUsername()))
@@ -221,7 +217,7 @@ public class UserService {
 					.bodyToMono(ArtistResponseDTO.class)
 					.block();
 			} catch (Exception e) {
-				System.err.println(String.format("Artist with userId %s doesn't exist", id));
+				System.err.println(String.format("Artist with userId %s doesn't exist", loggedUserId));
 			}
 		}
 		
