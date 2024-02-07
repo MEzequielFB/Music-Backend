@@ -209,12 +209,6 @@ public class UserService {
 			throw new AuthorizationException();
 		}
 		
-//		Integer loggedUserId = authService.getLoggedUserId();
-		// if logged user updating has another id and is not an admin or super_admin throw exception
-//		if (!id.equals(loggedUserId) && (!user.getRole().getName().equals(Roles.ADMIN) || !user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
-//			throw new AuthorizationException();
-//		}
-		
 		if (!user.getUsername().equals(request.getUsername())) {
 			try {
 				webClientBuilder.build()

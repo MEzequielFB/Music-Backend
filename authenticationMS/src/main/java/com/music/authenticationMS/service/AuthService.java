@@ -75,8 +75,10 @@ public class AuthService {
 		if (authentication.isAuthenticated()) {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 			
+	        System.out.println("Authentication object after setting in SecurityContextHolder: {} " + authentication);
+			
 			CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-			String jwt = tokenProvider.createToken(authentication);
+			String jwt = tokenProvider.createToken(authentication, user.getId());
 
 			return new AuthResponseDTO(new UserDTO(user), jwt);
 		} else {
@@ -93,9 +95,12 @@ public class AuthService {
 		return "Invalid token!";
 	}
 	
+	@Transactional
 	public Integer getLoggedUserId() throws NotFoundException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication.isAuthenticated()) {
+		if (authentication != null && authentication.isAuthenticated()) {
+			System.out.println("Authentication object after setting in SecurityContextHolder: {} " + authentication);
+			
 			CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 			return user.getId();
 		} else {

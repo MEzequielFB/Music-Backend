@@ -17,6 +17,11 @@ public class CustomUserDetails extends User {
 		this.id = user.getId();
 	}
 	
+	public CustomUserDetails(Integer id, String subject, Collection<? extends GrantedAuthority> grantedAuthorities) {
+		super(subject, "", grantedAuthorities);
+		this.id = id;
+	}
+	
 	public Integer getId() {
 		return this.id;
 	}

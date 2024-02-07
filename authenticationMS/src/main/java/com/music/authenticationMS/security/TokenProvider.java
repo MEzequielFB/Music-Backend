@@ -9,8 +9,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+
+import com.music.authenticationMS.config.CustomUserDetails;
+
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,13 +42,14 @@ public class TokenProvider {
         jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
     }
 
-    public String createToken( Authentication authentication ) {
+    public String createToken(Authentication authentication, Integer id) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.tokenValidityInMilliseconds );
         return Jwts
                 .builder()
                 .setSubject(authentication.getName())
+                .claim("id", id)
                 .claim(AUTHORITIES_KEY, authorities)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
@@ -62,7 +65,9 @@ public class TokenProvider {
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+//        User principal = new User(claims.getSubject(), "", authorities);
+        Integer id = (Integer) claims.get("id");
+        CustomUserDetails principal = new CustomUserDetails(id, claims.getSubject(), authorities);
 
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
