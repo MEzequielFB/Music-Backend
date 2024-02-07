@@ -115,18 +115,6 @@ public class AccountService {
 		User user = userOptional.get();
 		User loggedUser = loggedUserOptional.get();
 		
-//		Boolean containsId = false;
-//		for (User currentUser : account.getUsers()) {
-//			if (currentUser.getId().equals(loggedUserId)) {
-//				containsId = true;
-//				break;
-//			}
-//		}
-//		
-//		if (!containsId) {
-//			throw new AuthorizationException();
-//		}
-		
 		// if the logged user is not in the account and tries to add another user throw exception
 		if (!repository.accountContainsUser(account, loggedUser)) {
 			throw new AuthorizationException();
