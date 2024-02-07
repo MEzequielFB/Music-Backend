@@ -29,19 +29,19 @@ public class RoleController {
 	private RoleService service;
 	
 	@GetMapping("")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<List<RoleResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<RoleResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@PostMapping("")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<RoleResponseDTO> saveRole(@RequestBody @Valid RoleRequestDTO request) throws NameAlreadyUsedException {
 		return ResponseEntity.ok(service.saveRole(request));
 	}
