@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,7 +20,9 @@ import com.music.userMS.dto.AccountRequestDTO;
 import com.music.userMS.dto.AccountResponseDTO;
 import com.music.userMS.dto.BalanceDTO;
 import com.music.userMS.dto.UserIdDTO;
+import com.music.userMS.exception.AddUserException;
 import com.music.userMS.exception.AlreadyContainsException;
+import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
 import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
@@ -37,19 +40,19 @@ public class AccountController {
 	private AccountService service;
 	
 	@GetMapping("")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<List<AccountResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<AccountResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@GetMapping("/user/{userId}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<List<AccountResponseDTO>> findByAllByUser(@PathVariable Integer userId) throws NotFoundException {
 		return ResponseEntity.ok(service.findByAllByUser(userId));
 	}
@@ -62,8 +65,8 @@ public class AccountController {
 	
 	@PutMapping("/{id}/addUser")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<AccountResponseDTO> addUser(@PathVariable Integer id, @RequestBody @Valid UserIdDTO request) throws NotFoundException, AlreadyContainsException {
-		return ResponseEntity.ok(service.addUser(id, request.getUserId()));
+	public ResponseEntity<AccountResponseDTO> addUser(@PathVariable Integer id, @RequestBody @Valid UserIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException {
+		return ResponseEntity.ok(service.addUser(id, request.getUserId(), token));
 	}
 	
 	@PutMapping("/{id}/removeUser")

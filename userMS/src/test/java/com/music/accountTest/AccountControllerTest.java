@@ -19,7 +19,9 @@ import com.music.userMS.dto.AccountResponseDTO;
 import com.music.userMS.dto.BalanceDTO;
 import com.music.userMS.dto.UserIdDTO;
 import com.music.userMS.dto.UserResponseDTO;
+import com.music.userMS.exception.AddUserException;
 import com.music.userMS.exception.AlreadyContainsException;
+import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
 import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
@@ -38,6 +40,7 @@ public class AccountControllerTest {
 	private AccountRequestDTO accountRequestMock;
 	private UserIdDTO userRequestMock;
 	private BalanceDTO balanceRequestMock;
+	private String tokenMock;
 	
 	@BeforeEach
 	public void init() {
@@ -96,10 +99,10 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void addUserTest() throws NotFoundException, AlreadyContainsException {
-		when(service.addUser(1, 2)).thenReturn(accountResponseMock);
+	public void addUserTest() throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException {
+		when(service.addUser(1, 2, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.addUser(1, userRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.addUser(1, userRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());

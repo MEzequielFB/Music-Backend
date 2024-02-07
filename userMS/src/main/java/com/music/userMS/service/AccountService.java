@@ -7,16 +7,20 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.userMS.dto.AccountRequestDTO;
 import com.music.userMS.dto.AccountResponseDTO;
 import com.music.userMS.dto.BalanceDTO;
+import com.music.userMS.exception.AddUserException;
 import com.music.userMS.exception.AlreadyContainsException;
+import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
 import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
 import com.music.userMS.exception.SomeEntityDoesNotExistException;
 import com.music.userMS.model.Account;
+import com.music.userMS.model.Roles;
 import com.music.userMS.model.User;
 import com.music.userMS.repository.AccountRepository;
 import com.music.userMS.repository.UserRepository;
@@ -29,6 +33,9 @@ public class AccountService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
 	
 	private static Integer LIMIT_USERS_FOR_DELETE = 1;
 	
@@ -78,9 +85,24 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO addUser(Integer id, Integer userId) throws NotFoundException, AlreadyContainsException {
+	public AccountResponseDTO addUser(Integer id, Integer userId, String token) throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Account> optional = repository.findById(id);
 		Optional<User> userOptional = userRepository.findById(userId);
+		Optional<User> loggedUserOptional = userRepository.findById(loggedUserId);
 		
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Account", id);
@@ -91,9 +113,29 @@ public class AccountService {
 		
 		Account account = optional.get();
 		User user = userOptional.get();
+		User loggedUser = loggedUserOptional.get();
 		
+//		Boolean containsId = false;
+//		for (User currentUser : account.getUsers()) {
+//			if (currentUser.getId().equals(loggedUserId)) {
+//				containsId = true;
+//				break;
+//			}
+//		}
+//		
+//		if (!containsId) {
+//			throw new AuthorizationException();
+//		}
+		
+		// if the logged user is not in the account and tries to add another user throw exception
+		if (!repository.accountContainsUser(account, loggedUser)) {
+			throw new AuthorizationException();
+		}
 		if (repository.accountContainsUser(account, user)) {
 			throw new AlreadyContainsException(account, user);
+		}
+		if (!user.getRole().getName().equals(Roles.USER)) {
+			throw new AddUserException(userId);
 		}
 		
 		account.addUser(user);
