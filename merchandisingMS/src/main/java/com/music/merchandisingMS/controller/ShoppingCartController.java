@@ -40,13 +40,13 @@ public class ShoppingCartController {
 	private ShoppingCartService service;
 	
 	@GetMapping("")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<List<ShoppingCartResponseDTO>> findAll(@RequestHeader("Authorization") String token) {
 		return ResponseEntity.ok(service.findAll(token));
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<ShoppingCartResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id, token));
 	}
@@ -76,7 +76,7 @@ public class ShoppingCartController {
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<ShoppingCartResponseDTO> deleteShoppingCart(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteShoppingCart(id, token));
 	}
