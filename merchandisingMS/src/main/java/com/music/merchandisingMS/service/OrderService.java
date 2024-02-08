@@ -9,18 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.music.merchandisingMS.dto.OrderRequestDTO;
 import com.music.merchandisingMS.dto.OrderResponseDTO;
 import com.music.merchandisingMS.dto.OrderStatusUpdateDTO;
 import com.music.merchandisingMS.dto.UserDTO;
 import com.music.merchandisingMS.exception.NotFoundException;
-import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
 import com.music.merchandisingMS.model.Order;
 import com.music.merchandisingMS.model.OrderStatus;
-import com.music.merchandisingMS.model.Product;
 import com.music.merchandisingMS.model.Status;
 import com.music.merchandisingMS.repository.OrderRepository;
-import com.music.merchandisingMS.repository.ProductRepository;
 import com.music.merchandisingMS.repository.StatusRepository;
 
 @Service("orderService")
@@ -31,9 +27,6 @@ public class OrderService {
 	
 	@Autowired
 	private StatusRepository statusRepository;
-	
-	@Autowired
-	private ProductRepository productRepository;
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
@@ -131,6 +124,8 @@ public class OrderService {
 		order.setStatus(status);
 		if (status.getName().equalsIgnoreCase(OrderStatus.DELIVERED)) {
 			order.setDeliveredDate(new Date(System.currentTimeMillis()));
+		} else if (!status.getName().equalsIgnoreCase(OrderStatus.DELIVERED) && order.getDeliveredDate() != null) {
+			order.setDeliveredDate(null);
 		}
 		
 		UserDTO user = null;
