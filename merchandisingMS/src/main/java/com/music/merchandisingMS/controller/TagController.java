@@ -33,31 +33,31 @@ public class TagController {
 	private TagService service;
 	
 	@GetMapping("")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<List<TagResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN +  "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<TagResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@PostMapping("")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<TagResponseDTO> saveTag(@RequestBody @Valid TagRequestDTO request) throws NameAlreadyUsedException {
 		return new ResponseEntity<>(service.saveTag(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<TagResponseDTO> updateTag(@PathVariable Integer id, @RequestBody @Valid TagRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
 		return ResponseEntity.ok(service.updateTag(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<TagResponseDTO> deleteTag(@PathVariable Integer id) throws NotFoundException, NoTagsException {
 		return ResponseEntity.ok(service.deleteTag(id));
 	}
