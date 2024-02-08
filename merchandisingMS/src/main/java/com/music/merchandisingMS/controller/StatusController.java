@@ -33,31 +33,31 @@ public class StatusController {
 	private StatusService service;
 	
 	@GetMapping("")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.DELIVERY + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<List<StatusResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.DELIVERY + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<StatusResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@PostMapping("")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<StatusResponseDTO> saveStatus(@RequestBody @Valid StatusRequestDTO request) throws NameAlreadyUsedException {
 		return new ResponseEntity<StatusResponseDTO>(service.saveStatus(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<StatusResponseDTO> updateStatus(@PathVariable Integer id, @RequestBody @Valid StatusRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
 		return ResponseEntity.ok(service.updateStatus(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<StatusResponseDTO> deleteStatus(@PathVariable Integer id) throws NotFoundException, SQLIntegrityConstraintViolationException {
 		return ResponseEntity.ok(service.deleteStatus(id));
 	}
