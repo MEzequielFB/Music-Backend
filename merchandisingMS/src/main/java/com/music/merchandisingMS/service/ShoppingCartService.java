@@ -20,6 +20,7 @@ import com.music.merchandisingMS.dto.ProductQuantityRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
 import com.music.merchandisingMS.dto.UserDTO;
+import com.music.merchandisingMS.exception.AuthorizationException;
 import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.EmptyShoppingCartException;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
@@ -99,23 +100,37 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO saveShoppingCart(ShoppingCartRequestDTO request, String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException {
-		Optional<ShoppingCart> optional = repository.findByUserId(request.getUserId());
+	public ShoppingCartResponseDTO saveShoppingCart(ShoppingCartRequestDTO request, String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		Optional<ShoppingCart> optional = repository.findByUserId(loggedUserId);
 		if (optional.isPresent()) {
-			throw new EntityWithUserIdAlreadyUsedException("ShoppingCart", request.getUserId());
+			throw new EntityWithUserIdAlreadyUsedException("ShoppingCart", loggedUserId);
 		}
 		
 		UserDTO user = null;
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + request.getUserId())
+					.uri("http://localhost:8001/api/user/" + loggedUserId)
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
 		} catch (Exception e) {
-			throw new NotFoundException("User", request.getUserId());
+			throw new NotFoundException("User", loggedUserId);
 		}
 		
 		List<Product> products = new ArrayList<>();
@@ -131,7 +146,7 @@ public class ShoppingCartService {
 			products.add(product);
 		}
 		
-		ShoppingCart shoppingCart = new ShoppingCart(request, products);
+		ShoppingCart shoppingCart = new ShoppingCart(loggedUserId, products);
 		Double totalPrice = 0.0;
 		
 		for (Product product : products) {

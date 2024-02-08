@@ -21,6 +21,7 @@ import com.music.merchandisingMS.dto.ProductQuantityRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
 import com.music.merchandisingMS.exception.AccountIdRequest;
+import com.music.merchandisingMS.exception.AuthorizationException;
 import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.EmptyShoppingCartException;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
@@ -53,7 +54,7 @@ public class ShoppingCartController {
 	
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<ShoppingCartResponseDTO> saveShoppingCart(@RequestBody @Valid ShoppingCartRequestDTO request, @RequestHeader("Authorization") String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException {
+	public ResponseEntity<ShoppingCartResponseDTO> saveShoppingCart(@RequestBody @Valid ShoppingCartRequestDTO request, @RequestHeader("Authorization") String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException, AuthorizationException {
 		return new ResponseEntity<>(service.saveShoppingCart(request, token), HttpStatus.CREATED);
 	}
 	

@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ShoppingCartRequestDTO {
 
-	@NotNull(message = "userId shouldn't be null")
-	@Positive(message = "userId should be positive")
-	private Integer userId;
+//	@NotNull(message = "userId shouldn't be null")
+//	@Positive(message = "userId should be positive")
+//	private Integer userId;
 	
 	@NotNull(message = "products shouldn't be null")
 	@NotEmpty(message = "products shouldn't be empty")
