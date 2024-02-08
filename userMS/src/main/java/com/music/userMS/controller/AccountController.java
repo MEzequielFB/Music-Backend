@@ -71,24 +71,24 @@ public class AccountController {
 	
 	@PutMapping("/{id}/removeUser")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<AccountResponseDTO> removeUser(@PathVariable Integer id, @RequestBody @Valid UserIdDTO request) throws NotFoundException {
-		return ResponseEntity.ok(service.removeUser(id, request.getUserId()));
+	public ResponseEntity<AccountResponseDTO> removeUser(@PathVariable Integer id, @RequestBody @Valid UserIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
+		return ResponseEntity.ok(service.removeUser(id, request.getUserId(), token));
 	}
 	
 	@PutMapping("/{id}/addBalance")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
 	public ResponseEntity<AccountResponseDTO> addBalance(@PathVariable Integer id, @RequestBody @Valid BalanceDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.addBalance(id, request));
 	}
 	
 	@PutMapping("/{id}/removeBalance")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
 	public ResponseEntity<AccountResponseDTO> removeBalance(@PathVariable Integer id, @RequestBody @Valid BalanceDTO request) throws NotFoundException, NotEnoughBalanceException {
 		return ResponseEntity.ok(service.removeBalance(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
 	public ResponseEntity<AccountResponseDTO> deleteAccount(@PathVariable Integer id) throws NotFoundException, MultipleUsersLinkedToAccountException {
 		return ResponseEntity.ok(service.deleteAccount(id));
 	}

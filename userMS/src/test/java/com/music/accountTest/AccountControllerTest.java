@@ -109,10 +109,10 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void removeUserTest() throws NotFoundException {
-		when(service.removeUser(1, 2)).thenReturn(accountResponseMock);
+	public void removeUserTest() throws NotFoundException, AuthorizationException {
+		when(service.removeUser(1, 2, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeUser(1, userRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeUser(1, userRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());

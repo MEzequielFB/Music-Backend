@@ -132,9 +132,24 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO removeUser(Integer id, Integer userId) throws NotFoundException {
+	public AccountResponseDTO removeUser(Integer id, Integer userId, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Account> optional = repository.findById(id);
 		Optional<User> userOptional = userRepository.findById(userId);
+		Optional<User> loggedUserOptional = userRepository.findById(loggedUserId);
 		
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Account", id);
@@ -145,6 +160,12 @@ public class AccountService {
 		
 		Account account = optional.get();
 		User user = userOptional.get();
+		User loggedUser = loggedUserOptional.get();
+		
+		// if the logged user is not in the account and tries to add another user throw exception
+		if (!repository.accountContainsUser(account, loggedUser)) {
+			throw new AuthorizationException();
+		}
 		
 		account.removeUser(user);
 		
