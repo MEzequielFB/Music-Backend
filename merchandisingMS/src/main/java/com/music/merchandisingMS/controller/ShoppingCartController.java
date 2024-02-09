@@ -52,6 +52,12 @@ public class ShoppingCartController {
 		return ResponseEntity.ok(service.findById(id, token));
 	}
 	
+	@GetMapping("/loggedUser")
+	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
+	public ResponseEntity<ShoppingCartResponseDTO> findByLoggedUser(@RequestHeader("Authorization") String token) throws AuthorizationException, NotFoundException {
+		return ResponseEntity.ok(service.findByLoggedUser(token));
+	}
+	
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
 	public ResponseEntity<ShoppingCartResponseDTO> saveShoppingCart(@RequestBody @Valid ShoppingCartRequestDTO request, @RequestHeader("Authorization") String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException, AuthorizationException {

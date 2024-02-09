@@ -100,6 +100,45 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
+	public ShoppingCartResponseDTO findByLoggedUser(String token) throws AuthorizationException, NotFoundException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		Optional<ShoppingCart> optional = repository.findByUserId(loggedUserId);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("ShoppingCart", loggedUserId);
+		}
+		
+		ShoppingCart shoppingCart = optional.get();
+		
+		UserDTO user = null; 
+		try {
+			user = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+		} catch (Exception e) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
+		return new ShoppingCartResponseDTO(shoppingCart, user);
+	}
+	
+	@Transactional
 	public ShoppingCartResponseDTO saveShoppingCart(ShoppingCartRequestDTO request, String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
