@@ -173,28 +173,81 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO addBalance(Integer id, BalanceDTO request) throws NotFoundException {
-		Optional<Account> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Account account = optional.get();
-			Double newBalance = Math.round(( account.getBalance() + request.getBalance() ) * 100.0) / 100.0;
-			
-			account.setBalance(newBalance);
-			
-			return new AccountResponseDTO(repository.save(account));
-		} else {
-			throw new NotFoundException("Account", id);
+	public AccountResponseDTO addBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
 		}
-	}
-	
-	@Transactional
-	public AccountResponseDTO removeBalance(Integer id, BalanceDTO request) throws NotFoundException, NotEnoughBalanceException {
+		
 		Optional<Account> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Account", id);
 		}
+		
+		Optional<User> userOptional = userRepository.findById(loggedUserId);
+		if (!userOptional.isPresent()) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
+		Account account = optional.get();
+		User user = userOptional.get();
+		
+		// if the account doesn't contain the logged user and the logged user is not an admin or super admin throws exception
+		Boolean containsUser = repository.accountContainsUser(account, user);
+		if (!containsUser && !(user.getRole().getName().equals(Roles.ADMIN) || user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
+			throw new AuthorizationException();
+		}
+		
+		Double newBalance = Math.round(( account.getBalance() + request.getBalance() ) * 100.0) / 100.0;
+		
+		account.setBalance(newBalance);
+		
+		return new AccountResponseDTO(repository.save(account));
+	}
+	
+	@Transactional
+	public AccountResponseDTO removeBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, NotEnoughBalanceException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		Optional<Account> optional = repository.findById(id);
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Account", id);
+		}
+		
+		Optional<User> userOptional = userRepository.findById(loggedUserId);
+		if (!userOptional.isPresent()) {
+			throw new NotFoundException("User", loggedUserId);
+		}
 			
 		Account account = optional.get();
+		User user = userOptional.get();
+		
+		// if the account doesn't contain the logged user and the logged user is not an admin or super admin throws exception
+		Boolean containsUser = repository.accountContainsUser(account, user);
+		if (!containsUser && !(user.getRole().getName().equals(Roles.ADMIN) || user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
+			throw new AuthorizationException();
+		}
 		
 		if (account.getBalance() < request.getBalance()) {
 			throw new NotEnoughBalanceException(id);

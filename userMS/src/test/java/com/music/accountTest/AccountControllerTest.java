@@ -119,20 +119,20 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void addBalanceTest() throws NotFoundException {
-		when(service.addBalance(1, balanceRequestMock)).thenReturn(accountResponseMock);
+	public void addBalanceTest() throws NotFoundException, AuthorizationException {
+		when(service.addBalance(1, balanceRequestMock, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.addBalance(1, balanceRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.addBalance(1, balanceRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
-	public void removeBalanceTest() throws NotFoundException, NotEnoughBalanceException {
-		when(service.removeBalance(1, balanceRequestMock)).thenReturn(accountResponseMock);
+	public void removeBalanceTest() throws NotFoundException, NotEnoughBalanceException, AuthorizationException {
+		when(service.removeBalance(1, balanceRequestMock, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeBalance(1, balanceRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeBalance(1, balanceRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());
