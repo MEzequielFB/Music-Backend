@@ -165,7 +165,7 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO buyProducts(Integer id, Integer accountId, String token) throws NotFoundException, EmptyShoppingCartException, StockException {
+	public ShoppingCartResponseDTO buyProducts(Integer id, Integer accountId, String token) throws NotFoundException, EmptyShoppingCartException, StockException, AuthorizationException {
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
@@ -189,7 +189,7 @@ public class ShoppingCartService {
 		}
 		
 		try {
-			webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE AND ACCOUNT NOT FOUND
+			webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE, ACCOUNT NOT FOUND AND AUTHORIZATION ISSUE
 					.put()
 					.uri("http://localhost:8001/api/account/" + accountId + "/removeBalance")
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
