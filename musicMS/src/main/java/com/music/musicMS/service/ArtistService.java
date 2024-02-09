@@ -6,10 +6,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.musicMS.dto.ArtistRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.NameRequestDTO;
+import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Artist;
@@ -22,6 +24,9 @@ public class ArtistService {
 	
 	@Autowired
 	private ArtistRepository repository;
+	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
 	public List<ArtistResponseDTO> findAll() {
@@ -68,16 +73,36 @@ public class ArtistService {
 	}
 	
 	@Transactional
-	public ArtistResponseDTO updateArtist(Integer id, NameRequestDTO request) throws NotFoundException {
+	public ArtistResponseDTO updateArtist(Integer id, NameRequestDTO request, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Artist> optional = repository.findById(id);
-		if (optional.isPresent() && !optional.get().getIsDeleted()) {
-			Artist artist = optional.get();
-			artist.setName(request.getName());
-			
-			return new ArtistResponseDTO(repository.save(artist));
-		} else {
+		
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("Artist", id);
 		}
+		
+		Artist artist = optional.get();
+		
+		if (!artist.getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
+		
+		artist.setName(request.getName());
+		
+		return new ArtistResponseDTO(repository.save(artist));
 	}
 	
 	public ArtistResponseDTO updateArtistByUserId(Integer userId, @Valid NameRequestDTO request) throws NotFoundException {

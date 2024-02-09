@@ -17,6 +17,7 @@ import com.music.musicMS.controller.ArtistController;
 import com.music.musicMS.dto.ArtistRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.NameRequestDTO;
+import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.service.ArtistService;
@@ -32,6 +33,7 @@ public class ArtistControllerTest {
 	private ArtistResponseDTO artistResponseMock;
 	private ArtistRequestDTO artistRequestMock;
 	private NameRequestDTO nameRequestMock;
+	private String tokenMock;
 	
 	@BeforeEach
 	public void init() {
@@ -46,6 +48,7 @@ public class ArtistControllerTest {
 		this.nameRequestMock = NameRequestDTO.builder()
 			.name("newArtistName")
 			.build();
+		this.tokenMock = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsImlkIjoyMywiYXV0aCI6IlNVUEVSX0FETUlOIiwiZXhwIjoxNzA3NTMyNDU1fQ.JWKKgNu9xZs6c0lr7ZeRd2v_FFCyTle7XpbumUMeQXPLZYJ1TfTydpESzImAnbljMgZ-OrKCVTHytbVyl4edbQ";
 	}
 	
 	@Test
@@ -92,10 +95,10 @@ public class ArtistControllerTest {
 	}
 	
 	@Test
-	public void updateArtistTest() throws NotFoundException {
-		when(service.updateArtist(artistResponseMock.getId(), nameRequestMock)).thenReturn(artistResponseMock);
+	public void updateArtistTest() throws NotFoundException, AuthorizationException {
+		when(service.updateArtist(artistResponseMock.getId(), nameRequestMock, tokenMock)).thenReturn(artistResponseMock);
 		
-		ResponseEntity<ArtistResponseDTO> responseEntity = controller.updateArtist(artistResponseMock.getId(), nameRequestMock);
+		ResponseEntity<ArtistResponseDTO> responseEntity = controller.updateArtist(artistResponseMock.getId(), nameRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(artistResponseMock, responseEntity.getBody());

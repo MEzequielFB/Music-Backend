@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.music.musicMS.dto.ArtistRequestDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.NameRequestDTO;
+import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Roles;
@@ -63,13 +65,13 @@ public class ArtistController {
 	}
 	
 	@PutMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<ArtistResponseDTO> updateArtist(@PathVariable Integer id, @RequestBody @Valid NameRequestDTO request) throws NotFoundException {
-		return ResponseEntity.ok(service.updateArtist(id, request));
+	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
+	public ResponseEntity<ArtistResponseDTO> updateArtist(@PathVariable Integer id, @RequestBody @Valid NameRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
+		return ResponseEntity.ok(service.updateArtist(id, request, token));
 	}
 	
 	@PutMapping("/user/{userId}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<ArtistResponseDTO> updateArtistByUserId(@PathVariable Integer userId, @RequestBody @Valid NameRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updateArtistByUserId(userId, request));
 	}
