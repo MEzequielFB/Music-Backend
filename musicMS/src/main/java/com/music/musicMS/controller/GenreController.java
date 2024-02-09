@@ -32,31 +32,31 @@ public class GenreController {
 	private GenreService service;
 	
 	@GetMapping("")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<GenreResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<GenreResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@PostMapping("")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<GenreResponseDTO> saveGenre(@RequestBody @Valid GenreRequestDTO request) throws NameAlreadyUsedException {
 		return new ResponseEntity<>(service.saveGenre(request), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<GenreResponseDTO> updateGenre(@PathVariable Integer id, @RequestBody @Valid GenreRequestDTO request) throws NotFoundException {
 		return ResponseEntity.ok(service.updateGenre(id, request));
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<GenreResponseDTO> deleteGenre(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.deleteGenre(id));
 	}
