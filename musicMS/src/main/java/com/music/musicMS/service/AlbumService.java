@@ -6,11 +6,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
 import com.music.musicMS.exception.AlbumOwnerNotInSongException;
+import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
@@ -34,6 +36,9 @@ public class AlbumService {
 	
 	@Autowired
 	private SongRepository songRepository;
+	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
 	public List<AlbumResponseDTO> findAll() {
@@ -65,10 +70,24 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
-		Optional<Artist> artistOptional = artistRepository.findById(request.getOwnerId());
+	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request, String token) throws NotFoundException, NameAlreadyUsedException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		Optional<Artist> artistOptional = artistRepository.findByUserId(loggedUserId);
 		if (!artistOptional.isPresent()) {
-			throw new NotFoundException("Artist", request.getOwnerId());
+			throw new NotFoundException("Artist", loggedUserId);
 		}
 		
 		Artist owner = artistOptional.get();
