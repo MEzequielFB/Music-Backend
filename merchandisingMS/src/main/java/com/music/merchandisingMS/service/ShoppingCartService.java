@@ -235,7 +235,21 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request, String token) throws NotFoundException, DeletedEntityException, StockException {
+	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request, String token) throws NotFoundException, DeletedEntityException, StockException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
@@ -248,6 +262,10 @@ public class ShoppingCartService {
 		
 		ShoppingCart shoppingCart = optional.get();
 		Product product = productOptional.get();
+		
+		if (!shoppingCart.getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
 		
 		if (product.getIsDeleted()) {
 			throw new DeletedEntityException("Product", product.getName());
@@ -280,7 +298,21 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO removeProduct(Integer id, Integer productId, String token) throws NotFoundException {
+	public ShoppingCartResponseDTO removeProduct(Integer id, Integer productId, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<ShoppingCart> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
@@ -293,6 +325,10 @@ public class ShoppingCartService {
 		
 		ShoppingCart shoppingCart = optional.get();
 		Product product = productOptional.get();
+		
+		if (!shoppingCart.getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
 		
 		UserDTO user = null;
 		try {

@@ -66,13 +66,13 @@ public class ShoppingCartController {
 
 	@PutMapping("/{id}/addProduct")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Integer id, @RequestBody @Valid ProductQuantityRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, DeletedEntityException, StockException {
+	public ResponseEntity<ShoppingCartResponseDTO> addProduct(@PathVariable Integer id, @RequestBody @Valid ProductQuantityRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, DeletedEntityException, StockException, AuthorizationException {
 		return ResponseEntity.ok(service.addProduct(id, request, token));
 	}
 	
 	@PutMapping("/{id}/removeProduct")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<ShoppingCartResponseDTO> removeProduct(@PathVariable Integer id, @RequestBody @Valid ProductIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException {
+	public ResponseEntity<ShoppingCartResponseDTO> removeProduct(@PathVariable Integer id, @RequestBody @Valid ProductIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
 		return ResponseEntity.ok(service.removeProduct(id, request.getProductId(), token));
 	}
 	
