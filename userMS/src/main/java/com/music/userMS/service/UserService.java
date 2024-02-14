@@ -231,8 +231,10 @@ public class UserService {
 	public UserResponseDTO updateUserRole(Integer id, RoleUpdateRequestDTO request) throws NotFoundException, InvalidRoleException {
 		Optional<User> optional = repository.findById(id);
 		Optional<Role> requestOptional = roleRepository.findByName(request.getRole());
-		Optional<Role> roleOptional = roleRepository.findByName(Roles.USER);
-		Optional<Role> roleOptional2 = roleRepository.findByName(Roles.ADMIN);
+		Optional<Role> userRoleOptional = roleRepository.findByName(Roles.USER);
+		Optional<Role> adminRoleOptional = roleRepository.findByName(Roles.ADMIN);
+		Optional<Role> deliveryRoleOptional = roleRepository.findByName(Roles.DELIVERY);
+		
 		if (!optional.isPresent()) {
 			throw new NotFoundException("User", id);
 		}
@@ -241,20 +243,21 @@ public class UserService {
 			throw new NotFoundException("Role", request.getRole());
 		}
 		
-		if (!roleOptional.isPresent()) {
+		if (!userRoleOptional.isPresent()) {
 			throw new NotFoundException("Role", Roles.USER);
 		}
 		
-		if (!roleOptional2.isPresent()) {
+		if (!adminRoleOptional.isPresent()) {
 			throw new NotFoundException("Role", Roles.ADMIN);
 		}
 		
 		User user = optional.get();
 		Role requestRole = requestOptional.get();
-		Role role = roleOptional.get();
-		Role role2 = roleOptional2.get();
+		Role userRole = userRoleOptional.get();
+		Role adminRole = adminRoleOptional.get();
+		Role deliveryRole = deliveryRoleOptional.get();
 		
-		if ((!user.getRole().equals(role) && !user.getRole().equals(role2)) || (!requestRole.equals(role) && !requestRole.equals(role2))) {
+		if ((!user.getRole().equals(userRole) && !user.getRole().equals(adminRole) && !user.getRole().equals(deliveryRole)) || (!requestRole.equals(userRole) && !requestRole.equals(adminRole) && !requestRole.equals(deliveryRole))) {
 			throw new InvalidRoleException(user.getRole().getName());
 		}
 		
