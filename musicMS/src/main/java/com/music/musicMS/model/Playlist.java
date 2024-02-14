@@ -39,10 +39,10 @@ public class Playlist {
 			inverseJoinColumns = {@JoinColumn(name = "song_id")})
 	private List<Song> songs;
 	
-	public Playlist(PlaylistRequestDTO request) {
+	public Playlist(PlaylistRequestDTO request, Integer userId) {
 		this.name = request.getName();
 		this.isPublic = request.getIsPublic();
-		this.userId = request.getUserId();
+		this.userId = userId;
 	}
 	
 	public void addSong(Song song) {

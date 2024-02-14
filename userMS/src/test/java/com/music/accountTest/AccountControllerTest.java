@@ -19,7 +19,9 @@ import com.music.userMS.dto.AccountResponseDTO;
 import com.music.userMS.dto.BalanceDTO;
 import com.music.userMS.dto.UserIdDTO;
 import com.music.userMS.dto.UserResponseDTO;
+import com.music.userMS.exception.AddUserException;
 import com.music.userMS.exception.AlreadyContainsException;
+import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
 import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
@@ -38,6 +40,7 @@ public class AccountControllerTest {
 	private AccountRequestDTO accountRequestMock;
 	private UserIdDTO userRequestMock;
 	private BalanceDTO balanceRequestMock;
+	private String tokenMock;
 	
 	@BeforeEach
 	public void init() {
@@ -62,6 +65,7 @@ public class AccountControllerTest {
 		this.balanceRequestMock = BalanceDTO.builder()
 				.balance(40.0)
 				.build();
+		this.tokenMock = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsImlkIjoyMywiYXV0aCI6IlNVUEVSX0FETUlOIiwiZXhwIjoxNzA3NTMyNDU1fQ.JWKKgNu9xZs6c0lr7ZeRd2v_FFCyTle7XpbumUMeQXPLZYJ1TfTydpESzImAnbljMgZ-OrKCVTHytbVyl4edbQ";
 	}
 	
 	@Test
@@ -96,40 +100,40 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void addUserTest() throws NotFoundException, AlreadyContainsException {
-		when(service.addUser(1, 2)).thenReturn(accountResponseMock);
+	public void addUserTest() throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException {
+		when(service.addUser(1, 2, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.addUser(1, userRequestMock);
-		
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		assertEquals(accountResponseMock, responseEntity.getBody());
-	}
-	
-	@Test
-	public void removeUserTest() throws NotFoundException {
-		when(service.removeUser(1, 2)).thenReturn(accountResponseMock);
-		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeUser(1, userRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.addUser(1, userRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
-	public void addBalanceTest() throws NotFoundException {
-		when(service.addBalance(1, balanceRequestMock)).thenReturn(accountResponseMock);
+	public void removeUserTest() throws NotFoundException, AuthorizationException {
+		when(service.removeUser(1, 2, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.addBalance(1, balanceRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeUser(1, userRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
-	public void removeBalanceTest() throws NotFoundException, NotEnoughBalanceException {
-		when(service.removeBalance(1, balanceRequestMock)).thenReturn(accountResponseMock);
+	public void addBalanceTest() throws NotFoundException, AuthorizationException {
+		when(service.addBalance(1, balanceRequestMock, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeBalance(1, balanceRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.addBalance(1, balanceRequestMock, tokenMock);
+		
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(accountResponseMock, responseEntity.getBody());
+	}
+	
+	@Test
+	public void removeBalanceTest() throws NotFoundException, NotEnoughBalanceException, AuthorizationException {
+		when(service.removeBalance(1, balanceRequestMock, tokenMock)).thenReturn(accountResponseMock);
+		
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeBalance(1, balanceRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());

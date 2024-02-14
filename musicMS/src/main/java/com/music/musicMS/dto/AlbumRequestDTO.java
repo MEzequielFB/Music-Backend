@@ -15,7 +15,4 @@ public class AlbumRequestDTO {
 	@NotNull(message = "name shouldn't be null")
 	@NotBlank(message = "name shouldn't be empty")
 	private String name;
-	
-	@NotNull(message = "ownerId shouldn't be null")
-	private Integer ownerId;
 }

@@ -3,22 +3,21 @@ package com.music.merchandisingMS.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.music.merchandisingMS.dto.OrderRequestDTO;
 import com.music.merchandisingMS.dto.OrderResponseDTO;
 import com.music.merchandisingMS.dto.OrderStatusUpdateDTO;
 import com.music.merchandisingMS.exception.NotFoundException;
-import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
+import com.music.merchandisingMS.model.Roles;
 import com.music.merchandisingMS.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -31,13 +30,15 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 	private OrderService service;
 	
 	@GetMapping("")
-	public ResponseEntity<List<OrderResponseDTO>> findAll() {
-		return ResponseEntity.ok(service.findAll());
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
+	public ResponseEntity<List<OrderResponseDTO>> findAll(@RequestHeader("Authorization") String token) {
+		return ResponseEntity.ok(service.findAll(token));
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<OrderResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.findById(id));
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
+	public ResponseEntity<OrderResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.findById(id, token));
 	}
 	
 //	@PostMapping("")
@@ -46,12 +47,14 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 //	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable Integer id, @RequestBody @Valid OrderStatusUpdateDTO request) throws NotFoundException {
-		return ResponseEntity.ok(service.updateOrderStatus(id, request));
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
+	public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable Integer id, @RequestBody @Valid OrderStatusUpdateDTO request, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.updateOrderStatus(id, request, token));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<OrderResponseDTO> deleteOrder(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.deleteOrder(id));
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
+	public ResponseEntity<OrderResponseDTO> deleteOrder(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.deleteOrder(id, token));
 	}
 }

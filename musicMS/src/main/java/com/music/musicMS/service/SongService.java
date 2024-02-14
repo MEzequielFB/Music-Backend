@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.musicMS.dto.SongRequestDTO;
 import com.music.musicMS.dto.SongResponseDTO;
+import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.exception.SomeEntityDoesNotExistException;
@@ -41,6 +43,9 @@ public class SongService {
 	
 	@Autowired
 	private PlaylistRepository playlistRepository;
+	
+	@Autowired
+	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> searchSongs(String name, List<String> genres, List<Integer> years) {
@@ -98,7 +103,21 @@ public class SongService {
 	}
 	
 	@Transactional
-	public SongResponseDTO saveSong(SongRequestDTO request) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException {
+	public SongResponseDTO saveSong(SongRequestDTO request, String token) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Song> optional = repository.findByArtistsAndName(request.getArtists(), request.getName());
 		Optional<Album> albumOptional = null;
 		Album album = null;
@@ -123,6 +142,19 @@ public class SongService {
 			throw new SomeEntityDoesNotExistException("artists");
 		}
 		
+		Boolean containsLoggedUser = false;
+		for (Artist artist : artists) {
+			if (artist.getUserId().equals(loggedUserId)) {
+				containsLoggedUser = true;
+				break;
+			}
+		}
+		
+		// the logged artist should be in the list of artists to save the song
+		if (!containsLoggedUser) {
+			throw new AuthorizationException();
+		}
+		
 		List<Genre> genres = genreRepository.findAllById(request.getGenres());
 		
 		if (genres.size() != request.getGenres().size()) {
@@ -142,26 +174,59 @@ public class SongService {
 	}
 	
 	@Transactional
-	public SongResponseDTO updateSong(Integer id, SongRequestDTO request) throws SomeEntityDoesNotExistException, NotFoundException {
+	public SongResponseDTO updateSong(Integer id, SongRequestDTO request, String token) throws SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Song> optional = repository.findById(id);
-		Optional<Album> albumOptional = albumRepository.findById(request.getAlbumId());
+		Optional<Album> albumOptional = null;
+		
+		if (request.getAlbumId() != null) {
+			albumOptional = albumRepository.findById(request.getAlbumId());
+		}
 		
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Song", id);
 		}
-		if (!albumOptional.isPresent()) {
+		if (albumOptional != null && !albumOptional.isPresent()) {
 			throw new NotFoundException("Album", request.getAlbumId());
 		}
 
 		Song song = optional.get();
-		Album album = albumOptional.get();
+		if (albumOptional != null) {
+			Album album = albumOptional.get();
+			song.setAlbum(album);
+		}
 		song.setName(request.getName());
-		song.setAlbum(album);
 		
 		List<Artist> artists = artistRepository.findAllByIds(request.getArtists());
 		
 		if (artists.size() != request.getArtists().size()) {
 			throw new SomeEntityDoesNotExistException("artists");
+		}
+		
+		Boolean containsLoggedUser = false;
+		for (Artist artist : artists) {
+			if (artist.getUserId().equals(loggedUserId)) {
+				containsLoggedUser = true;
+				break;
+			}
+		}
+		
+		// the logged artist should be in the list of artists to save the song
+		if (!containsLoggedUser) {
+			throw new AuthorizationException();
 		}
 		
 		song.setArtists(artists);

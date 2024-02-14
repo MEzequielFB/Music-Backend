@@ -20,6 +20,7 @@ import com.music.musicMS.dto.AlbumUpdateDTO;
 import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.exception.AlbumOwnerNotInSongException;
+import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
@@ -40,6 +41,7 @@ public class AlbumControllerTest {
 	private AlbumRequestDTO albumRequestMock;
 	private AlbumUpdateDTO albumUpdateMock;
 	private SongIdDTO songIdMock;
+	private String tokenMock;
 	
 	@BeforeEach
 	public void init() {
@@ -57,7 +59,6 @@ public class AlbumControllerTest {
 			.build();
 		this.albumRequestMock = AlbumRequestDTO.builder()
 			.name("album1")
-			.ownerId(1)
 			.build();
 		this.albumUpdateMock = AlbumUpdateDTO.builder()
 			.name("album1")
@@ -65,6 +66,7 @@ public class AlbumControllerTest {
 		this.songIdMock = SongIdDTO.builder()
 			.songId(1)
 			.build();
+		this.tokenMock = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdXBlcmFkbWluQGdtYWlsLmNvbSIsImlkIjoyMywiYXV0aCI6IlNVUEVSX0FETUlOIiwiZXhwIjoxNzA3NTMyNDU1fQ.JWKKgNu9xZs6c0lr7ZeRd2v_FFCyTle7XpbumUMeQXPLZYJ1TfTydpESzImAnbljMgZ-OrKCVTHytbVyl4edbQ";
 	}
 	
 	@Test
@@ -101,50 +103,50 @@ public class AlbumControllerTest {
 	}
 	
 	@Test
-	public void saveAlbumTest() throws NotFoundException, NameAlreadyUsedException {
-		when(service.saveAlbum(albumRequestMock)).thenReturn(albumResponseMock);
+	public void saveAlbumTest() throws NotFoundException, NameAlreadyUsedException, AuthorizationException {
+		when(service.saveAlbum(albumRequestMock, tokenMock)).thenReturn(albumResponseMock);
 		
-		ResponseEntity<AlbumResponseDTO> responseEntity = controller.saveAlbum(albumRequestMock);
+		ResponseEntity<AlbumResponseDTO> responseEntity = controller.saveAlbum(albumRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 		assertEquals(albumResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
-	public void updateAlbumTest() throws NotFoundException, SomeEntityDoesNotExistException {
-		when(service.updateAlbum(albumResponseMock.getId(), albumUpdateMock)).thenReturn(albumResponseMock);
+	public void updateAlbumTest() throws NotFoundException, SomeEntityDoesNotExistException, AuthorizationException {
+		when(service.updateAlbum(albumResponseMock.getId(), albumUpdateMock, tokenMock)).thenReturn(albumResponseMock);
 		
-		ResponseEntity<AlbumResponseDTO> responseEntity = controller.updateAlbum(albumResponseMock.getId(), albumUpdateMock);
-		
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		assertEquals(albumResponseMock, responseEntity.getBody());
-	}
-	
-	@Test
-	public void addSongTest() throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
-		when(service.addSong(albumResponseMock.getId(), songIdMock.getSongId())).thenReturn(albumResponseMock);
-		
-		ResponseEntity<AlbumResponseDTO> responseEntity = controller.addSong(albumResponseMock.getId(), songIdMock);
+		ResponseEntity<AlbumResponseDTO> responseEntity = controller.updateAlbum(albumResponseMock.getId(), albumUpdateMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(albumResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
-	public void removeSongTest() throws NotFoundException, DoNotContainsTheSongException {
-		when(service.removeSong(albumResponseMock.getId(), songIdMock.getSongId())).thenReturn(albumResponseMock);
+	public void addSongTest() throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException, AuthorizationException {
+		when(service.addSong(albumResponseMock.getId(), songIdMock.getSongId(), tokenMock)).thenReturn(albumResponseMock);
 		
-		ResponseEntity<AlbumResponseDTO> responseEntity = controller.removeSong(albumResponseMock.getId(), songIdMock);
+		ResponseEntity<AlbumResponseDTO> responseEntity = controller.addSong(albumResponseMock.getId(), songIdMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(albumResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
-	public void deleteAlbumTest() throws NotFoundException {
-		when(service.deleteAlbum(albumResponseMock.getId())).thenReturn(albumResponseMock);
+	public void removeSongTest() throws NotFoundException, DoNotContainsTheSongException, AuthorizationException {
+		when(service.removeSong(albumResponseMock.getId(), songIdMock.getSongId(), tokenMock)).thenReturn(albumResponseMock);
 		
-		ResponseEntity<AlbumResponseDTO> responseEntity = controller.deleteAlbum(albumResponseMock.getId());
+		ResponseEntity<AlbumResponseDTO> responseEntity = controller.removeSong(albumResponseMock.getId(), songIdMock, tokenMock);
+		
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertEquals(albumResponseMock, responseEntity.getBody());
+	}
+	
+	@Test
+	public void deleteAlbumTest() throws NotFoundException, AuthorizationException {
+		when(service.deleteAlbum(albumResponseMock.getId(), tokenMock)).thenReturn(albumResponseMock);
+		
+		ResponseEntity<AlbumResponseDTO> responseEntity = controller.deleteAlbum(albumResponseMock.getId(), tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(albumResponseMock, responseEntity.getBody());

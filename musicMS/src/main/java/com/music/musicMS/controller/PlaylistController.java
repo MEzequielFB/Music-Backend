@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,8 +22,11 @@ import com.music.musicMS.dto.PlaylistUpdateDTO;
 import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.exception.AlreadyContainsSongException;
+import com.music.musicMS.exception.AuthorizationException;
+import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.model.Roles;
 import com.music.musicMS.service.PlaylistService;
 
 import jakarta.validation.Valid;
@@ -34,42 +39,50 @@ public class PlaylistController {
 	private PlaylistService service;
 	
 	@GetMapping("")
-	public ResponseEntity<List<PlaylistResponseDTO>> findAll() {
-		return ResponseEntity.ok(service.findAll());
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	public ResponseEntity<List<PlaylistResponseDTO>> findAll(@RequestHeader("Authorization") String token) {
+		return ResponseEntity.ok(service.findAll(token));
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.findById(id));
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.findById(id, token));
 	}
 	
 	@GetMapping("/{id}/songs")
-	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.getSongsFromPlaylist(id));
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+		return ResponseEntity.ok(service.getSongsFromPlaylist(id, token));
 	}
 	
 	@PostMapping("")
-	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
-		return new ResponseEntity<>(service.savePlaylist(request), HttpStatus.CREATED);
+	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
+	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request, @RequestHeader("Authorization") String token) throws NameAlreadyUsedException, NotFoundException, AuthorizationException {
+		return new ResponseEntity<>(service.savePlaylist(request, token), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Integer id, @RequestBody @Valid PlaylistUpdateDTO request) throws NotFoundException {
-		return ResponseEntity.ok(service.updatePlaylist(id, request));
+	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
+	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Integer id, @RequestBody @Valid PlaylistUpdateDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
+		return ResponseEntity.ok(service.updatePlaylist(id, request, token));
 	}
 	
 	@PutMapping("/{id}/addSong")
-	public ResponseEntity<SongResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, AlreadyContainsSongException {
-		return ResponseEntity.ok(service.addSong(id, request.getSongId()));
+	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
+	public ResponseEntity<SongResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException {
+		return ResponseEntity.ok(service.addSong(id, request.getSongId(), token));
 	}
 	
 	@PutMapping("/{id}/removeSong")
-	public ResponseEntity<SongResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, AlreadyContainsSongException {
-		return ResponseEntity.ok(service.removeSong(id, request.getSongId()));
+	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
+	public ResponseEntity<SongResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException, DoNotContainsTheSongException {
+		return ResponseEntity.ok(service.removeSong(id, request.getSongId(), token));
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.deletePlaylist(id));
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
+	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
+		return ResponseEntity.ok(service.deletePlaylist(id, token));
 	}
 }

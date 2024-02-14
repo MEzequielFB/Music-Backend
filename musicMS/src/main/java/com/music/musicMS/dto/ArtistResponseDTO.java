@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArtistResponseDTO {
-	private int id;
+	private Integer id;
 	private String name;
 	
 	public ArtistResponseDTO(Artist artist) {

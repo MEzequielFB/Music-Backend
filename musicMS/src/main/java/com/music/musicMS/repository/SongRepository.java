@@ -21,7 +21,7 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 			+ " JOIN s.playlists p"
 			+ " WHERE s.id = :id"
 			+ " AND p = :playlist")
-	public Optional<Song> findByPlaylist(int id, Playlist playlist);
+	public Optional<Song> findByPlaylist(Integer id, Playlist playlist);
 	
 	@Query("SELECT s"
 			+ " FROM Song s"

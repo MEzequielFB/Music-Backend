@@ -15,10 +15,10 @@ public class PlaylistResponseDTO {
 	private Boolean isPublic;
 	private UserDTO user;
 	
-	public PlaylistResponseDTO(Playlist playlist) {
+	public PlaylistResponseDTO(Playlist playlist, UserDTO user) {
 		this.id = playlist.getId();
 		this.name = playlist.getName();
 		this.isPublic = playlist.getIsPublic();
-		this.user = null;
+		this.user = user;
 	}
 }

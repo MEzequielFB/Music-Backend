@@ -41,6 +41,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	
 	@Query("SELECT u"
 			+ " FROM User u"
+			+ " WHERE u.email = :email"
+			+ " AND u.isDeleted = false")
+	public Optional<User> findByEmailAndNotDeleted(String email);
+	
+	@Query("SELECT u"
+			+ " FROM User u"
 			+ " WHERE u.id IN :ids")
 	public List<User> findAllByIds(List<Integer> ids);
 	
