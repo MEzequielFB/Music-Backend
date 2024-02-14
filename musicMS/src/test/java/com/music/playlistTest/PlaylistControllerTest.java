@@ -23,6 +23,7 @@ import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.dto.UserDTO;
 import com.music.musicMS.exception.AlreadyContainsSongException;
+import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Artist;
@@ -86,9 +87,9 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void savePlaylistTest() throws NameAlreadyUsedException, NotFoundException {
+	public void savePlaylistTest() throws NameAlreadyUsedException, NotFoundException, AuthorizationException {
 		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", "USER");
-		PlaylistRequestDTO playlistRequestMock = new PlaylistRequestDTO("playlist1", false, 1);
+		PlaylistRequestDTO playlistRequestMock = new PlaylistRequestDTO("playlist1", false);
 		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "playlist1", false, userDTO);
 		
 		when(service.savePlaylist(playlistRequestMock, tokenMock)).thenReturn(playlistResponseMock);
@@ -100,7 +101,7 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void updatePlaylistTest() throws NotFoundException {
+	public void updatePlaylistTest() throws NotFoundException, AuthorizationException {
 		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", "USER");
 		PlaylistUpdateDTO playlistUpdateMock = new PlaylistUpdateDTO("new name", false);
 		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "new name", false, userDTO);
@@ -114,22 +115,22 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void addSongTest() throws NotFoundException, AlreadyContainsSongException {
+	public void addSongTest() throws NotFoundException, AlreadyContainsSongException, AuthorizationException {
 		Genre genre = new Genre(1, "rock", List.of());
 		Artist artist = new Artist(1, 1, "artist1", false, List.of(), List.of(), List.of());
 		SongIdDTO songRequestMock = new SongIdDTO(1);
 		SongResponseDTO songResponseMock = new SongResponseDTO(1, "song1", 5, 120, "album1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre)));
 		
-		when(service.addSong(1, songRequestMock.getSongId())).thenReturn(songResponseMock);
+		when(service.addSong(1, songRequestMock.getSongId(), tokenMock)).thenReturn(songResponseMock);
 		
-		ResponseEntity<SongResponseDTO> responseEntity = controller.addSong(1, songRequestMock);
+		ResponseEntity<SongResponseDTO> responseEntity = controller.addSong(1, songRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(songResponseMock, responseEntity.getBody());
 	}
 	
 	@Test
-	public void deletePlaylistTest() throws NotFoundException {
+	public void deletePlaylistTest() throws NotFoundException, AuthorizationException {
 		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", "USER");
 		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "playlist1", false, userDTO);
 		

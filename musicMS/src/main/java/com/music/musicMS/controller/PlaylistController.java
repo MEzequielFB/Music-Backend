@@ -22,6 +22,8 @@ import com.music.musicMS.dto.PlaylistUpdateDTO;
 import com.music.musicMS.dto.SongIdDTO;
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.exception.AlreadyContainsSongException;
+import com.music.musicMS.exception.AuthorizationException;
+import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Roles;
@@ -37,50 +39,50 @@ public class PlaylistController {
 	private PlaylistService service;
 	
 	@GetMapping("")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<PlaylistResponseDTO>> findAll(@RequestHeader("Authorization") String token) {
 		return ResponseEntity.ok(service.findAll(token));
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id, token));
 	}
 	
 	@GetMapping("/{id}/songs")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
 		return ResponseEntity.ok(service.getSongsFromPlaylist(id, token));
 	}
 	
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request, @RequestHeader("Authorization") String token) throws NameAlreadyUsedException, NotFoundException {
+	public ResponseEntity<PlaylistResponseDTO> savePlaylist(@RequestBody @Valid PlaylistRequestDTO request, @RequestHeader("Authorization") String token) throws NameAlreadyUsedException, NotFoundException, AuthorizationException {
 		return new ResponseEntity<>(service.savePlaylist(request, token), HttpStatus.CREATED);
 	}
 	
 	@PutMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "')")
-	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Integer id, @RequestBody @Valid PlaylistUpdateDTO request, @RequestHeader("Authorization") String token) throws NotFoundException {
+	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
+	public ResponseEntity<PlaylistResponseDTO> updatePlaylist(@PathVariable Integer id, @RequestBody @Valid PlaylistUpdateDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
 		return ResponseEntity.ok(service.updatePlaylist(id, request, token));
 	}
 	
 	@PutMapping("/{id}/addSong")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<SongResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, AlreadyContainsSongException {
-		return ResponseEntity.ok(service.addSong(id, request.getSongId()));
+	public ResponseEntity<SongResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException {
+		return ResponseEntity.ok(service.addSong(id, request.getSongId(), token));
 	}
 	
 	@PutMapping("/{id}/removeSong")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<SongResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, AlreadyContainsSongException {
-		return ResponseEntity.ok(service.removeSong(id, request.getSongId()));
+	public ResponseEntity<SongResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException, DoNotContainsTheSongException {
+		return ResponseEntity.ok(service.removeSong(id, request.getSongId(), token));
 	}
 	
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.USER + "')")
-	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
+	public ResponseEntity<PlaylistResponseDTO> deletePlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
 		return ResponseEntity.ok(service.deletePlaylist(id, token));
 	}
 }

@@ -223,7 +223,7 @@ public class AlbumService {
 			song.setAlbum(null);
 			album.removeSong(song);
 		} else {
-			throw new DoNotContainsTheSongException(album.getName(), song.getName());
+			throw new DoNotContainsTheSongException(album, song.getName());
 		}
 
 		List<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());

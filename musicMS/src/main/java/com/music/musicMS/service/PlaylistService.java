@@ -16,9 +16,12 @@ import com.music.musicMS.dto.PlaylistUpdateDTO;
 import com.music.musicMS.dto.SongResponseDTO;
 import com.music.musicMS.dto.UserDTO;
 import com.music.musicMS.exception.AlreadyContainsSongException;
+import com.music.musicMS.exception.AuthorizationException;
+import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
 import com.music.musicMS.model.Playlist;
+import com.music.musicMS.model.Roles;
 import com.music.musicMS.model.Song;
 import com.music.musicMS.repository.PlaylistRepository;
 import com.music.musicMS.repository.SongRepository;
@@ -48,8 +51,7 @@ public class PlaylistService {
 							.bodyToMono(UserDTO.class)
 							.block();
 					
-					PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist);
-					responseDTO.setUser(user);
+					PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist, user);
 					
 					return responseDTO;
 				}).toList();
@@ -69,8 +71,7 @@ public class PlaylistService {
 					.bodyToMono(UserDTO.class)
 					.block();
 			
-			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist);
-			responseDTO.setUser(user);
+			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist, user);
 					
 			return responseDTO;
 		} else {
@@ -109,18 +110,32 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request, String token) throws NameAlreadyUsedException, NotFoundException {
+	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request, String token) throws NameAlreadyUsedException, NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		UserDTO user = null;
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + request.getUserId())
+					.uri("http://localhost:8001/api/user/" + loggedUserId)
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
 		} catch (Exception e) {
-			throw new NotFoundException("User", request.getUserId());
+			throw new NotFoundException("User", loggedUserId);
 //			System.out.println(e.getStackTrace());
 		}
 		
@@ -130,16 +145,29 @@ public class PlaylistService {
 			throw new NameAlreadyUsedException("Playlist", request.getName());
 		}
 		
-		Playlist playlist = new Playlist(request);
+		Playlist playlist = new Playlist(request, loggedUserId);
 		
-		PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(repository.save(playlist));
-		responseDTO.setUser(user);
+		PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(repository.save(playlist), user);
 		
 		return responseDTO;
 	}
 	
 	@Transactional
-	public SongResponseDTO addSong(Integer id, Integer songId) throws NotFoundException, AlreadyContainsSongException {
+	public SongResponseDTO addSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Playlist> optional = repository.findById(id);
 		Optional<Song> songOptional = songRepository.findById(songId);
 		if (!optional.isPresent()) {
@@ -151,6 +179,10 @@ public class PlaylistService {
 		
 		Playlist playlist = optional.get();
 		Song song = songOptional.get();
+		
+		if (!playlist.getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
 		
 		songOptional = songRepository.findByPlaylist(songId, playlist);
 		if (songOptional.isPresent()) {
@@ -166,7 +198,21 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public SongResponseDTO removeSong(Integer id, Integer songId) throws NotFoundException, AlreadyContainsSongException {
+	public SongResponseDTO removeSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException, DoNotContainsTheSongException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Playlist> optional = repository.findById(id);
 		Optional<Song> songOptional = songRepository.findById(songId);
 		if (!optional.isPresent()) {
@@ -179,6 +225,15 @@ public class PlaylistService {
 		Playlist playlist = optional.get();
 		Song song = songOptional.get();
 		
+		if (!playlist.getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
+		
+		songOptional = songRepository.findByPlaylist(songId, playlist);
+		if (!songOptional.isPresent()) {
+			throw new DoNotContainsTheSongException(playlist, song.getName());
+		}
+		
 		playlist.removeSong(song);
 		repository.save(playlist);
 		
@@ -188,51 +243,110 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request, String token) throws NotFoundException {
+	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Playlist> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Playlist playlist = optional.get();
-			playlist.setName(request.getName());
-			playlist.setIsPublic(request.getIsPublic());
-			
-			UserDTO user = webClientBuilder.build()
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Playlist", id);
+		}
+		
+		Playlist playlist = optional.get();
+		
+		if (!playlist.getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
+		
+		playlist.setName(request.getName());
+		playlist.setIsPublic(request.getIsPublic());
+		
+		UserDTO user = null;
+		try {
+			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
-			
-			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(repository.save(playlist));
-			responseDTO.setUser(user);
-					
-			return responseDTO;
-		} else {
-			throw new NotFoundException("Playlist", id);
+		} catch (Exception e) {
+			throw new NotFoundException("User", playlist.getId());
 		}
+		
+		PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(repository.save(playlist), user);
+				
+		return responseDTO;
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO deletePlaylist(Integer id, String token) throws NotFoundException {
+	public PlaylistResponseDTO deletePlaylist(Integer id, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		UserDTO loggedUser = null;
+		try {
+			loggedUser = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+		} catch (Exception e) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
 		Optional<Playlist> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Playlist playlist = optional.get();
-			repository.deleteById(id);
-			
-			UserDTO user = webClientBuilder.build()
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Playlist", id);
+		}
+		
+		Playlist playlist = optional.get();
+		
+		if (!playlist.getUserId().equals(loggedUserId) && (!loggedUser.getRole().equals(Roles.ADMIN) && !loggedUser.getRole().equals(Roles.SUPER_ADMIN))) {
+			throw new AuthorizationException();
+		}
+		
+		repository.deleteById(id);
+		
+		UserDTO user = null;
+		try {
+			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
-			
-			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist);
-			responseDTO.setUser(user);
-					
-			return responseDTO;
-		} else {
-			throw new NotFoundException("Playlist", id);
+		} catch (Exception e) {
+			throw new NotFoundException("User", playlist.getUserId());
 		}
+		
+		PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist, user);
+				
+		return responseDTO;
 	}
 }
