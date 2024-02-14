@@ -28,8 +28,6 @@ import com.music.userMS.model.User;
 import com.music.userMS.repository.RoleRepository;
 import com.music.userMS.repository.UserRepository;
 
-import reactor.core.publisher.Mono;
-
 @Service(value = "userService")
 public class UserService {
 	
@@ -154,6 +152,11 @@ public class UserService {
 		Role role = roleOptional.get();
 		User user = new User(request, role);
 		
+		UserResponseDTO userDTO = new UserResponseDTO(repository.save(user));
+		
+		System.err.println(user);
+		System.err.println(userDTO);
+		
 		try {
 			webClientBuilder.build()
 				.post()
@@ -162,16 +165,11 @@ public class UserService {
 				.bodyValue(new ArtistRequestDTO(user.getUsername(), user.getId()))
 				.retrieve()
 				.bodyToMono(ArtistResponseDTO.class)
-				.onErrorResume(Exception.class, ex -> {
-					System.err.println(ex);
-					return Mono.error(ex);
-				})
 				.block();	
 		} catch (Exception e) {
+			System.err.println(e);
 			throw new ServerErrorException("Server not respond or the username is already in use", e);
 		}
-		
-		UserResponseDTO userDTO = new UserResponseDTO(repository.save(user));
 		
 		return userDTO;
 	}

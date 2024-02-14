@@ -58,13 +58,13 @@ public class AuthService {
 		request.setPassword(passwordEncoder.encode(request.getPassword()));
 		
 		UserDTO user = webClientBuilder.build()
-			.post()
-			.uri("http://localhost:8001/api/user/artist")
-			.contentType(MediaType.APPLICATION_JSON)
-			.bodyValue(request)
-			.retrieve()
-			.bodyToMono(UserDTO.class)
-			.block();
+				.post()
+				.uri("http://localhost:8001/api/user/artist")
+				.contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(request)
+				.retrieve()
+				.bodyToMono(UserDTO.class)
+				.block();
 		
 		return login(new AuthRequestDTO(user.getEmail(), decodePassword));
 	}
