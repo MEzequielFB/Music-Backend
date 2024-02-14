@@ -65,25 +65,25 @@ public class AlbumController {
 	
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<AlbumResponseDTO> updateAlbum(@PathVariable Integer id, @RequestBody @Valid AlbumUpdateDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
-		return ResponseEntity.ok(service.updateAlbum(id, request));
+	public ResponseEntity<AlbumResponseDTO> updateAlbum(@PathVariable Integer id, @RequestBody @Valid AlbumUpdateDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, SomeEntityDoesNotExistException, AuthorizationException {
+		return ResponseEntity.ok(service.updateAlbum(id, request, token));
 	}
 	
 	@PutMapping("/{id}/addSong")
 	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
-	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
-		return ResponseEntity.ok(service.addSong(id, request.getSongId()));
+	public ResponseEntity<AlbumResponseDTO> addSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException, AuthorizationException {
+		return ResponseEntity.ok(service.addSong(id, request.getSongId(), token));
 	}
 	
 	@PutMapping("/{id}/removeSong")
 	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
-	public ResponseEntity<AlbumResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request) throws NotFoundException, DoNotContainsTheSongException {
-		return ResponseEntity.ok(service.removeSong(id, request.getSongId()));
+	public ResponseEntity<AlbumResponseDTO> removeSong(@PathVariable Integer id, @RequestBody @Valid SongIdDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, DoNotContainsTheSongException, AuthorizationException {
+		return ResponseEntity.ok(service.removeSong(id, request.getSongId(), token));
 	}
 	
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<AlbumResponseDTO> deleteAlbum(@PathVariable Integer id) throws NotFoundException {
-		return ResponseEntity.ok(service.deleteAlbum(id));
+	public ResponseEntity<AlbumResponseDTO> deleteAlbum(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
+		return ResponseEntity.ok(service.deleteAlbum(id, token));
 	}
 }

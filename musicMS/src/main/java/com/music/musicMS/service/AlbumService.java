@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.music.musicMS.dto.AlbumRequestDTO;
 import com.music.musicMS.dto.AlbumResponseDTO;
 import com.music.musicMS.dto.AlbumUpdateDTO;
+import com.music.musicMS.dto.UserDTO;
 import com.music.musicMS.exception.AlbumOwnerNotInSongException;
 import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
@@ -20,6 +21,7 @@ import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.exception.SongIsAlreadyInAnAlbumException;
 import com.music.musicMS.model.Album;
 import com.music.musicMS.model.Artist;
+import com.music.musicMS.model.Roles;
 import com.music.musicMS.model.Song;
 import com.music.musicMS.repository.AlbumRepository;
 import com.music.musicMS.repository.ArtistRepository;
@@ -104,10 +106,29 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO updateAlbum(int id, AlbumUpdateDTO request) throws NotFoundException, SomeEntityDoesNotExistException {
+	public AlbumResponseDTO updateAlbum(int id, AlbumUpdateDTO request, String token) throws NotFoundException, SomeEntityDoesNotExistException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Album> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Album album = optional.get();
+			
+			if (!album.getOwner().getUserId().equals(loggedUserId)) {
+				throw new AuthorizationException();
+			}
+			
 			album.setName(request.getName());
 			
 			return new AlbumResponseDTO(repository.save(album));
@@ -117,7 +138,21 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO addSong(Integer id, Integer songId) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException {
+	public AlbumResponseDTO addSong(Integer id, Integer songId, String token) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Album> optional = repository.findById(id);
 		Optional<Song> songOptional = songRepository.findById(songId);
 		
@@ -131,6 +166,9 @@ public class AlbumService {
 		Album album = optional.get();
 		Song song = songOptional.get();
 	
+		if (!album.getOwner().getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
 		if (song.getAlbum() != null) {
 			throw new SongIsAlreadyInAnAlbumException(song.getName());
 		}
@@ -150,7 +188,21 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO removeSong(Integer id, Integer songId) throws NotFoundException, DoNotContainsTheSongException {
+	public AlbumResponseDTO removeSong(Integer id, Integer songId, String token) throws NotFoundException, DoNotContainsTheSongException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Album> optional = repository.findById(id);
 		Optional<Song> songOptional = songRepository.findById(songId);
 		
@@ -164,6 +216,9 @@ public class AlbumService {
 		Album album = optional.get();
 		Song song = songOptional.get();
 		
+		if (!album.getOwner().getUserId().equals(loggedUserId)) {
+			throw new AuthorizationException();
+		}
 		if (song.getAlbum() != null && song.getAlbum().equals(album)) {
 			song.setAlbum(null);
 			album.removeSong(song);
@@ -178,17 +233,49 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO deleteAlbum(int id) throws NotFoundException {
+	public AlbumResponseDTO deleteAlbum(Integer id, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		UserDTO user = null; 
+		try {
+			user = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+		} catch (Exception e) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
 		Optional<Album> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Album album = optional.get();
-			album.getArtists().clear();
-			
-			repository.deleteById(id);
-			
-			return new AlbumResponseDTO(album);
-		} else {
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Album", id);
 		}
+		
+		Album album = optional.get();
+		
+		if (!album.getOwner().getId().equals(loggedUserId) && (!user.getRole().equals(Roles.ADMIN) && !user.getRole().equals(Roles.SUPER_ADMIN))) {
+			throw new AuthorizationException();
+		}
+		
+		album.getArtists().clear();
+		
+		repository.deleteById(id);
+		
+		return new AlbumResponseDTO(album);
 	}
 }
