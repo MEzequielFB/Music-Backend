@@ -44,15 +44,21 @@ public class PlaylistController {
 		return ResponseEntity.ok(service.findAll(token));
 	}
 	
+	@GetMapping("/user")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	public ResponseEntity<List<PlaylistResponseDTO>> findAllByLoggedUser(@RequestHeader("Authorization") String token) throws AuthorizationException {
+		return ResponseEntity.ok(service.findAllByLoggedUser(token));
+	}
+	
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+	public ResponseEntity<PlaylistResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
 		return ResponseEntity.ok(service.findById(id, token));
 	}
 	
 	@GetMapping("/{id}/songs")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
+	public ResponseEntity<List<SongResponseDTO>> getSongsFromPlaylist(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
 		return ResponseEntity.ok(service.getSongsFromPlaylist(id, token));
 	}
 	

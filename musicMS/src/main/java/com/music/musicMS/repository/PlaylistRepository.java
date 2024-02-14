@@ -16,6 +16,11 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
 	
 	@Query("SELECT p"
 			+ " FROM Playlist p"
+			+ " WHERE p.isPublic = true")
+	public List<Playlist> findAllByPublic();
+	
+	@Query("SELECT p"
+			+ " FROM Playlist p"
 			+ " WHERE :song IN elements(p.songs)")
 	public List<Playlist> findAllBySong(Song song);
 
@@ -24,10 +29,15 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
 			+ " WHERE p.userId = :userId"
 			+ " AND p.name = :name")
 	public Optional<Playlist> findByUserAndName(Integer userId, String name);
+	
+	@Query("SELECT p"
+			+ " FROM Playlist p"
+			+ " WHERE p.userId = :userId")
+	public List<Playlist> findAllByUserId(Integer userId);
 
 	@Query("SELECT new com.music.musicMS.dto.SongResponseDTO(s)"
 			+ " FROM Playlist p"
 			+ " JOIN p.songs s"
-			+ " WHERE p.id = :id")
-	public List<SongResponseDTO> getSongsFromPlaylist(Integer id);
+			+ " WHERE p = :playlist")
+	public List<SongResponseDTO> getSongsFromPlaylist(Playlist playlist);
 }

@@ -60,7 +60,7 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void findByIdTest() throws NotFoundException {
+	public void findByIdTest() throws NotFoundException, AuthorizationException {
 		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", "USER");
 		PlaylistResponseDTO playlistResponseMock =  new PlaylistResponseDTO(1, "playlist1", false, userDTO);
 		
@@ -73,7 +73,7 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void getSongsFromPlaylistTest() throws NotFoundException {
+	public void getSongsFromPlaylistTest() throws NotFoundException, AuthorizationException {
 		Genre genre = new Genre(1, "rock", List.of());
 		Artist artist = new Artist(1, 1, "artist1", false, List.of(), List.of(), List.of());
 		List<SongResponseDTO> songsResponseMock = List.of(new SongResponseDTO(1, "song1", 5, 120, "album1", List.of(new ArtistResponseDTO(artist)), List.of(new GenreResponseDTO(genre))));
