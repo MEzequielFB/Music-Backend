@@ -66,6 +66,12 @@ public class SongController {
 		return ResponseEntity.ok(service.updateSong(id, request, token));
 	}
 	
+	@PutMapping("/{id}/listen")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ARTIST + "', '" + Roles.USER + "')")
+	public ResponseEntity<SongResponseDTO> listenSong(@PathVariable Integer id) throws NotFoundException {
+		return ResponseEntity.ok(service.listenSong(id));
+	}
+	
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<SongResponseDTO> deleteSong(@PathVariable Integer id) throws NotFoundException {

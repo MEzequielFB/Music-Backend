@@ -243,6 +243,19 @@ public class SongService {
 		return responseDTO;
 	}
 	
+	public SongResponseDTO listenSong(Integer id) throws NotFoundException {
+		Optional<Song> optional = repository.findById(id);
+		
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Song", id);
+		}
+		
+		Song song = optional.get();
+		song.addReproduction();
+		
+		return new SongResponseDTO(repository.save(song));
+	}
+	
 	@Transactional
 	public SongResponseDTO deleteSong(Integer id) throws NotFoundException {
 		Optional<Song> optional = repository.findById(id);
