@@ -36,10 +36,16 @@ public class SongController {
 	private SongService service;
 	
 	//@GetMapping(value = "/search", params = {"name", "genres", "years"})
+//	@GetMapping("/search")
+//	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+//	public ResponseEntity<List<SongResponseDTO>> searchSongs(@RequestParam(required = false) String name, @RequestParam(required = false) List<String> genres, @RequestParam(required = false) List<Integer> years) {
+//		return ResponseEntity.ok(service.searchSongs(name, genres, years));
+//	}
+	
 	@GetMapping("/search")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<List<SongResponseDTO>> searchSongs(@RequestParam(required = false) String name, @RequestParam(required = false) List<String> genres, @RequestParam(required = false) List<Integer> years) {
-		return ResponseEntity.ok(service.searchSongs(name, genres, years));
+	public ResponseEntity<List<SongResponseDTO>> findAllByFilters(@RequestParam List<String> data) {
+		return ResponseEntity.ok(service.findAllByFilters(data));
 	}
 	
 	@GetMapping("")
