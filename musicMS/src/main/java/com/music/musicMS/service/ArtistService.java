@@ -37,6 +37,18 @@ public class ArtistService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<ArtistResponseDTO> findAllByName(String name) {
+		if (name == null || name.isEmpty()) {
+			return repository.findAllNotDeleted()
+					.stream()
+					.map( ArtistResponseDTO::new )
+					.toList();
+		}
+		
+		return repository.findAllByName(name);
+	}
+	
+	@Transactional(readOnly = true)
 	public List<ArtistResponseDTO> findAllDeleted() {
 		return repository.findAllDeleted()
 				.stream()

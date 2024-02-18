@@ -47,8 +47,8 @@ public class PlaylistController {
 	
 	@GetMapping("/search")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
-	public ResponseEntity<List<PlaylistResponseDTO>> findAllByFilter(@RequestParam(required = false) String data, @RequestHeader("Authorization") String token) {
-		return ResponseEntity.ok(service.findAllByFilter(data, token));
+	public ResponseEntity<List<PlaylistResponseDTO>> findAllByName(@RequestParam(required = false) String name, @RequestHeader("Authorization") String token) {
+		return ResponseEntity.ok(service.findAllByName(name, token));
 	}
 	
 	@GetMapping("/user")

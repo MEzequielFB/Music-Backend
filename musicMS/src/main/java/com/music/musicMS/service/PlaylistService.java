@@ -58,8 +58,8 @@ public class PlaylistService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<PlaylistResponseDTO> findAllByFilter(String data, String token) {
-		if (data == null || data.isEmpty()) {
+	public List<PlaylistResponseDTO> findAllByName(String name, String token) {
+		if (name == null || name.isEmpty()) {
 			return repository.findAllByPublic()
 					.stream()
 					.map(playlist -> {
@@ -76,7 +76,7 @@ public class PlaylistService {
 						return responseDTO;
 					}).toList();
 		}
-		return repository.findAllByFilter(data)
+		return repository.findAllByName(name)
 				.stream()
 				.map(playlist -> {
 					UserDTO user = webClientBuilder.build()

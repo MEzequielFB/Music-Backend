@@ -41,6 +41,11 @@ public class ArtistController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
+	@GetMapping("/search")
+	public ResponseEntity<List<ArtistResponseDTO>> findAllByName(@RequestParam(required = false) String name) {
+		return ResponseEntity.ok(service.findAllByName(name));
+	}
+	
 	@GetMapping("/deleted")
 	@PreAuthorize("hasAuthority('" + Roles.ADMIN + "')")
 	public ResponseEntity<List<ArtistResponseDTO>> findAllDeletedArtists() {
