@@ -86,6 +86,12 @@ public class SongService {
 	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> findAllByFilters(List<String> data) {
+		if (data == null || data.isEmpty()) {
+			return repository.findAll()
+					.stream()
+					.map(SongResponseDTO::new)
+					.toList();
+		}
 		return repository.findAllByFilters(data)
 				.stream()
 				.map(SongResponseDTO::new)
