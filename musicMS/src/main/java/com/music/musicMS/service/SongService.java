@@ -48,43 +48,6 @@ public class SongService {
 	private WebClient.Builder webClientBuilder;
 	
 	@Transactional(readOnly = true)
-	public List<SongResponseDTO> searchSongs(String name, List<String> genres, List<Integer> years) {
-		if (name != null) {
-			if (genres == null && years == null) {
-				return repository.findByName(name)
-						.stream()
-						.map( SongResponseDTO::new ).toList();
-			} else if (genres != null && years == null) {
-				return repository.findByNameAndGenre(name, genres)
-						.stream()
-						.map( SongResponseDTO::new ).toList();
-			} else if (genres == null && years != null) {
-				return repository.findByNameAndYear(name, years)
-						.stream()
-						.map( SongResponseDTO::new ).toList();
-			} else {
-				return repository.findByNameGenreAndYear(name, genres, years)
-						.stream()
-						.map( SongResponseDTO::new ).toList();
-			}
-		} else {
-			if (genres != null && years == null) {
-				return repository.findByGenre(genres)
-						.stream()
-						.map( SongResponseDTO::new ).toList();
-			} else if (genres == null && years != null) {
-				return repository.findByYear(years)
-						.stream()
-						.map( SongResponseDTO::new ).toList();
-			} else {
-				return repository.findByGenreAndYear(genres, years)
-						.stream()
-						.map( SongResponseDTO::new ).toList();
-			}
-		}
-	}
-	
-	@Transactional(readOnly = true)
 	public List<SongResponseDTO> findAllByFilters(List<String> data) {
 		if (data == null || data.isEmpty()) {
 			return repository.findAll()
