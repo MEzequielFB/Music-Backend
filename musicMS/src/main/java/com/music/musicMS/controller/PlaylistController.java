@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.musicMS.dto.PlaylistRequestDTO;
@@ -42,6 +43,12 @@ public class PlaylistController {
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<PlaylistResponseDTO>> findAll(@RequestHeader("Authorization") String token) {
 		return ResponseEntity.ok(service.findAll(token));
+	}
+	
+	@GetMapping("/search")
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
+	public ResponseEntity<List<PlaylistResponseDTO>> findAllByFilter(@RequestParam(required = false) String data, @RequestHeader("Authorization") String token) {
+		return ResponseEntity.ok(service.findAllByFilter(data, token));
 	}
 	
 	@GetMapping("/user")

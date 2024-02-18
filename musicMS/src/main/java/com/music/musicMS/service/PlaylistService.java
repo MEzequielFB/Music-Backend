@@ -58,6 +58,43 @@ public class PlaylistService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<PlaylistResponseDTO> findAllByFilter(String data, String token) {
+		if (data == null || data.isEmpty()) {
+			return repository.findAllByPublic()
+					.stream()
+					.map(playlist -> {
+						UserDTO user = webClientBuilder.build()
+								.get()
+								.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+								.header("Authorization", token)
+								.retrieve()
+								.bodyToMono(UserDTO.class)
+								.block();
+						
+						PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist, user);
+						
+						return responseDTO;
+					}).toList();
+		}
+		return repository.findAllByFilter(data)
+				.stream()
+				.map(playlist -> {
+					UserDTO user = webClientBuilder.build()
+							.get()
+							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.header("Authorization", token)
+							.retrieve()
+							.bodyToMono(UserDTO.class)
+							.block();
+					
+					PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist, user);
+					
+					return responseDTO;
+				})
+				.toList();
+	}
+	
+	@Transactional(readOnly = true)
 	public List<PlaylistResponseDTO> findAllByLoggedUser(String token) throws AuthorizationException {
 		Integer loggedUserId = null;
 		try {

@@ -16,6 +16,12 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Integer> {
 	
 	@Query("SELECT p"
 			+ " FROM Playlist p"
+			+ " WHERE p.name LIKE CONCAT(:data, '%')"
+			+ " AND p.isPublic = true")
+	public List<Playlist> findAllByFilter(String data);
+	
+	@Query("SELECT p"
+			+ " FROM Playlist p"
 			+ " WHERE p.isPublic = true")
 	public List<Playlist> findAllByPublic();
 	
