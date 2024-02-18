@@ -42,6 +42,7 @@ public class SongController {
 //		return ResponseEntity.ok(service.searchSongs(name, genres, years));
 //	}
 	
+	//By name, genre and release year
 	@GetMapping("/search")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<SongResponseDTO>> findAllByFilters(@RequestParam List<String> data) {

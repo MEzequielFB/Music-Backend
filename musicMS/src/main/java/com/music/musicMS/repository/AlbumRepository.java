@@ -15,6 +15,13 @@ public interface AlbumRepository extends JpaRepository<Album, Integer> {
 
 	@Query("SELECT a"
 			+ " FROM Album a"
+			+ " JOIN a.artists aa"
+			+ " WHERE a.name LIKE CONCAT(:data, '%')"
+			+ " OR aa.name LIKE CONCAT(:data, '%')")
+	public List<Album> findAllByFilter(String data);
+	
+	@Query("SELECT a"
+			+ " FROM Album a"
 			+ " WHERE a.name = :name"
 			+ " AND a.owner = :owner")
 	public Optional<Album> findByNameAndOwner(String name, Artist owner);

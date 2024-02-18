@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.music.musicMS.dto.SongIdDTO;
@@ -43,6 +44,12 @@ public class AlbumController {
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<AlbumResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
+	}
+	
+	// By name and artist name
+	@GetMapping("/search")
+	public ResponseEntity<List<AlbumResponseDTO>> findAllByFilter(@RequestParam(required = false) String data) {
+		return ResponseEntity.ok(service.findAllByFilter(data));
 	}
 	
 	@GetMapping("/{id}")
