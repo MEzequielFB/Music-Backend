@@ -73,12 +73,35 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO saveAccount(AccountRequestDTO request) throws SomeEntityDoesNotExistException {
-		List<User> users = userRepository.findAllByIds(request.getUsersId());
-		
-		if (users.size() != request.getUsersId().size()) {
-			throw new SomeEntityDoesNotExistException("User");
+	public AccountResponseDTO saveAccount(AccountRequestDTO request, String token) throws SomeEntityDoesNotExistException, AuthorizationException, NotFoundException, AddUserException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
 		}
+		
+		Optional<User> userOptional = userRepository.findById(loggedUserId);
+		
+		if (!userOptional.isPresent()) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
+		User user = userOptional.get();
+		
+		if (!user.getRole().getName().equals(Roles.USER)) {
+			throw new AddUserException(loggedUserId);
+		}
+		
+		List<User> users = new ArrayList<>();
+		users.add(user);
 		
 		Account account = new Account(request, users);
 		return new AccountResponseDTO(repository.save(account));
@@ -261,22 +284,48 @@ public class AccountService {
 	
 	// Delete just when it has zero or one users linked
 	@Transactional
-	public AccountResponseDTO deleteAccount(Integer id) throws NotFoundException, MultipleUsersLinkedToAccountException {
+	public AccountResponseDTO deleteAccount(Integer id, String token) throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		Optional<User> userOptional = userRepository.findById(loggedUserId);
+		
+		if (!userOptional.isPresent()) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
+		User user = userOptional.get();
+		
 		Optional<Account> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Account account = optional.get();
-			
-			if (account.getUsers().size() > LIMIT_USERS_FOR_DELETE) {
-				throw new MultipleUsersLinkedToAccountException(id);
-			}
-			
-			account.setUsers(new ArrayList<>());
-			repository.save(account);
-			repository.deleteById(id);
-			
-			return new AccountResponseDTO(account);
-		} else {
+		
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Account", id);
 		}
+			
+		Account account = optional.get();
+		
+		if (!account.containsUser(user) && (!user.getRole().getName().equals(Roles.ADMIN) && !user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
+			throw new AuthorizationException();
+		}
+		if (account.getUsers().size() > LIMIT_USERS_FOR_DELETE) {
+			throw new MultipleUsersLinkedToAccountException(id);
+		}
+		
+		account.setUsers(new ArrayList<>());
+		repository.save(account);
+		repository.deleteById(id);
+		
+		return new AccountResponseDTO(account);
 	}
 }

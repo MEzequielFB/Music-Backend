@@ -41,6 +41,10 @@ public class Account {
 		this.balance = request.getBalance();
 	}
 	
+	public Boolean containsUser(User user) {
+		return users.contains(user);
+	}
+	
 	public void addUser(User user) {
 		users.add(user);
 	}

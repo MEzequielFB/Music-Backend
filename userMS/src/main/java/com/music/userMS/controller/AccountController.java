@@ -69,8 +69,8 @@ public class AccountController {
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
-	public ResponseEntity<AccountResponseDTO> saveAccount(@RequestBody @Valid AccountRequestDTO request) throws SomeEntityDoesNotExistException {
-		return new ResponseEntity<AccountResponseDTO>(service.saveAccount(request), HttpStatus.CREATED);
+	public ResponseEntity<AccountResponseDTO> saveAccount(@RequestBody @Valid AccountRequestDTO request, @RequestHeader("Authorization") String token) throws SomeEntityDoesNotExistException, AuthorizationException, NotFoundException, AddUserException {
+		return new ResponseEntity<AccountResponseDTO>(service.saveAccount(request, token), HttpStatus.CREATED);
 	}
 	
 	@Operation(summary = "Add a user to an account. The logged user should be linked to the account to add another user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ")
@@ -89,7 +89,7 @@ public class AccountController {
 		return ResponseEntity.ok(service.removeUser(id, request.getUserId(), token));
 	}
 	
-	@Operation(summary = "Add balance to an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><<li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Add balance to an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}/addBalance")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
@@ -97,7 +97,7 @@ public class AccountController {
 		return ResponseEntity.ok(service.addBalance(id, request, token));
 	}
 	
-	@Operation(summary = "Remove balance from an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><<li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Remove balance from an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}/removeBalance")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
@@ -105,11 +105,11 @@ public class AccountController {
 		return ResponseEntity.ok(service.removeBalance(id, request, token));
 	}
 	
-	@Operation(summary = "Delete an account. The logged user should be linked to the account or be an administrator. There should be one or zero users linked to the account for delete it", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><<li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Delete an account. The logged user should be linked to the account or be an administrator. There should be one or zero users linked to the account for delete it", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
-	public ResponseEntity<AccountResponseDTO> deleteAccount(@PathVariable Integer id) throws NotFoundException, MultipleUsersLinkedToAccountException {
-		return ResponseEntity.ok(service.deleteAccount(id));
+	public ResponseEntity<AccountResponseDTO> deleteAccount(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException {
+		return ResponseEntity.ok(service.deleteAccount(id, token));
 	}
 }
