@@ -83,7 +83,7 @@ public class AlbumController {
 		return new ResponseEntity<>(service.saveAlbum(request, token), HttpStatus.CREATED);
 	}
 	
-	@Operation(summary = "Update album", description = "<p>Required roles:</p> <ul><li>ARTIST</li></ul> ")
+	@Operation(summary = "Update album. The logged artist should be the owner of the album", description = "<p>Required roles:</p> <ul><li>ARTIST</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
