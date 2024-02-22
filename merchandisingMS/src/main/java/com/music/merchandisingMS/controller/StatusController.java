@@ -23,6 +23,8 @@ import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.model.Roles;
 import com.music.merchandisingMS.service.StatusService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController("statusController")
@@ -32,30 +34,40 @@ public class StatusController {
 	@Autowired
 	private StatusService service;
 	
+	@Operation(summary = "Find all status", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<List<StatusResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
+	@Operation(summary = "Find status by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<StatusResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
+	@Operation(summary = "Save status", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@PostMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<StatusResponseDTO> saveStatus(@RequestBody @Valid StatusRequestDTO request) throws NameAlreadyUsedException {
 		return new ResponseEntity<StatusResponseDTO>(service.saveStatus(request), HttpStatus.CREATED);
 	}
 	
+	@Operation(summary = "Update status", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<StatusResponseDTO> updateStatus(@PathVariable Integer id, @RequestBody @Valid StatusRequestDTO request) throws NameAlreadyUsedException, NotFoundException {
 		return ResponseEntity.ok(service.updateStatus(id, request));
 	}
 	
+	@Operation(summary = "Delete status", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<StatusResponseDTO> deleteStatus(@PathVariable Integer id) throws NotFoundException, SQLIntegrityConstraintViolationException {
