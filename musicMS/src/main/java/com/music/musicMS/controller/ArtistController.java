@@ -37,6 +37,7 @@ public class ArtistController {
 
 	@Autowired
 	private ArtistService service;
+	
 	@Operation(summary = "Find all artists", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("")

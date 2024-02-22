@@ -26,6 +26,8 @@ import com.music.musicMS.exception.SomeEntityDoesNotExistException;
 import com.music.musicMS.model.Roles;
 import com.music.musicMS.service.SongService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController
@@ -36,42 +38,56 @@ public class SongController {
 	private SongService service;
 	
 	//By name, genre and release year
+	@Operation(summary = "Find songs by name, genre  and release year", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/search")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<SongResponseDTO>> findAllByFilters(@RequestParam List<String> data) {
 		return ResponseEntity.ok(service.findAllByFilters(data));
 	}
 	
+	@Operation(summary = "Find all songs", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<List<SongResponseDTO>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
+	@Operation(summary = "Find song by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<SongResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
+	@Operation(summary = "Save song. The logged artist should be on the list of artists", description = "<p>Required roles:</p> <ul><li>ARTIST</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<SongResponseDTO> saveSong(@RequestBody @Valid SongRequestDTO request, @RequestHeader("Authorization") String token) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
 		return new ResponseEntity<>(service.saveSong(request, token), HttpStatus.CREATED);
 	}
 	
+	@Operation(summary = "Update song. The logged artist should be on the list of artists", description = "<p>Required roles:</p> <ul><li>ARTIST</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<SongResponseDTO> updateSong(@PathVariable Integer id, @RequestBody @Valid SongRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, SomeEntityDoesNotExistException, AuthorizationException {
 		return ResponseEntity.ok(service.updateSong(id, request, token));
 	}
 	
+	@Operation(summary = "Listen to a song", description = "<p>Required roles:</p> <ul><li>USER</li><li>ARTIST</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}/listen")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ARTIST + "', '" + Roles.USER + "')")
 	public ResponseEntity<SongResponseDTO> listenSong(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.listenSong(id));
 	}
 	
+	@Operation(summary = "Delete song", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>ARTIST</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.ARTIST + "')")
 	public ResponseEntity<SongResponseDTO> deleteSong(@PathVariable Integer id) throws NotFoundException {
