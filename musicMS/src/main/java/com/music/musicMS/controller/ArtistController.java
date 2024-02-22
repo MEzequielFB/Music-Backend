@@ -79,7 +79,6 @@ public class ArtistController {
 	}
 	
 	@Operation(summary = "Save an artist", description = "<p>Permit all roles</p>")
-	@SecurityRequirement(name = "Bearer Authentication")
 	@Hidden
 	@PostMapping("") // permit all
 	public ResponseEntity<ArtistResponseDTO> saveArtist(@RequestBody @Valid ArtistRequestDTO request) throws NameAlreadyUsedException {
