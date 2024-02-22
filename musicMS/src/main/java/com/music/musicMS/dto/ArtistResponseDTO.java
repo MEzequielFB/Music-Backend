@@ -13,10 +13,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ArtistResponseDTO {
 	private Integer id;
+	private Integer userId;
 	private String name;
 	
 	public ArtistResponseDTO(Artist artist) {
 		this.id = artist.getId();
+		this.userId = artist.getUserId();
 		this.name = artist.getName();
 	}
 }
