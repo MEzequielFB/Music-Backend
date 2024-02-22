@@ -49,20 +49,28 @@ public class AccountController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
-	@Operation(summary = "Find account by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Find account by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
-	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')" )
 	public ResponseEntity<AccountResponseDTO> findById(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
-	@Operation(summary = "Find all accounts by userId", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Find all accounts by userId", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/user/{userId}")
-	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
+	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')" )
 	public ResponseEntity<List<AccountResponseDTO>> findByAllByUser(@PathVariable Integer userId) throws NotFoundException {
 		return ResponseEntity.ok(service.findByAllByUser(userId));
+	}
+	
+	@Operation(summary = "Find all accounts by logged user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
+	@GetMapping("/loggedUser")
+	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
+	public ResponseEntity<List<AccountResponseDTO>> findByAllByLoggedUser(@RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
+		return ResponseEntity.ok(service.findByAllByLoggedUser(token));
 	}
 	
 	@Operation(summary = "Save account", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ")

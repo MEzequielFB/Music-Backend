@@ -72,6 +72,36 @@ public class AccountService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	public List<AccountResponseDTO> findByAllByLoggedUser(String token) throws AuthorizationException, NotFoundException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		Optional<User> userOptional = userRepository.findById(loggedUserId);
+		
+		if (!userOptional.isPresent()) {
+			throw new NotFoundException("User", loggedUserId);
+		}
+		
+		User user = userOptional.get();
+		
+		return repository.findAllByUser(user)
+				.stream()
+				.map(AccountResponseDTO::new)
+				.toList();
+	}
+	
 	@Transactional
 	public AccountResponseDTO saveAccount(AccountRequestDTO request, String token) throws SomeEntityDoesNotExistException, AuthorizationException, NotFoundException, AddUserException {
 		Integer loggedUserId = null;

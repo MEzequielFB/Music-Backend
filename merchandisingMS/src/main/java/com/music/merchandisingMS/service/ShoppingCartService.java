@@ -243,7 +243,7 @@ public class ShoppingCartService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE AND ACCOUNT NOT FOUND
+			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
 					.header("Authorization", token)
@@ -394,29 +394,29 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO deleteShoppingCart(Integer id, String token) throws NotFoundException {
+	public ShoppingCartResponseDTO deleteShoppingCart(Integer id, String token) throws NotFoundException {		
 		Optional<ShoppingCart> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			ShoppingCart shoppingCart = optional.get();
-			
-			UserDTO user = null;
-			try {
-				user = webClientBuilder.build()
-						.get()
-						.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
-						.header("Authorization", token)
-						.retrieve()
-						.bodyToMono(UserDTO.class)
-						.block();
-			} catch (Exception e) {
-				throw new NotFoundException("User", shoppingCart.getUserId());
-			}
-			
-			repository.deleteById(id);
-			
-			return new ShoppingCartResponseDTO(shoppingCart, user);
-		} else {
+		if (!optional.isPresent()) {
 			throw new NotFoundException("ShoppingCart", id);
 		}
+		
+		ShoppingCart shoppingCart = optional.get();
+		
+		UserDTO user = null;
+		try {
+			user = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(UserDTO.class)
+					.block();
+		} catch (Exception e) {
+			throw new NotFoundException("User", shoppingCart.getUserId());
+		}
+		
+		repository.deleteById(id);
+		
+		return new ShoppingCartResponseDTO(shoppingCart, user);
 	}
 }
