@@ -3,6 +3,7 @@ package com.music.userMS.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +52,6 @@ public class RoleController {
 	@PostMapping("")
 	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
 	public ResponseEntity<RoleResponseDTO> saveRole(@RequestBody @Valid RoleRequestDTO request) throws NameAlreadyUsedException {
-		return ResponseEntity.ok(service.saveRole(request));
+		return new ResponseEntity<RoleResponseDTO>(service.saveRole(request), HttpStatus.CREATED);
 	}
 }
