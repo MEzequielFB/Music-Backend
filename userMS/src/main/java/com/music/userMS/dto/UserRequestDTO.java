@@ -3,9 +3,11 @@ package com.music.userMS.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class UserRequestDTO {
 	@NotNull(message = "username shouldn't be null")
 	@NotBlank(message = "username shouldn't be empty")
