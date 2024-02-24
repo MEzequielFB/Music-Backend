@@ -77,7 +77,7 @@ public class ArtistController {
 	public ResponseEntity<List<ArtistResponseDTO>> findAllByIds(@RequestParam List<Integer> ids) {
 		return ResponseEntity.ok(service.findAllByids(ids));
 	}
-	
+
 	@Operation(summary = "Save an artist", description = "<p>Permit all roles</p>")
 	@Hidden
 	@PostMapping("") // permit all
