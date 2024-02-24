@@ -79,7 +79,7 @@ public class ProductController {
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
-	public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id, @RequestBody @Valid ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, DeletedEntityException {
+	public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Integer id, @RequestBody @Valid ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, DeletedEntityException, NameAlreadyUsedException {
 		return ResponseEntity.ok(service.updateProduct(id, request));
 	}
 	
