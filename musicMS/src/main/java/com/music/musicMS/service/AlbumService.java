@@ -48,6 +48,14 @@ public class AlbumService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<AlbumResponseDTO> findAllByFilter(String data) {
+		return repository.findAllByFilter(data)
+				.stream()
+				.map(AlbumResponseDTO::new)
+				.toList();
+	}
+	
+	@Transactional(readOnly = true)
 	public AlbumResponseDTO findById(int id) throws NotFoundException {
 		Optional<Album> optional = repository.findById(id);
 		if (optional.isPresent()) {

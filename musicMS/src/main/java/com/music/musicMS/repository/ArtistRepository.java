@@ -15,6 +15,12 @@ public interface ArtistRepository extends JpaRepository<Artist, Integer> {
 	
 	@Query("SELECT a"
 			+ " FROM Artist a"
+			+ " WHERE a.name LIKE CONCAT(:name, '%')"
+			+ " AND a.isDeleted = false")
+	public List<ArtistResponseDTO> findAllByName(String name);
+	
+	@Query("SELECT a"
+			+ " FROM Artist a"
 			+ " WHERE a.isDeleted = false")
 	public List<Artist> findAllNotDeleted();
 	

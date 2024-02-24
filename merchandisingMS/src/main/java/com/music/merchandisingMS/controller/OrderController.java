@@ -20,6 +20,8 @@ import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.model.Roles;
 import com.music.merchandisingMS.service.OrderService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
 @RestController("orderController")
@@ -29,12 +31,16 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 	@Autowired
 	private OrderService service;
 	
+	@Operation(summary = "Find all orders", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<List<OrderResponseDTO>> findAll(@RequestHeader("Authorization") String token) {
 		return ResponseEntity.ok(service.findAll(token));
 	}
 	
+	@Operation(summary = "Find order by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<OrderResponseDTO> findById(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {
@@ -46,12 +52,16 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 //		return new ResponseEntity<>(service.saveOrder(request), HttpStatus.CREATED);
 //	}
 	
+	@Operation(summary = "Update order status", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<OrderResponseDTO> updateOrderStatus(@PathVariable Integer id, @RequestBody @Valid OrderStatusUpdateDTO request, @RequestHeader("Authorization") String token) throws NotFoundException {
 		return ResponseEntity.ok(service.updateOrderStatus(id, request, token));
 	}
 	
+	@Operation(summary = "Delete order", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<OrderResponseDTO> deleteOrder(@PathVariable Integer id, @RequestHeader("Authorization") String token) throws NotFoundException {

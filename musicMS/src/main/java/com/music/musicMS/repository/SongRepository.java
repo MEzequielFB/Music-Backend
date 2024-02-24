@@ -18,6 +18,14 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 	
 	@Query("SELECT s"
 			+ " FROM Song s"
+			+ " JOIN s.genres g"
+			+ " WHERE s.name IN :data"
+	        + " OR CAST(YEAR(s.releaseDate) AS string) IN :data"
+			+ " OR g.name IN :data")
+	public List<Song> findAllByFilters(List<String> data);
+	
+	@Query("SELECT s"
+			+ " FROM Song s"
 			+ " JOIN s.playlists p"
 			+ " WHERE s.id = :id"
 			+ " AND p = :playlist")

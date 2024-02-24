@@ -65,4 +65,8 @@ public class Song {
 		this.duration = request.getDuration();
 		this.album = album;
 	}
+	
+	public void addReproduction() {
+		this.reproductions++;
+	}
 }

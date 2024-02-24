@@ -56,7 +56,6 @@ public class AccountControllerTest {
 				.balance(20.0)
 				.build();
 		this.accountRequestMock = AccountRequestDTO.builder()
-				.usersId(List.of(1))
 				.balance(20.0)
 				.build();
 		this.userRequestMock = UserIdDTO.builder()
@@ -90,10 +89,10 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void saveAccountTest() throws SomeEntityDoesNotExistException {
-		when(service.saveAccount(accountRequestMock)).thenReturn(accountResponseMock);
+	public void saveAccountTest() throws SomeEntityDoesNotExistException, AuthorizationException, NotFoundException, AddUserException {
+		when(service.saveAccount(accountRequestMock, tokenMock)).thenReturn(accountResponseMock);
 		
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.saveAccount(accountRequestMock);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.saveAccount(accountRequestMock, tokenMock);
 		
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());
@@ -140,10 +139,10 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void deleteAccountTest() throws NotFoundException, MultipleUsersLinkedToAccountException {
-		when(service.deleteAccount(1)).thenReturn(accountResponseMock);
+	public void deleteAccountTest() throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException {
+		when(service.deleteAccount(1, tokenMock)).thenReturn(accountResponseMock);
 		 
-		ResponseEntity<AccountResponseDTO> responseEntity = controller.deleteAccount(1);
+		ResponseEntity<AccountResponseDTO> responseEntity = controller.deleteAccount(1, tokenMock);
 		 
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(accountResponseMock, responseEntity.getBody());

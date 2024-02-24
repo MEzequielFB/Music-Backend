@@ -93,8 +93,13 @@ public class ProductService {
 	}
 	
 	@Transactional
-	public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, DeletedEntityException {
-		Optional<Product> optional = repository.findById(id);
+	public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, DeletedEntityException, NameAlreadyUsedException {
+		Optional<Product> optional = repository.findByName(request.getName());
+		if (optional.isPresent()) {
+			throw new NameAlreadyUsedException("Product", request.getName());
+		}
+		
+		optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Product", id);
 		}

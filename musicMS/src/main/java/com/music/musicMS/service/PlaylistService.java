@@ -40,7 +40,7 @@ public class PlaylistService {
 	
 	@Transactional(readOnly = true)
 	public List<PlaylistResponseDTO> findAll(String token) {
-		return repository.findAll()
+		return repository.findAllByPublic()
 				.stream()
 				.map(playlist -> {
 					UserDTO user = webClientBuilder.build()
@@ -58,35 +58,148 @@ public class PlaylistService {
 	}
 	
 	@Transactional(readOnly = true)
-	public PlaylistResponseDTO findById(Integer id, String token) throws NotFoundException {
+	public List<PlaylistResponseDTO> findAllByName(String name, String token) {
+		if (name == null || name.isEmpty()) {
+			return repository.findAllByPublic()
+					.stream()
+					.map(playlist -> {
+						UserDTO user = webClientBuilder.build()
+								.get()
+								.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+								.header("Authorization", token)
+								.retrieve()
+								.bodyToMono(UserDTO.class)
+								.block();
+						
+						PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist, user);
+						
+						return responseDTO;
+					}).toList();
+		}
+		return repository.findAllByName(name)
+				.stream()
+				.map(playlist -> {
+					UserDTO user = webClientBuilder.build()
+							.get()
+							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.header("Authorization", token)
+							.retrieve()
+							.bodyToMono(UserDTO.class)
+							.block();
+					
+					PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist, user);
+					
+					return responseDTO;
+				})
+				.toList();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<PlaylistResponseDTO> findAllByLoggedUser(String token) throws AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
+		return repository.findAllByUserId(loggedUserId)
+				.stream()
+				.map(playlist -> {
+					UserDTO user = webClientBuilder.build()
+							.get()
+							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.header("Authorization", token)
+							.retrieve()
+							.bodyToMono(UserDTO.class)
+							.block();
+					
+					PlaylistResponseDTO responseDTO = new PlaylistResponseDTO(playlist, user);
+					
+					return responseDTO;
+				})
+				.toList();
+	}
+	
+	@Transactional(readOnly = true)
+	public PlaylistResponseDTO findById(Integer id, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Playlist> optional = repository.findById(id);
-		if (optional.isPresent()) {
-			Playlist playlist = optional.get();
-			
-			UserDTO user = webClientBuilder.build()
+		if (!optional.isPresent()) {
+			throw new NotFoundException("Playlist", id);
+		}
+		
+		Playlist playlist = optional.get();
+		
+		if (!playlist.getIsPublic() && !playlist.getUserId().equals(loggedUserId)) {
+			throw new NotFoundException("Playlist", id);
+		}
+		
+		UserDTO user = null;
+		try {
+			user = webClientBuilder.build()
 					.get()
 					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
-			
-			PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist, user);
-					
-			return responseDTO;
-		} else {
-			throw new NotFoundException("Playlist", id);
+		} catch (Exception e) {
+			throw new NotFoundException("User", playlist.getUserId());
 		}
+		
+		PlaylistResponseDTO responseDTO =  new PlaylistResponseDTO(playlist, user);
+				
+		return responseDTO;
 	}
 	
 	@Transactional(readOnly = true)
-	public List<SongResponseDTO> getSongsFromPlaylist(Integer id, String token) throws NotFoundException {
+	public List<SongResponseDTO> getSongsFromPlaylist(Integer id, String token) throws NotFoundException, AuthorizationException {
+		Integer loggedUserId = null;
+		try {
+			loggedUserId = webClientBuilder.build()
+					.get()
+					.uri("http://localhost:8004/api/auth/id")
+					.header("Authorization", token)
+					.retrieve()
+					.bodyToMono(Integer.class)	
+					.block();
+		} catch (Exception e) {
+			System.err.println(e);
+			throw new AuthorizationException();
+		}
+		
 		Optional<Playlist> optional = repository.findById(id);
 		if (!optional.isPresent()) {
 			throw new NotFoundException("Playlist", id);
 		}
 		
-		List<SongResponseDTO> songs = repository.getSongsFromPlaylist(id);
+		Playlist playlist = optional.get();
+		
+		if (!playlist.getIsPublic() && !loggedUserId.equals(playlist.getUserId())) {
+			throw new NotFoundException("Playlist", id);
+		}
+		List<SongResponseDTO> songs = repository.getSongsFromPlaylist(playlist);
 		
 		for (SongResponseDTO song : songs) {
 			List<ArtistResponseDTO> artists = webClientBuilder.build()
