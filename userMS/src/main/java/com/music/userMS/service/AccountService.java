@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -36,6 +37,9 @@ public class AccountService {
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
+	
+	@Value("${app.api.domain}")
+	private String domain;
 	
 	private static Integer LIMIT_USERS_FOR_DELETE = 1;
 	
@@ -78,7 +82,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -108,7 +112,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -143,7 +147,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -190,7 +194,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -231,7 +235,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -273,7 +277,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -319,7 +323,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
