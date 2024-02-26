@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.PlaylistRequestDTO;
 import com.music.musicMS.dto.PlaylistResponseDTO;
 import com.music.musicMS.dto.PlaylistUpdateDTO;
@@ -38,6 +37,9 @@ public class PlaylistService {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
+	@Value("${app.api.domain}")
+	private String domain;
+	
 	@Transactional(readOnly = true)
 	public List<PlaylistResponseDTO> findAll(String token) {
 		return repository.findAllByPublic()
@@ -45,7 +47,7 @@ public class PlaylistService {
 				.map(playlist -> {
 					UserDTO user = webClientBuilder.build()
 							.get()
-							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -65,7 +67,7 @@ public class PlaylistService {
 					.map(playlist -> {
 						UserDTO user = webClientBuilder.build()
 								.get()
-								.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+								.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
 								.header("Authorization", token)
 								.retrieve()
 								.bodyToMono(UserDTO.class)
@@ -81,7 +83,7 @@ public class PlaylistService {
 				.map(playlist -> {
 					UserDTO user = webClientBuilder.build()
 							.get()
-							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -100,7 +102,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -115,7 +117,7 @@ public class PlaylistService {
 				.map(playlist -> {
 					UserDTO user = webClientBuilder.build()
 							.get()
-							.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+							.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -134,7 +136,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -159,7 +161,7 @@ public class PlaylistService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -179,7 +181,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -201,24 +203,6 @@ public class PlaylistService {
 		}
 		List<SongResponseDTO> songs = repository.getSongsFromPlaylist(playlist);
 		
-		for (SongResponseDTO song : songs) {
-			List<ArtistResponseDTO> artists = webClientBuilder.build()
-			.get()
-			.uri(uriBuilder -> uriBuilder
-					.scheme("http")
-			        .host("localhost")
-			        .port(8001)
-			        .path("/api/artist/allByIds")
-					.queryParam("ids", songRepository.findById(song.getId()).get().getArtists())
-					.build())
-			.header("Authorization", token)
-			.retrieve()
-			.bodyToMono(new ParameterizedTypeReference<List<ArtistResponseDTO>>(){})
-			.block();
-			
-			song.setArtists(artists);
-		}
-		
 		return songs;
 	}
 	
@@ -228,7 +212,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -242,7 +226,7 @@ public class PlaylistService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -271,7 +255,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -316,7 +300,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -361,7 +345,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -389,7 +373,7 @@ public class PlaylistService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -409,7 +393,7 @@ public class PlaylistService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -423,7 +407,7 @@ public class PlaylistService {
 		try {
 			loggedUser = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -449,7 +433,7 @@ public class PlaylistService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + playlist.getUserId())
+					.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
