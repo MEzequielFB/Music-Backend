@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -47,6 +48,9 @@ public class SongService {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
+	@Value("${app.api.domain}")
+	private String domain;
+	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> findAllByFilters(List<String> data) {
 		if (data == null || data.isEmpty()) {
@@ -85,7 +89,7 @@ public class SongService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -156,7 +160,7 @@ public class SongService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
