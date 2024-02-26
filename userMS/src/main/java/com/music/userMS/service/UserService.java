@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,9 @@ public class UserService {
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
+	
+	@Value("${app.api.domain}")
+	private String domain;
 	
 	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findFollowedUsersById(Integer id) throws NotFoundException {
@@ -160,7 +164,7 @@ public class UserService {
 		try {
 			webClientBuilder.build()
 				.post()
-				.uri("http://localhost:8002/api/artist")
+				.uri(String.format("%s:8002/api/artist", this.domain))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new ArtistRequestDTO(user.getUsername(), user.getId()))
 				.retrieve()
@@ -180,7 +184,7 @@ public class UserService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -207,7 +211,7 @@ public class UserService {
 			try {
 				webClientBuilder.build()
 					.put()
-					.uri("http://localhost:8002/api/artist/user/" + loggedUserId)
+					.uri(String.format("%s:8002/api/artist/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
 					.contentType(MediaType.APPLICATION_JSON)
 					.bodyValue(new NameRequestDTO(request.getUsername()))
@@ -278,7 +282,7 @@ public class UserService {
 		try {
 			webClientBuilder.build()
 				.delete()
-				.uri("http://localhost:8002/api/artist/user/" + id)
+				.uri(String.format("%s:8002/api/artist/user/%s", this.domain, id))
 				.header("Authorization", token)
 				.retrieve()
 				.bodyToMono(ArtistResponseDTO.class)
