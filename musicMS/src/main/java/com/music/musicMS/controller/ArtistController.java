@@ -87,6 +87,7 @@ public class ArtistController {
 	
 	@Operation(summary = "Update an artist", description = "<p>Required roles:</p> <ul><li>ARTIST</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
+	@Hidden
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<ArtistResponseDTO> updateArtist(@PathVariable Integer id, @RequestBody @Valid NameRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
@@ -95,6 +96,7 @@ public class ArtistController {
 	
 	@Operation(summary = "Update an artist by userId", description = "<p>Required roles:</p> <ul><li>ARTIST</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
+	@Hidden
 	@PutMapping("/user/{userId}")
 	@PreAuthorize("hasAuthority('" + Roles.ARTIST + "')")
 	public ResponseEntity<ArtistResponseDTO> updateArtistByUserId(@PathVariable Integer userId, @RequestBody @Valid NameRequestDTO request, @RequestHeader("Authorization") String token) throws NotFoundException, AuthorizationException {
@@ -103,6 +105,7 @@ public class ArtistController {
 	
 	@Operation(summary = "Delete an artist", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
+	@Hidden
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<ArtistResponseDTO> deleteArtist(@PathVariable Integer id) throws NotFoundException {
@@ -111,6 +114,7 @@ public class ArtistController {
 	
 	@Operation(summary = "Delete an artist by userId", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
+	@Hidden
 	@DeleteMapping("/user/{userId}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
 	public ResponseEntity<ArtistResponseDTO> deleteArtistByUserId(@PathVariable Integer userId) throws NotFoundException {
