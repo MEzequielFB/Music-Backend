@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.music.musicMS.dto.AlbumRequestDTO;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,7 +41,7 @@ public class Album {
 			inverseJoinColumns = {@JoinColumn(name = "artist_id")})
 	private List<Artist> artists = new ArrayList<>();
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "album", cascade = CascadeType.REMOVE)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "album")
 	private List<Song> songs = new ArrayList<>();
 	
 	public Album(AlbumRequestDTO request) {

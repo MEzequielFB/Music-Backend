@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -42,6 +43,9 @@ public class AlbumService {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
+	@Value("${app.api.domain}")
+	private String domain;
+	
 	@Transactional(readOnly = true)
 	public List<AlbumResponseDTO> findAll() {
 		return repository.findAll().stream().map( AlbumResponseDTO::new ).toList();
@@ -56,7 +60,7 @@ public class AlbumService {
 	}
 	
 	@Transactional(readOnly = true)
-	public AlbumResponseDTO findById(int id) throws NotFoundException {
+	public AlbumResponseDTO findById(Integer id) throws NotFoundException {
 		Optional<Album> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Album album = optional.get();
@@ -85,7 +89,7 @@ public class AlbumService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -114,12 +118,12 @@ public class AlbumService {
 	}
 	
 	@Transactional
-	public AlbumResponseDTO updateAlbum(int id, AlbumUpdateDTO request, String token) throws NotFoundException, SomeEntityDoesNotExistException, AuthorizationException {
+	public AlbumResponseDTO updateAlbum(Integer id, AlbumUpdateDTO request, String token) throws NotFoundException, SomeEntityDoesNotExistException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -151,7 +155,7 @@ public class AlbumService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -178,7 +182,7 @@ public class AlbumService {
 			throw new AuthorizationException();
 		}
 		if (song.getAlbum() != null) {
-			throw new SongIsAlreadyInAnAlbumException(song.getName());
+			throw new SongIsAlreadyInAnAlbumException(song.getName(), song.getAlbum().getName());
 		}
 		if (!songRepository.songContainsArtist(song, album.getOwner())) {
 			throw new AlbumOwnerNotInSongException(song.getName(), album.getOwner().getName());
@@ -201,7 +205,7 @@ public class AlbumService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -246,7 +250,8 @@ public class AlbumService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+//					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -260,7 +265,8 @@ public class AlbumService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + loggedUserId)
+//					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -276,11 +282,12 @@ public class AlbumService {
 		
 		Album album = optional.get();
 		
-		if (!album.getOwner().getId().equals(loggedUserId) && (!user.getRole().equals(Roles.ADMIN) && !user.getRole().equals(Roles.SUPER_ADMIN))) {
+		if (!album.getOwner().getUserId().equals(loggedUserId) && (!user.getRole().equals(Roles.ADMIN) && !user.getRole().equals(Roles.SUPER_ADMIN))) {
 			throw new AuthorizationException();
 		}
 		
 		album.getArtists().clear();
+		songRepository.removeSongsFromAlbum(album);
 		
 		repository.deleteById(id);
 		
