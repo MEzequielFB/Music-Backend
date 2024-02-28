@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,13 +19,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 	
 	@Autowired
 	private WebClient.Builder webClientBuilder;
+	
+	@Value("${app.api.domain}")
+	private String domain;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		try {
 			UserDTO user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/email/" + email)
+					.uri(String.format("%s:8001/api/user/email/%s", this.domain, email))
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();

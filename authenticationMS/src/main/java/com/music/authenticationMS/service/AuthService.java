@@ -1,6 +1,7 @@
 package com.music.authenticationMS.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +36,9 @@ public class AuthService {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
+	@Value("${app.api.domain}")
+	private String domain;
+	
 	@Transactional
 	public AuthResponseDTO register(UserRequestDTO request) throws NotFoundException {
 		String decodePassword = request.getPassword();
@@ -42,7 +46,7 @@ public class AuthService {
 		
 		UserDTO user = webClientBuilder.build()
 			.post()
-			.uri("http://localhost:8001/api/user")
+			.uri(String.format("%s:8001/api/user", this.domain))
 			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(request)
 			.retrieve()
@@ -59,7 +63,7 @@ public class AuthService {
 		
 		UserDTO user = webClientBuilder.build()
 				.post()
-				.uri("http://localhost:8001/api/user/artist")
+				.uri(String.format("%s:8001/api/user/artist", this.domain))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(request)
 				.retrieve()
