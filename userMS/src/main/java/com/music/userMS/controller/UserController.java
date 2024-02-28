@@ -73,7 +73,7 @@ public class UserController {
 	@Operation(summary = "Find all deleted users", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/deleted")
-	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<List<UserResponseDTO>> findAllDeletedUsers() {
 		return ResponseEntity.ok(service.findAllDeletedUsers());
 	}
@@ -90,7 +90,7 @@ public class UserController {
 	@Operation(summary = "Find user by id even if is deleted", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}/evenDeleted")
-	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
+	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
 	public ResponseEntity<UserResponseDTO> findByIdEvenDeleted(@PathVariable Integer id) throws NotFoundException {
 		return ResponseEntity.ok(service.findByIdEvenDeleted(id));
 	}

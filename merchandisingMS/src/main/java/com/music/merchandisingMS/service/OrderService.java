@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,6 +32,9 @@ public class OrderService {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
+	@Value("${app.api.domain}")
+	private String domain;
+	
 	@Transactional(readOnly = true)
 	public List<OrderResponseDTO> findAll(String token) {
 		return repository.findAll()
@@ -38,7 +42,7 @@ public class OrderService {
 				.map(order -> {
 					UserDTO user = webClientBuilder.build()
 							.get()
-							.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+							.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -63,7 +67,7 @@ public class OrderService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+					.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -132,7 +136,7 @@ public class OrderService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+					.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -155,7 +159,7 @@ public class OrderService {
 			try {
 				user = webClientBuilder.build()
 						.get()
-						.uri("http://localhost:8001/api/user/" + order.getUserId() + "/evenDeleted")
+						.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 						.header("Authorization", token)
 						.retrieve()
 						.bodyToMono(UserDTO.class)

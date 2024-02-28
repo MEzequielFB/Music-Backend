@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,9 @@ public class ShoppingCartService {
 	@Autowired
 	private WebClient.Builder webClientBuilder;
 	
+	@Value("${app.api.domain}")
+	private String domain;
+	
 	@Transactional(readOnly = true)
 	public List<ShoppingCartResponseDTO> findAll(String token) {
 		return repository.findAll()
@@ -63,7 +67,7 @@ public class ShoppingCartService {
 					UserDTO user = null;
 					user = webClientBuilder.build()
 							.get()
-							.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+							.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -84,7 +88,7 @@ public class ShoppingCartService {
 			try {
 				user = webClientBuilder.build()
 						.get()
-						.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+						.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 						.header("Authorization", token)
 						.retrieve()
 						.bodyToMono(UserDTO.class)
@@ -105,7 +109,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -126,7 +130,7 @@ public class ShoppingCartService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -144,7 +148,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -163,7 +167,7 @@ public class ShoppingCartService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + loggedUserId)
+					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -230,7 +234,7 @@ public class ShoppingCartService {
 		try {
 			webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE, ACCOUNT NOT FOUND AND AUTHORIZATION ISSUE
 					.put()
-					.uri("http://localhost:8001/api/account/" + accountId + "/removeBalance")
+					.uri(String.format("%s:8001/api/account/%s/removeBalance", this.domain, accountId))
 					.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 					.header("Authorization", token)
 					.body(BodyInserters.fromValue(new BalanceDTO(shoppingCart.getTotalPrice())))
@@ -245,7 +249,7 @@ public class ShoppingCartService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -279,7 +283,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -318,7 +322,8 @@ public class ShoppingCartService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+//					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -342,7 +347,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8004/api/auth/id")
+					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -373,7 +378,7 @@ public class ShoppingCartService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -406,7 +411,7 @@ public class ShoppingCartService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
+					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)

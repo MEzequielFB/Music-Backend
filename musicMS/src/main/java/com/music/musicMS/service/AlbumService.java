@@ -250,7 +250,6 @@ public class AlbumService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-//					.uri("http://localhost:8004/api/auth/id")
 					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
 					.retrieve()
@@ -265,7 +264,6 @@ public class AlbumService {
 		try {
 			user = webClientBuilder.build()
 					.get()
-//					.uri("http://localhost:8001/api/user/" + loggedUserId)
 					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
