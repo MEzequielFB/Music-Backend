@@ -1,0 +1,111 @@
+server:
+  port: 8080
+  
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-route
+          uri: http://localhost:8004
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: order-route
+          uri: http://localhost:8003
+          predicates:
+            - Path=/api/order/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: product-route
+          uri: http://localhost:8003
+          predicates:
+            - Path=/api/product/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: shoppingCart-route
+          uri: http://localhost:8003
+          predicates:
+            - Path=/api/shoppingCart/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: status-route
+          uri: http://localhost:8003
+          predicates:
+            - Path=/api/status/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: tag-route
+          uri: http://localhost:8003
+          predicates:
+            - Path=/api/tag/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: album-route
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/album/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: artist-route
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/artist/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: genre-route
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/genre/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: genre-route
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/genre/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: playlist-route
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/playlist/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: song-route
+          uri: http://localhost:8002
+          predicates:
+            - Path=/api/song/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: account-route
+          uri: http://localhost:8001
+          predicates:
+            - Path=/api/account/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: role-route
+          uri: http://localhost:8001
+          predicates:
+            - Path=/api/role/**
+          filters:
+            - name: AuthenticationFilter
+            
+        - id: user-route
+          uri: http://localhost:8001
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - name: AuthenticationFilter
