@@ -50,7 +50,11 @@ public class AuthController {
 	@Operation(summary = "Validate token", description = "Returns if the token is valid or not")
 	@GetMapping("/validate")
 	public ResponseEntity<String> validate(@RequestParam String token) throws InvalidTokenException {
-		return ResponseEntity.ok(service.validateToken(token));
+		try {
+			return ResponseEntity.ok(service.validateToken(token));
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 	
 	@Operation(summary = "Get the id from the current logged user", description = "Get the id from the current logged user | Enter the token is required to work")

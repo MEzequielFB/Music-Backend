@@ -80,14 +80,18 @@ public class AuthService {
 	public AuthResponseDTO login(AuthRequestDTO request) throws NotFoundException {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())); 
 		if (authentication.isAuthenticated()) {
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			
-	        System.out.println("Authentication object after setting in SecurityContextHolder: {} " + authentication);
-			
-			CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-			String jwt = tokenProvider.createToken(authentication, user.getId());
+			try {
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+				
+		        System.out.println("Authentication object after setting in SecurityContextHolder: {} " + authentication);
+				
+				CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+				String jwt = tokenProvider.createToken(authentication, user.getId());
 
-			return new AuthResponseDTO(new UserDTO(user), jwt);
+				return new AuthResponseDTO(new UserDTO(user), jwt);
+			} catch (Exception e) {
+				throw e;
+			}
 		} else {
 			throw new NotFoundException("User", request.getEmail());
 		}
@@ -95,7 +99,12 @@ public class AuthService {
 	
 	@Transactional
 	public String validateToken(String token) throws InvalidTokenException {
-		Boolean isValid = tokenProvider.validateToken(token);
+		Boolean isValid = null;
+		try {
+			isValid = tokenProvider.validateToken(token);
+		} catch (Exception e) {
+			throw e;
+		}
 		if (isValid) {
 			return "The token is valid";
 		}

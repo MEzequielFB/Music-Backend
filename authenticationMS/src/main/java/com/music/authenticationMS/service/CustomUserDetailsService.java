@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		try {
 			UserDTO user = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:%s/api/user/email/%s", this.domain, this.usermsPort, email))
+					.uri(String.format("https://music-render-pvrq.onrender.com:%s/api/user/email/%s", this.usermsPort, email))
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();
