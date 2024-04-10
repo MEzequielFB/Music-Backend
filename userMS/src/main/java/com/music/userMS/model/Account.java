@@ -1,6 +1,7 @@
 package com.music.userMS.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.music.userMS.dto.AccountRequestDTO;
 
@@ -31,12 +32,12 @@ public class Account {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "account_id")},
 			inverseJoinColumns = {@JoinColumn(name = "user_id")})
-	private List<User> users;
+	private Set<User> users;
 	
 	@Column(nullable = false)
 	private Double balance;
 	
-	public Account(AccountRequestDTO request, List<User> users) {
+	public Account(AccountRequestDTO request, Set<User> users) {
 		this.users = users;
 		this.balance = request.getBalance();
 	}

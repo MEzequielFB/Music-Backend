@@ -1,8 +1,10 @@
 package com.music.userMS.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -134,7 +136,7 @@ public class AccountService {
 			throw new AddUserException(loggedUserId);
 		}
 		
-		List<User> users = new ArrayList<>();
+		Set<User> users = new HashSet<>();
 		users.add(user);
 		
 		Account account = new Account(request, users);
@@ -356,7 +358,7 @@ public class AccountService {
 			throw new MultipleUsersLinkedToAccountException(id);
 		}
 		
-		account.setUsers(new ArrayList<>());
+		account.setUsers(new HashSet<>());
 		repository.save(account);
 		repository.deleteById(id);
 		
