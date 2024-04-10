@@ -23,15 +23,15 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Value("${app.api.domain}")
 	private String domain;
 	
-	@Value("${app.api.userms.port}")
-	private String usermsPort;
+	@Value("${app.api.userms.domain}")
+	private String usermsDomain;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		try {
 			UserDTO user = webClientBuilder.build()
 					.get()
-					.uri(String.format("https://music-render-pvrq.onrender.com:%s/api/user/email/%s", this.usermsPort, email))
+					.uri(String.format("%s/api/user/email/%s", this.usermsDomain, email))
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();

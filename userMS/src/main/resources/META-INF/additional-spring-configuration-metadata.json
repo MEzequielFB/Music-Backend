@@ -9,6 +9,11 @@
 	  		"name": "app.api.authms.port",
 	  		"type": "java.lang.String",
 	  		"description": "Defines the port of authentication microservice"
+		},
+		{
+	  		"name": "app.api.authms.domain",
+	  		"type": "java.lang.String",
+	  		"description": "Defines the domain with port of authentication microservice"
 		}
 	]
 }

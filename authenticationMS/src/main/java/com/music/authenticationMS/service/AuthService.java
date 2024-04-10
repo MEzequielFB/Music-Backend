@@ -39,8 +39,8 @@ public class AuthService {
 	@Value("${app.api.domain}")
 	private String domain;
 	
-	@Value("${app.api.userms.port}")
-	private String usermsPort;
+	@Value("${app.api.userms.domain}")
+	private String usermsDomain;
 	
 	@Transactional
 	public AuthResponseDTO register(UserRequestDTO request) throws NotFoundException {
@@ -49,7 +49,7 @@ public class AuthService {
 		
 		UserDTO user = webClientBuilder.build()
 			.post()
-			.uri(String.format("%s:%s/api/user", this.domain, this.usermsPort))
+			.uri(String.format("%s/api/user", this.usermsDomain))
 			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(request)
 			.retrieve()
@@ -66,7 +66,7 @@ public class AuthService {
 		
 		UserDTO user = webClientBuilder.build()
 				.post()
-				.uri(String.format("%s:%s/api/user/artist", this.domain, this.usermsPort))
+				.uri(String.format("%s/api/user/artist", this.usermsDomain))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(request)
 				.retrieve()
@@ -80,18 +80,14 @@ public class AuthService {
 	public AuthResponseDTO login(AuthRequestDTO request) throws NotFoundException {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())); 
 		if (authentication.isAuthenticated()) {
-			try {
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-				
-		        System.out.println("Authentication object after setting in SecurityContextHolder: {} " + authentication);
-				
-				CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-				String jwt = tokenProvider.createToken(authentication, user.getId());
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			
+	        System.out.println("Authentication object after setting in SecurityContextHolder: {} " + authentication);
+			
+			CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+			String jwt = tokenProvider.createToken(authentication, user.getId());
 
-				return new AuthResponseDTO(new UserDTO(user), jwt);
-			} catch (Exception e) {
-				throw e;
-			}
+			return new AuthResponseDTO(new UserDTO(user), jwt);
 		} else {
 			throw new NotFoundException("User", request.getEmail());
 		}
@@ -99,12 +95,7 @@ public class AuthService {
 	
 	@Transactional
 	public String validateToken(String token) throws InvalidTokenException {
-		Boolean isValid = null;
-		try {
-			isValid = tokenProvider.validateToken(token);
-		} catch (Exception e) {
-			throw e;
-		}
+		Boolean	isValid = tokenProvider.validateToken(token);
 		if (isValid) {
 			return "The token is valid";
 		}

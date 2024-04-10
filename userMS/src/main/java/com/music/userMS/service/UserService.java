@@ -47,8 +47,8 @@ public class UserService {
 	@Value("${app.api.domain}")
 	private String domain;
 	
-	@Value("${app.api.authms.port}")
-	private String authmsPort;
+	@Value("${app.api.authms.domain}")
+	private String authmsDomain;
 	
 	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findFollowedUsersById(Integer id) throws NotFoundException {
@@ -187,7 +187,7 @@ public class UserService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
