@@ -1,5 +1,14 @@
-{"properties": [{
-  "name": "app.api.domain",
-  "type": "java.lang.String",
-  "description": "It defines the domain in use"
-}]}
+{
+	"properties": [
+		{
+	  		"name": "app.api.domain",
+	  		"type": "java.lang.String",
+	  		"description": "It defines the domain in use"
+		},
+		{
+	  		"name": "app.api.userms.port",
+	  		"type": "java.lang.String",
+	  		"description": "Defines the port of user microservice"
+		}
+	]
+}

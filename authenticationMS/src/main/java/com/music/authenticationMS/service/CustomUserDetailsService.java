@@ -22,13 +22,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 	
 	@Value("${app.api.domain}")
 	private String domain;
+	
+	@Value("${app.api.userms.port}")
+	private String usermsPort;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		try {
 			UserDTO user = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8001/api/user/email/%s", this.domain, email))
+					.uri(String.format("%s:%s/api/user/email/%s", this.domain, this.usermsPort, email))
 					.retrieve()
 					.bodyToMono(UserDTO.class)
 					.block();

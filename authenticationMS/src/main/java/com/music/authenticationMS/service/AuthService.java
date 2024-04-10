@@ -39,6 +39,9 @@ public class AuthService {
 	@Value("${app.api.domain}")
 	private String domain;
 	
+	@Value("${app.api.userms.port}")
+	private String usermsPort;
+	
 	@Transactional
 	public AuthResponseDTO register(UserRequestDTO request) throws NotFoundException {
 		String decodePassword = request.getPassword();
@@ -46,7 +49,7 @@ public class AuthService {
 		
 		UserDTO user = webClientBuilder.build()
 			.post()
-			.uri(String.format("%s:8001/api/user", this.domain))
+			.uri(String.format("%s:%s/api/user", this.domain, this.usermsPort))
 			.contentType(MediaType.APPLICATION_JSON)
 			.bodyValue(request)
 			.retrieve()
@@ -63,7 +66,7 @@ public class AuthService {
 		
 		UserDTO user = webClientBuilder.build()
 				.post()
-				.uri(String.format("%s:8001/api/user/artist", this.domain))
+				.uri(String.format("%s:%s/api/user/artist", this.domain, this.usermsPort))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(request)
 				.retrieve()

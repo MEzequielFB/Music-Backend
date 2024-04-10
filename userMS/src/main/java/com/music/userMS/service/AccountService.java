@@ -43,6 +43,9 @@ public class AccountService {
 	@Value("${app.api.domain}")
 	private String domain;
 	
+	@Value("${app.api.authms.port}")
+	private String authmsPort;
+	
 	private static Integer LIMIT_USERS_FOR_DELETE = 1;
 	
 	@Transactional(readOnly = true)
@@ -84,7 +87,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -114,7 +117,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -149,7 +152,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -196,7 +199,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -237,7 +240,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -279,7 +282,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -325,7 +328,7 @@ public class AccountService {
 		try {
 			loggedUserId = webClientBuilder.build()
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s:%s/api/auth/id", this.domain, this.authmsPort))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
