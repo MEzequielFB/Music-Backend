@@ -34,7 +34,7 @@ public class AuthService {
 	private AuthenticationManager authenticationManager;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
@@ -47,7 +47,7 @@ public class AuthService {
 		String decodePassword = request.getPassword();
 		request.setPassword(passwordEncoder.encode(request.getPassword()));
 		
-		UserDTO user = webClientBuilder.build()
+		UserDTO user = webClient
 			.post()
 			.uri(String.format("%s/api/user", this.usermsDomain))
 			.contentType(MediaType.APPLICATION_JSON)
@@ -55,7 +55,7 @@ public class AuthService {
 			.retrieve()
 			.bodyToMono(UserDTO.class)
 			.block();
-		
+			
 		return login(new AuthRequestDTO(user.getEmail(), decodePassword));
 	}
 	
@@ -64,7 +64,7 @@ public class AuthService {
 		String decodePassword = request.getPassword();
 		request.setPassword(passwordEncoder.encode(request.getPassword()));
 		
-		UserDTO user = webClientBuilder.build()
+		UserDTO user = webClient
 				.post()
 				.uri(String.format("%s/api/user/artist", this.usermsDomain))
 				.contentType(MediaType.APPLICATION_JSON)

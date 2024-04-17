@@ -19,6 +19,16 @@ public class GeneralExceptionHandler {
 		});
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(UnknownException.class)
+	public ResponseEntity<String> handlUnknownException(UnknownException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(ClientException.class)
+	public ResponseEntity<String> handlBadRequestException(ClientException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 
 	@ExceptionHandler(NotFoundException.class)
 	public ResponseEntity<String> handleNotFoundException(NotFoundException e) {

@@ -18,7 +18,7 @@ import com.music.authenticationMS.dto.UserDTO;
 public class CustomUserDetailsService implements UserDetailsService {
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
@@ -28,18 +28,14 @@ public class CustomUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		try {
-			UserDTO user = webClientBuilder.build()
-					.get()
-					.uri(String.format("%s/api/user/email/%s", this.usermsDomain, email))
-					.retrieve()
-					.bodyToMono(UserDTO.class)
-					.block();
-			
-			return createSpringSecurityUser(user);
-		} catch (Exception e) {
-			throw new UsernameNotFoundException(String.format("An user with email %s does not exists", email));
-		}
+		UserDTO user = webClient
+				.get()
+				.uri(String.format("%s/api/user/email/%s", this.usermsDomain, email))
+				.retrieve()
+				.bodyToMono(UserDTO.class)
+				.block();
+		
+		return createSpringSecurityUser(user);
 	}
 
 	private UserDetails createSpringSecurityUser(UserDTO user) {
