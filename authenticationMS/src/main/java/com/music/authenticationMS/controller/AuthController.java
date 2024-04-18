@@ -18,6 +18,7 @@ import com.music.authenticationMS.exception.NotFoundException;
 import com.music.authenticationMS.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,7 +49,10 @@ public class AuthController {
 		return ResponseEntity.ok(service.login(request));
 	}
 	
-	@Operation(summary = "Validate token", description = "Returns if the token is valid or not")
+	@Operation(summary = "Validate token", description = "Returns if the token is valid or not", 
+			parameters = {
+				@Parameter(name = "token", description = "Provided token when login or sign up", required = true)
+			})
 	@GetMapping("/validate")
 	public ResponseEntity<String> validate(@RequestParam String token) throws InvalidTokenException {
 		try {
