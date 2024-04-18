@@ -1,6 +1,5 @@
 package com.music.userMS.model;
 
-import java.util.List;
 import java.util.Set;
 
 import com.music.userMS.dto.AccountRequestDTO;

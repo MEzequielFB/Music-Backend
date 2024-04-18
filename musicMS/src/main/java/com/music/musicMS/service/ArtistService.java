@@ -25,10 +25,13 @@ public class ArtistService {
 	private ArtistRepository repository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
+	
+	@Value("${app.api.authms.domain}")
+	private String authmsDomain;
 	
 	@Transactional(readOnly = true)
 	public List<ArtistResponseDTO> findAll() {
@@ -90,9 +93,9 @@ public class ArtistService {
 	public ArtistResponseDTO updateArtist(Integer id, NameRequestDTO request, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -122,9 +125,9 @@ public class ArtistService {
 	public ArtistResponseDTO updateArtistByUserId(Integer userId, NameRequestDTO request, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	

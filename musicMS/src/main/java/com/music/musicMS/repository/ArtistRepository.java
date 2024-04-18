@@ -2,6 +2,7 @@ package com.music.musicMS.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -38,7 +39,7 @@ public interface ArtistRepository extends JpaRepository<Artist, Integer> {
 			+ " FROM Artist a"
 			+ " WHERE a.id IN :ids"
 			+ " AND a.isDeleted = false")
-	public List<Artist> findAllByIds(List<Integer> ids);
+	public Set<Artist> findAllByIds(List<Integer> ids);
 	
 	@Query("SELECT new com.music.musicMS.dto.ArtistResponseDTO(a)"
 			+ " FROM Artist a"

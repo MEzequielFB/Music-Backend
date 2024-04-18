@@ -35,19 +35,25 @@ public class PlaylistService {
 	private SongRepository songRepository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
+	
+	@Value("${app.api.authms.domain}")
+	private String authmsDomain;
+	
+	@Value("${app.api.userms.domain}")
+	private String usermsDomain;
 	
 	@Transactional(readOnly = true)
 	public List<PlaylistResponseDTO> findAll(String token) {
 		return repository.findAllByPublic()
 				.stream()
 				.map(playlist -> {
-					UserDTO user = webClientBuilder.build()
+					UserDTO user = webClient
 							.get()
-							.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
+							.uri(String.format("%s/api/user/%s", this.usermsDomain, playlist.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -65,9 +71,9 @@ public class PlaylistService {
 			return repository.findAllByPublic()
 					.stream()
 					.map(playlist -> {
-						UserDTO user = webClientBuilder.build()
+						UserDTO user = webClient
 								.get()
-								.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
+								.uri(String.format("%s/api/user/%s", this.usermsDomain, playlist.getUserId()))
 								.header("Authorization", token)
 								.retrieve()
 								.bodyToMono(UserDTO.class)
@@ -81,9 +87,9 @@ public class PlaylistService {
 		return repository.findAllByName(name)
 				.stream()
 				.map(playlist -> {
-					UserDTO user = webClientBuilder.build()
+					UserDTO user = webClient
 							.get()
-							.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
+							.uri(String.format("%s/api/user/%s", this.usermsDomain, playlist.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -100,9 +106,9 @@ public class PlaylistService {
 	public List<PlaylistResponseDTO> findAllByLoggedUser(String token) throws AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -115,9 +121,9 @@ public class PlaylistService {
 		return repository.findAllByUserId(loggedUserId)
 				.stream()
 				.map(playlist -> {
-					UserDTO user = webClientBuilder.build()
+					UserDTO user = webClient
 							.get()
-							.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
+							.uri(String.format("%s/api/user/%s", this.usermsDomain, playlist.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -134,9 +140,9 @@ public class PlaylistService {
 	public PlaylistResponseDTO findById(Integer id, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -159,9 +165,9 @@ public class PlaylistService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, playlist.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -179,9 +185,9 @@ public class PlaylistService {
 	public List<SongResponseDTO> getSongsFromPlaylist(Integer id, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -210,9 +216,9 @@ public class PlaylistService {
 	public PlaylistResponseDTO savePlaylist(PlaylistRequestDTO request, String token) throws NameAlreadyUsedException, NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -224,9 +230,9 @@ public class PlaylistService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -253,9 +259,9 @@ public class PlaylistService {
 	public SongResponseDTO addSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -298,9 +304,9 @@ public class PlaylistService {
 	public SongResponseDTO removeSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException, DoNotContainsTheSongException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -343,9 +349,9 @@ public class PlaylistService {
 	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -371,9 +377,9 @@ public class PlaylistService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, playlist.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -391,9 +397,9 @@ public class PlaylistService {
 	public PlaylistResponseDTO deletePlaylist(Integer id, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -405,9 +411,9 @@ public class PlaylistService {
 		
 		UserDTO loggedUser = null;
 		try {
-			loggedUser = webClientBuilder.build()
+			loggedUser = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -431,9 +437,9 @@ public class PlaylistService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, playlist.getUserId()))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, playlist.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)

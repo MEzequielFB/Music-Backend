@@ -1,6 +1,6 @@
 package com.music.musicMS.model;
 
-import java.util.List;
+import java.util.Set;
 
 import com.music.musicMS.dto.PlaylistRequestDTO;
 
@@ -37,7 +37,7 @@ public class Playlist {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "playlist_id")},
 			inverseJoinColumns = {@JoinColumn(name = "song_id")})
-	private List<Song> songs;
+	private Set<Song> songs;
 	
 	public Playlist(PlaylistRequestDTO request, Integer userId) {
 		this.name = request.getName();

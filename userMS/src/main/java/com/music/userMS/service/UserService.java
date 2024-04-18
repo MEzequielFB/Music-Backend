@@ -42,13 +42,16 @@ public class UserService {
 	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
 	
 	@Value("${app.api.authms.domain}")
 	private String authmsDomain;
+	
+	@Value("${app.api.musicms.domain}")
+	private String musicmsDomain;
 	
 	@Transactional(readOnly = true)
 	public List<UserResponseDTO> findFollowedUsersById(Integer id) throws NotFoundException {
@@ -165,9 +168,9 @@ public class UserService {
 		System.err.println(userDTO);
 		
 		try {
-			webClientBuilder.build()
+			webClient
 				.post()
-				.uri(String.format("%s:8002/api/artist", this.domain))
+				.uri(String.format("%s/api/artist", this.musicmsDomain))
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(new ArtistRequestDTO(user.getUsername(), user.getId()))
 				.retrieve()
@@ -185,7 +188,7 @@ public class UserService {
 	public UserResponseDTO updateUser(UserRequestDTO request, String token) throws NotFoundException, EmailAlreadyUsedException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
@@ -212,9 +215,9 @@ public class UserService {
 		
 		if (!user.getUsername().equals(request.getUsername())) {
 			try {
-				webClientBuilder.build()
+				webClient
 					.put()
-					.uri(String.format("%s:8002/api/artist/user/%s", this.domain, loggedUserId))
+					.uri(String.format("%s/api/artist/user/%s", this.musicmsDomain, loggedUserId))
 					.header("Authorization", token)
 					.contentType(MediaType.APPLICATION_JSON)
 					.bodyValue(new NameRequestDTO(request.getUsername()))
@@ -283,9 +286,9 @@ public class UserService {
 		user.setIsDeleted(true);
 		
 		try {
-			webClientBuilder.build()
+			webClient
 				.delete()
-				.uri(String.format("%s:8002/api/artist/user/%s", this.domain, id))
+				.uri(String.format("%s/api/artist/user/%s", this.musicmsDomain, id))
 				.header("Authorization", token)
 				.retrieve()
 				.bodyToMono(ArtistResponseDTO.class)

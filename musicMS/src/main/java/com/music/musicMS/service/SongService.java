@@ -3,6 +3,7 @@ package com.music.musicMS.service;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,10 +47,13 @@ public class SongService {
 	private PlaylistRepository playlistRepository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
+	
+	@Value("${app.api.authms.domain}")
+	private String authmsDomain;
 	
 	@Transactional(readOnly = true)
 	public List<SongResponseDTO> findAllByFilters(List<String> data) {
@@ -87,9 +91,9 @@ public class SongService {
 	public SongResponseDTO saveSong(SongRequestDTO request, String token) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -117,7 +121,7 @@ public class SongService {
 			throw new NameAlreadyUsedException("Song", request.getName());
 		}
 		
-		List<Artist> artists = artistRepository.findAllByIds(request.getArtists());
+		Set<Artist> artists = artistRepository.findAllByIds(request.getArtists());
 		
 		if (artists.size() != request.getArtists().size()) {
 			throw new SomeEntityDoesNotExistException("artists");
@@ -136,7 +140,7 @@ public class SongService {
 			throw new AuthorizationException();
 		}
 		
-		List<Genre> genres = genreRepository.findAllById(request.getGenres());
+		Set<Genre> genres = Set.copyOf(genreRepository.findAllById(request.getGenres()));
 		
 		if (genres.size() != request.getGenres().size()) {
 			throw new SomeEntityDoesNotExistException("genres");
@@ -158,9 +162,9 @@ public class SongService {
 	public SongResponseDTO updateSong(Integer id, SongRequestDTO request, String token) throws SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -191,7 +195,7 @@ public class SongService {
 		}
 		song.setName(request.getName());
 		
-		List<Artist> artists = artistRepository.findAllByIds(request.getArtists());
+		Set<Artist> artists = artistRepository.findAllByIds(request.getArtists());
 		
 		if (artists.size() != request.getArtists().size()) {
 			throw new SomeEntityDoesNotExistException("artists");
@@ -212,7 +216,7 @@ public class SongService {
 		
 		song.setArtists(artists);
 		
-		List<Genre> genres = genreRepository.findAllByIds(request.getGenres());
+		Set<Genre> genres = Set.copyOf(genreRepository.findAllByIds(request.getGenres()));
 		
 		if (genres.size() != request.getGenres().size()) {
 			throw new SomeEntityDoesNotExistException("genres");

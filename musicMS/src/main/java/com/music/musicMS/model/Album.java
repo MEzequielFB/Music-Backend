@@ -1,7 +1,9 @@
 package com.music.musicMS.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.music.musicMS.dto.AlbumRequestDTO;
 
@@ -39,7 +41,7 @@ public class Album {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "album_id")},
 			inverseJoinColumns = {@JoinColumn(name = "artist_id")})
-	private List<Artist> artists = new ArrayList<>();
+	private Set<Artist> artists = new HashSet<>();
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "album")
 	private List<Song> songs = new ArrayList<>();

@@ -2,7 +2,9 @@ package com.music.musicMS.model;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.music.musicMS.dto.SongRequestDTO;
 
@@ -48,13 +50,13 @@ public class Song {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "song_id")},
 			inverseJoinColumns = {@JoinColumn(name = "artist_id")})
-	private List<Artist> artists = new ArrayList<>();
+	private Set<Artist> artists = new HashSet<>();
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "song_id")},
 			inverseJoinColumns = {@JoinColumn(name = "genre_id")})
-	private List<Genre> genres = new ArrayList<>();
+	private Set<Genre> genres = new HashSet<>();
 	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "songs")
 	private List<Playlist> playlists;

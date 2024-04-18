@@ -1,6 +1,5 @@
 package com.music.userMS.service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +37,7 @@ public class AccountService {
 	private UserRepository userRepository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
@@ -85,7 +84,7 @@ public class AccountService {
 	public List<AccountResponseDTO> findByAllByLoggedUser(String token) throws AuthorizationException, NotFoundException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
@@ -115,7 +114,7 @@ public class AccountService {
 	public AccountResponseDTO saveAccount(AccountRequestDTO request, String token) throws SomeEntityDoesNotExistException, AuthorizationException, NotFoundException, AddUserException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
@@ -150,7 +149,7 @@ public class AccountService {
 	public AccountResponseDTO addUser(Integer id, Integer userId, String token) throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
@@ -197,7 +196,7 @@ public class AccountService {
 	public AccountResponseDTO removeUser(Integer id, Integer userId, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
@@ -238,7 +237,7 @@ public class AccountService {
 	public AccountResponseDTO addBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
@@ -280,7 +279,7 @@ public class AccountService {
 	public AccountResponseDTO removeBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, NotEnoughBalanceException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
@@ -326,7 +325,7 @@ public class AccountService {
 	public AccountResponseDTO deleteAccount(Integer id, String token) throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)

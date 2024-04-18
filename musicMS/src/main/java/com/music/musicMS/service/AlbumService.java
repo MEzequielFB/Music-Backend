@@ -2,6 +2,7 @@ package com.music.musicMS.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,10 +42,16 @@ public class AlbumService {
 	private SongRepository songRepository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
+	
+	@Value("${app.api.authms.domain}")
+	private String authmsDomain;
+	
+	@Value("${app.api.userms.domain}")
+	private String usermsDomain;
 	
 	@Transactional(readOnly = true)
 	public List<AlbumResponseDTO> findAll() {
@@ -87,9 +94,9 @@ public class AlbumService {
 	public AlbumResponseDTO saveAlbum(AlbumRequestDTO request, String token) throws NotFoundException, NameAlreadyUsedException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -121,9 +128,9 @@ public class AlbumService {
 	public AlbumResponseDTO updateAlbum(Integer id, AlbumUpdateDTO request, String token) throws NotFoundException, SomeEntityDoesNotExistException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -153,9 +160,9 @@ public class AlbumService {
 	public AlbumResponseDTO addSong(Integer id, Integer songId, String token) throws NotFoundException, SongIsAlreadyInAnAlbumException, AlbumOwnerNotInSongException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -193,7 +200,7 @@ public class AlbumService {
 		
 		album.addSong(song);
 		
-		List<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());
+		Set<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());
 		album.setArtists(artists);
 		
 		return new AlbumResponseDTO(repository.save(album));
@@ -203,9 +210,9 @@ public class AlbumService {
 	public AlbumResponseDTO removeSong(Integer id, Integer songId, String token) throws NotFoundException, DoNotContainsTheSongException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -238,7 +245,7 @@ public class AlbumService {
 			throw new DoNotContainsTheSongException(album, song.getName());
 		}
 
-		List<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());
+		Set<Artist> artists = songRepository.findArtistsBySongs(album.getSongs());
 		album.setArtists(artists);
 		
 		return new AlbumResponseDTO(repository.save(album));
@@ -248,9 +255,9 @@ public class AlbumService {
 	public AlbumResponseDTO deleteAlbum(Integer id, String token) throws NotFoundException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)	
@@ -260,11 +267,11 @@ public class AlbumService {
 			throw new AuthorizationException();
 		}
 		
-		UserDTO user = null; 
+		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)

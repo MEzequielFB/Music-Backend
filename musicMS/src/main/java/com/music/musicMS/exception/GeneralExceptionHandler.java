@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(ClientException.class)
+	public ResponseEntity<String> handleClientException(ClientException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(AuthorizationException.class)
 	public ResponseEntity<String> handleAuthorizationException(AuthorizationException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);

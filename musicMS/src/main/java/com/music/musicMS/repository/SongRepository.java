@@ -2,6 +2,7 @@ package com.music.musicMS.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -85,7 +86,7 @@ public interface SongRepository extends JpaRepository<Song, Integer> {
 	@Query("SELECT DISTINCT s.artists"
 			+ " FROM Song s"
 			+ " WHERE s IN :songs")
-	public List<Artist> findArtistsBySongs(List<Song> songs);
+	public Set<Artist> findArtistsBySongs(List<Song> songs);
 	
 	@Modifying
 	@Query("UPDATE Song s"
