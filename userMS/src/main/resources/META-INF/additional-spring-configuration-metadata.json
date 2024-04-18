@@ -18,5 +18,10 @@
     "name": "app.api.musicms.domain",
     "type": "java.lang.String",
     "description": "Defines the domain with port of music microservice"
+  },
+  {
+    "name": "app.api.merchandisingms.domain",
+    "type": "java.lang.String",
+    "description": "Defines the domain with port of merchandising microservice"
   }
 ]}

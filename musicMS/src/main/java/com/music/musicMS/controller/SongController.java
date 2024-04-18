@@ -28,10 +28,12 @@ import com.music.musicMS.service.SongService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/song")
+@Tag(name = "Song Controller", description = "<p>Used for song management: create/delete/return/listen songs, update songs attributes</p>")
 public class SongController {
 
 	@Autowired

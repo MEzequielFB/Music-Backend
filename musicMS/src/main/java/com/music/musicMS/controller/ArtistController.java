@@ -29,10 +29,12 @@ import com.music.musicMS.service.ArtistService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/artist")
+@Tag(name = "Artist Controller", description = "<p>Used for artist management: return artists. creation/deletetion/update methods are called from the User Controller</p>")
 public class ArtistController {
 
 	@Autowired

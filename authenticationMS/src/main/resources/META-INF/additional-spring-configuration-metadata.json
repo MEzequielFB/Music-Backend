@@ -1,19 +1,27 @@
-{
-	"properties": [
-		{
-	  		"name": "app.api.domain",
-	  		"type": "java.lang.String",
-	  		"description": "It defines the domain in use"
-		},
-		{
-	  		"name": "app.api.userms.port",
-	  		"type": "java.lang.String",
-	  		"description": "Defines the port of user microservice"
-		},
-		{
-	  		"name": "app.api.userms.domain",
-	  		"type": "java.lang.String",
-	  		"description": "Defines the domain with port of user microservice"
-		}
-	]
-}
+{"properties": [
+  {
+    "name": "app.api.domain",
+    "type": "java.lang.String",
+    "description": "It defines the domain in use"
+  },
+  {
+    "name": "app.api.userms.port",
+    "type": "java.lang.String",
+    "description": "Defines the port of user microservice"
+  },
+  {
+    "name": "app.api.userms.domain",
+    "type": "java.lang.String",
+    "description": "Defines the domain with port of user microservice"
+  },
+  {
+    "name": "app.api.musicms.domain",
+    "type": "java.lang.String",
+    "description": "Defines the domain with port of music microservice"
+  },
+  {
+    "name": "app.api.merchandisingms.domain",
+    "type": "java.lang.String",
+    "description": "Defines the domain with port of merchandising microservice"
+  }
+]}

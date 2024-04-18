@@ -11,7 +11,12 @@
   },
   {
     "name": "app.api.userms.domain",
-	"type": "java.lang.String",
-	"description": "Defines the domain with port of user microservice"
+    "type": "java.lang.String",
+    "description": "Defines the domain with port of user microservice"
+  },
+  {
+    "name": "app.api.merchandisingms.domain",
+    "type": "java.lang.String",
+    "description": "Defines the domain with port of merchandising microservice"
   }
 ]}

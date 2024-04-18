@@ -33,10 +33,12 @@ import com.music.userMS.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController(value = "userController")
 @RequestMapping("/api/user")
+@Tag(name = "User Controller", description = "<p>Used for user management: create/logic delete/return users, update users attributes</p>")
 public class UserController {
 	@Autowired
 	private UserService service;

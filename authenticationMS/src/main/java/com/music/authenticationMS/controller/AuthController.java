@@ -19,11 +19,12 @@ import com.music.authenticationMS.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController("authController")
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication Controller", description = "<p>Used for authentication, user/artist registry and token validation</p>")
 public class AuthController {
 
 	@Autowired

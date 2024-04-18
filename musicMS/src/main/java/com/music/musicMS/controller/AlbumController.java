@@ -33,10 +33,12 @@ import com.music.musicMS.service.AlbumService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/album")
+@Tag(name = "Album Controller", description = "<p>Used for album management: create/delete/return albums, update albums attributes, add/remove songs to albums</p>")
 public class AlbumController {
 
 	@Autowired

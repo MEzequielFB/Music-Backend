@@ -22,10 +22,12 @@ import com.music.userMS.service.RoleService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController(value = "roleController")
 @RequestMapping("/api/role")
+@Tag(name = "Role Controller", description = "<p>Used for role management: create and return roles</p>")
 public class RoleController {
 
 	@Autowired

@@ -32,10 +32,12 @@ import com.music.musicMS.service.PlaylistService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/playlist")
+@Tag(name = "Playlist Controller", description = "<p>Used for playlist management: create/delete/return playlists, add/remove songs to playlists and update playlists attributes</p>")
 public class PlaylistController {
 	
 	@Autowired

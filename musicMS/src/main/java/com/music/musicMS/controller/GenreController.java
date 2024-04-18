@@ -24,10 +24,12 @@ import com.music.musicMS.service.GenreService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/genre")
+@Tag(name = "Genre Controller", description = "<p>Used for genre management: create/delete/return genres, update genres attributes</p>")
 public class GenreController {
 
 	@Autowired

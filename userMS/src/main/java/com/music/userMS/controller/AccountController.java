@@ -32,10 +32,12 @@ import com.music.userMS.service.AccountService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController(value = "accountController")
 @RequestMapping("api/account")
+@Tag(name = "Account Controller", description = "<p>Used for account management: create accounts, add/remove users to accounts, add/remove balance from accounts, deleted accounts and return accounts</p>")
 public class AccountController {
 
 	@Autowired
