@@ -31,6 +31,7 @@ import com.music.userMS.model.Roles;
 import com.music.userMS.service.AccountService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -51,7 +52,10 @@ public class AccountController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
-	@Operation(summary = "Find account by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li></ul> ")
+	@Operation(summary = "Find account by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Account id", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')" )
@@ -59,7 +63,10 @@ public class AccountController {
 		return ResponseEntity.ok(service.findById(id));
 	}
 	
-	@Operation(summary = "Find all accounts by userId", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li></ul> ")
+	@Operation(summary = "Find all accounts by userId", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li></ul> ",
+			parameters = {
+				@Parameter(name = "userId", description = "User id", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/user/{userId}")
 	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')" )
@@ -67,7 +74,10 @@ public class AccountController {
 		return ResponseEntity.ok(service.findByAllByUser(userId));
 	}
 	
-	@Operation(summary = "Find all accounts by logged user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ")
+	@Operation(summary = "Find all accounts by logged user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ",
+			parameters = {
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/loggedUser")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
@@ -75,7 +85,10 @@ public class AccountController {
 		return ResponseEntity.ok(service.findByAllByLoggedUser(token));
 	}
 	
-	@Operation(summary = "Save account", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ")
+	@Operation(summary = "Save account", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ",
+			parameters = {
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PostMapping("")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
@@ -83,7 +96,11 @@ public class AccountController {
 		return new ResponseEntity<AccountResponseDTO>(service.saveAccount(request, token), HttpStatus.CREATED);
 	}
 	
-	@Operation(summary = "Add a user to an account. The logged user should be linked to the account to add another user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ")
+	@Operation(summary = "Add a user to an account. The logged user should be linked to the account to add another user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Account id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}/addUser")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
@@ -91,7 +108,11 @@ public class AccountController {
 		return ResponseEntity.ok(service.addUser(id, request.getUserId(), token));
 	}
 	
-	@Operation(summary = "Remove a user from an account. The logged user should be linked to the account to remove another user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ")
+	@Operation(summary = "Remove a user from an account. The logged user should be linked to the account to remove another user", description = "<p>Required roles:</p> <ul><li>USER</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Account id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}/removeUser")
 	@PreAuthorize("hasAuthority('" + Roles.USER + "')")
@@ -99,7 +120,11 @@ public class AccountController {
 		return ResponseEntity.ok(service.removeUser(id, request.getUserId(), token));
 	}
 	
-	@Operation(summary = "Add balance to an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Add balance to an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Account id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}/addBalance")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
@@ -107,7 +132,11 @@ public class AccountController {
 		return ResponseEntity.ok(service.addBalance(id, request, token));
 	}
 	
-	@Operation(summary = "Remove balance from an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Remove balance from an account. The logged user should be linked to the account or be an administrator", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Account id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}/removeBalance")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")
@@ -115,7 +144,11 @@ public class AccountController {
 		return ResponseEntity.ok(service.removeBalance(id, request, token));
 	}
 	
-	@Operation(summary = "Delete an account. The logged user should be linked to the account or be an administrator. There should be one or zero users linked to the account for delete it", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Delete an account. The logged user should be linked to the account or be an administrator. There should be one or zero users linked to the account for delete it", description = "<p>Required roles:</p> <ul><li>USER</li><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Account id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "')")

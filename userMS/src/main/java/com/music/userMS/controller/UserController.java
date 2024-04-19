@@ -32,6 +32,7 @@ import com.music.userMS.service.UserService;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -80,7 +81,10 @@ public class UserController {
 		return ResponseEntity.ok(service.findAllDeletedUsers());
 	}
 	
-	@Operation(summary = "Find user by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li></ul> ")
+	@Operation(summary = "Find user by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "User id", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
@@ -89,7 +93,10 @@ public class UserController {
 		
 	}
 	
-	@Operation(summary = "Find user by id even if is deleted", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Find user by id even if is deleted", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "User id", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}/evenDeleted")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
@@ -97,25 +104,34 @@ public class UserController {
 		return ResponseEntity.ok(service.findByIdEvenDeleted(id));
 	}
 	
+	@Operation(summary = "Find user by email", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul>",
+			parameters = {
+				@Parameter(name = "email", description = "User email", required = true)
+			})
 	@Hidden
 	@GetMapping("/email/{email}") // Permit all
 	public ResponseEntity<UserDetailsResponseDTO> findByEmail(@PathVariable String email) throws NotFoundException {
 		return ResponseEntity.ok(service.findByEmail(email));
 	}
 	
+	@Operation(summary = "Save user", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul>")
 	@Hidden
 	@PostMapping("") // Permit all
 	public ResponseEntity<UserResponseDTO> saveUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		return new ResponseEntity<>(service.saveUser(request), HttpStatus.CREATED);
 	}
 	
+	@Operation(summary = "Save artist user", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul>")
 	@Hidden
 	@PostMapping("/artist") // Permit all
 	public ResponseEntity<UserResponseDTO> saveArtistUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
 		return new ResponseEntity<>(service.saveArtistUser(request), HttpStatus.CREATED);
 	}
 	
-	@Operation(summary = "The logged user update his attributes", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul> ")
+	@Operation(summary = "The logged user update his attributes", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul> ",
+			parameters = {
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
@@ -123,7 +139,10 @@ public class UserController {
 		return ResponseEntity.ok(service.updateUser(request, token));
 	}
 	
-	@Operation(summary = "As a super admin change the role of users (user, admin or delivery)", description = "<p>Required roles:</p> <ul><li>SUPER_ADMIN</li></ul>")
+	@Operation(summary = "As a super admin change the role of users (user, admin or delivery)", description = "<p>Required roles:</p> <ul><li>SUPER_ADMIN</li></ul>",
+			parameters = {
+				@Parameter(name = "id", description = "User id", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/role/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.SUPER_ADMIN + "')")
@@ -131,7 +150,11 @@ public class UserController {
 		return ResponseEntity.ok(service.updateUserRole(id, request));
 	}
 	
-	@Operation(summary = "Delete an user", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul>")
+	@Operation(summary = "Delete an user", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul>",
+			parameters = {
+				@Parameter(name = "id", description = "User id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")

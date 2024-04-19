@@ -17,6 +17,7 @@ import com.music.authenticationMS.dto.AuthRequestDTO;
 import com.music.authenticationMS.dto.AuthResponseDTO;
 import com.music.authenticationMS.dto.UserDTO;
 import com.music.authenticationMS.dto.UserRequestDTO;
+import com.music.authenticationMS.exception.AuthenticationException;
 import com.music.authenticationMS.exception.InvalidTokenException;
 import com.music.authenticationMS.exception.NotFoundException;
 import com.music.authenticationMS.security.TokenProvider;
@@ -43,7 +44,7 @@ public class AuthService {
 	private String usermsDomain;
 	
 	@Transactional
-	public AuthResponseDTO register(UserRequestDTO request) throws NotFoundException {
+	public AuthResponseDTO register(UserRequestDTO request) throws AuthenticationException {
 		String decodePassword = request.getPassword();
 		request.setPassword(passwordEncoder.encode(request.getPassword()));
 		
@@ -60,7 +61,7 @@ public class AuthService {
 	}
 	
 	@Transactional
-	public AuthResponseDTO registerArtist(UserRequestDTO request) throws NotFoundException {
+	public AuthResponseDTO registerArtist(UserRequestDTO request) throws AuthenticationException {
 		String decodePassword = request.getPassword();
 		request.setPassword(passwordEncoder.encode(request.getPassword()));
 		
@@ -77,7 +78,7 @@ public class AuthService {
 	}
 	
 	@Transactional
-	public AuthResponseDTO login(AuthRequestDTO request) throws NotFoundException {
+	public AuthResponseDTO login(AuthRequestDTO request) throws AuthenticationException {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())); 
 		if (authentication.isAuthenticated()) {
 			SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -89,7 +90,7 @@ public class AuthService {
 
 			return new AuthResponseDTO(new UserDTO(user), jwt);
 		} else {
-			throw new NotFoundException("User", request.getEmail());
+			throw new AuthenticationException();
 		}
 	}
 	
@@ -99,7 +100,7 @@ public class AuthService {
 		if (isValid) {
 			return "The token is valid";
 		}
-		return "Invalid token!";
+		throw new InvalidTokenException();
 	}
 	
 	@Transactional

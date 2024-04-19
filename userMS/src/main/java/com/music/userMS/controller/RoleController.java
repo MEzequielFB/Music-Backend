@@ -21,6 +21,7 @@ import com.music.userMS.model.Roles;
 import com.music.userMS.service.RoleService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -41,7 +42,10 @@ public class RoleController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
-	@Operation(summary = "Find role by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Find role by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Role id", required = true)
+			})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )

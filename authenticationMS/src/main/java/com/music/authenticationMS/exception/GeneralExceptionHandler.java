@@ -20,6 +20,11 @@ public class GeneralExceptionHandler {
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(AuthenticationException.class)
+	public ResponseEntity<String> handlAuthenticationException(AuthenticationException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+	}
+	
 	@ExceptionHandler(UnknownException.class)
 	public ResponseEntity<String> handlUnknownException(UnknownException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
