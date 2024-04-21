@@ -20,7 +20,7 @@ import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
 import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
-import com.music.userMS.exception.SomeEntityDoesNotExistException;
+import com.music.userMS.exception.PermissionsException;
 import com.music.userMS.model.Account;
 import com.music.userMS.model.Roles;
 import com.music.userMS.model.User;
@@ -111,7 +111,7 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO saveAccount(AccountRequestDTO request, String token) throws SomeEntityDoesNotExistException, AuthorizationException, NotFoundException, AddUserException {
+	public AccountResponseDTO saveAccount(AccountRequestDTO request, String token) throws AuthorizationException, NotFoundException, AddUserException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -146,7 +146,7 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO addUser(Integer id, Integer userId, String token) throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException {
+	public AccountResponseDTO addUser(Integer id, Integer userId, String token) throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -178,7 +178,7 @@ public class AccountService {
 		
 		// if the logged user is not in the account and tries to add another user throw exception
 		if (!repository.accountContainsUser(account, loggedUser)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		if (repository.accountContainsUser(account, user)) {
 			throw new AlreadyContainsException(account, user);
@@ -193,7 +193,7 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO removeUser(Integer id, Integer userId, String token) throws NotFoundException, AuthorizationException {
+	public AccountResponseDTO removeUser(Integer id, Integer userId, String token) throws NotFoundException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -223,9 +223,9 @@ public class AccountService {
 		User user = userOptional.get();
 		User loggedUser = loggedUserOptional.get();
 		
-		// if the logged user is not in the account and tries to add another user throw exception
+		// if the logged user is not in the account and tries to remove another user throw exception
 		if (!repository.accountContainsUser(account, loggedUser)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		account.removeUser(user);
@@ -234,7 +234,7 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO addBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, AuthorizationException {
+	public AccountResponseDTO addBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -265,7 +265,7 @@ public class AccountService {
 		// if the account doesn't contain the logged user and the logged user is not an admin or super admin throws exception
 		Boolean containsUser = repository.accountContainsUser(account, user);
 		if (!containsUser && !(user.getRole().getName().equals(Roles.ADMIN) || user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		Double newBalance = Math.round(( account.getBalance() + request.getBalance() ) * 100.0) / 100.0;
@@ -276,7 +276,7 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public AccountResponseDTO removeBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, NotEnoughBalanceException, AuthorizationException {
+	public AccountResponseDTO removeBalance(Integer id, BalanceDTO request, String token) throws NotFoundException, NotEnoughBalanceException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -307,7 +307,7 @@ public class AccountService {
 		// if the account doesn't contain the logged user and the logged user is not an admin or super admin throws exception
 		Boolean containsUser = repository.accountContainsUser(account, user);
 		if (!containsUser && !(user.getRole().getName().equals(Roles.ADMIN) || user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		if (account.getBalance() < request.getBalance()) {
@@ -322,7 +322,7 @@ public class AccountService {
 	
 	// Delete just when it has zero or one users linked
 	@Transactional
-	public AccountResponseDTO deleteAccount(Integer id, String token) throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException {
+	public AccountResponseDTO deleteAccount(Integer id, String token) throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -354,7 +354,7 @@ public class AccountService {
 		Account account = optional.get();
 		
 		if (!account.containsUser(user) && (!user.getRole().getName().equals(Roles.ADMIN) && !user.getRole().getName().equals(Roles.SUPER_ADMIN))) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		if (account.getUsers().size() > LIMIT_USERS_FOR_DELETE) {
 			throw new MultipleUsersLinkedToAccountException(id);

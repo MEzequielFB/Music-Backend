@@ -22,6 +22,10 @@ import com.music.userMS.service.RoleService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -46,6 +50,14 @@ public class RoleController {
 			parameters = {
 				@Parameter(name = "id", description = "Role id", required = true)
 			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "200", description = "Role found", content = {
+			@Content(schema = @Schema(implementation = RoleResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "Role not found", content = {
+			@Content(schema = @Schema(example = "The entity Role with id 1 doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )
@@ -54,6 +66,14 @@ public class RoleController {
 	}
 	
 	@Operation(summary = "Save role", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "201", description = "Role saved", content = {
+			@Content(schema = @Schema(implementation = RoleResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "400", description = "Role's name already in used", content = {
+			@Content(schema = @Schema(example = "A Role with the name 'USER' already exists"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PostMapping("")
 	@PreAuthorize( "hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')" )

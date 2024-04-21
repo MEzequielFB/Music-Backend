@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(PermissionsException.class)
+	public ResponseEntity<String> handlePermissionsException(PermissionsException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+	}
+	
 	@ExceptionHandler(ClientException.class)
 	public ResponseEntity<String> handleClientException(ClientException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

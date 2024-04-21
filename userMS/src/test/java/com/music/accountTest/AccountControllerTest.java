@@ -25,6 +25,7 @@ import com.music.userMS.exception.AuthorizationException;
 import com.music.userMS.exception.MultipleUsersLinkedToAccountException;
 import com.music.userMS.exception.NotEnoughBalanceException;
 import com.music.userMS.exception.NotFoundException;
+import com.music.userMS.exception.PermissionsException;
 import com.music.userMS.exception.SomeEntityDoesNotExistException;
 import com.music.userMS.service.AccountService;
 
@@ -99,7 +100,7 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void addUserTest() throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException {
+	public void addUserTest() throws NotFoundException, AlreadyContainsException, AuthorizationException, AddUserException, PermissionsException {
 		when(service.addUser(1, 2, tokenMock)).thenReturn(accountResponseMock);
 		
 		ResponseEntity<AccountResponseDTO> responseEntity = controller.addUser(1, userRequestMock, tokenMock);
@@ -109,7 +110,7 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void removeUserTest() throws NotFoundException, AuthorizationException {
+	public void removeUserTest() throws NotFoundException, AuthorizationException, PermissionsException {
 		when(service.removeUser(1, 2, tokenMock)).thenReturn(accountResponseMock);
 		
 		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeUser(1, userRequestMock, tokenMock);
@@ -119,7 +120,7 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void addBalanceTest() throws NotFoundException, AuthorizationException {
+	public void addBalanceTest() throws NotFoundException, AuthorizationException, PermissionsException {
 		when(service.addBalance(1, balanceRequestMock, tokenMock)).thenReturn(accountResponseMock);
 		
 		ResponseEntity<AccountResponseDTO> responseEntity = controller.addBalance(1, balanceRequestMock, tokenMock);
@@ -129,7 +130,7 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void removeBalanceTest() throws NotFoundException, NotEnoughBalanceException, AuthorizationException {
+	public void removeBalanceTest() throws NotFoundException, NotEnoughBalanceException, AuthorizationException, PermissionsException {
 		when(service.removeBalance(1, balanceRequestMock, tokenMock)).thenReturn(accountResponseMock);
 		
 		ResponseEntity<AccountResponseDTO> responseEntity = controller.removeBalance(1, balanceRequestMock, tokenMock);
@@ -139,7 +140,7 @@ public class AccountControllerTest {
 	}
 	
 	@Test
-	public void deleteAccountTest() throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException {
+	public void deleteAccountTest() throws NotFoundException, MultipleUsersLinkedToAccountException, AuthorizationException, PermissionsException {
 		when(service.deleteAccount(1, tokenMock)).thenReturn(accountResponseMock);
 		 
 		ResponseEntity<AccountResponseDTO> responseEntity = controller.deleteAccount(1, tokenMock);

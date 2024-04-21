@@ -10,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.server.ServerErrorException;
 
 import com.music.userMS.dto.ArtistRequestDTO;
 import com.music.userMS.dto.ArtistResponseDTO;
@@ -167,19 +166,14 @@ public class UserService {
 		System.err.println(user);
 		System.err.println(userDTO);
 		
-		try {
-			webClient
-				.post()
-				.uri(String.format("%s/api/artist", this.musicmsDomain))
-				.contentType(MediaType.APPLICATION_JSON)
-				.bodyValue(new ArtistRequestDTO(user.getUsername(), user.getId()))
-				.retrieve()
-				.bodyToMono(ArtistResponseDTO.class)
-				.block();	
-		} catch (Exception e) {
-			System.err.println(e);
-			throw new ServerErrorException("Server not respond or the username is already in use", e);
-		}
+		webClient
+			.post()
+			.uri(String.format("%s/api/artist", this.musicmsDomain))
+			.contentType(MediaType.APPLICATION_JSON)
+			.bodyValue(new ArtistRequestDTO(user.getUsername(), user.getId()))
+			.retrieve()
+			.bodyToMono(ArtistResponseDTO.class)
+			.block();
 		
 		return userDTO;
 	}

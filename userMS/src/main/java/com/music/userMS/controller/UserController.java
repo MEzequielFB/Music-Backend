@@ -33,6 +33,10 @@ import com.music.userMS.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -85,6 +89,14 @@ public class UserController {
 			parameters = {
 				@Parameter(name = "id", description = "User id", required = true)
 			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "200", description = "User found", content = {
+			@Content(schema = @Schema(implementation = UserResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "User not found", content = {
+			@Content(schema = @Schema(example = "The entity User with id '1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "')")
@@ -97,6 +109,14 @@ public class UserController {
 			parameters = {
 				@Parameter(name = "id", description = "User id", required = true)
 			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "200", description = "User found", content = {
+			@Content(schema = @Schema(implementation = UserResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "User not found", content = {
+			@Content(schema = @Schema(example = "The entity User with id '1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}/evenDeleted")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
@@ -108,6 +128,14 @@ public class UserController {
 			parameters = {
 				@Parameter(name = "email", description = "User email", required = true)
 			})
+	@ApiResponses(value = {
+			@ApiResponse(responseCode =  "200", description = "User found", content = {
+				@Content(schema = @Schema(implementation = UserDetailsResponseDTO.class))
+			}),
+			@ApiResponse(responseCode =  "404", description = "User not found", content = {
+				@Content(schema = @Schema(example = "The entity User with the email 'user1@gmail.com' doesn't exist"))
+			})
+		})
 	@Hidden
 	@GetMapping("/email/{email}") // Permit all
 	public ResponseEntity<UserDetailsResponseDTO> findByEmail(@PathVariable String email) throws NotFoundException {
@@ -115,6 +143,17 @@ public class UserController {
 	}
 	
 	@Operation(summary = "Save user", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul>")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "201", description = "User saved", content = {
+			@Content(schema = @Schema(implementation = UserResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "Role not found", content = {
+			@Content(schema = @Schema(example = "The entity Role with name 'USER' doesn't exist"))
+		}),
+		@ApiResponse(responseCode =  "400", description = "Entered email already in use", content = {
+			@Content(schema = @Schema(example = "The email 'user1@gmail.com' is already in use"))
+		})
+	})
 	@Hidden
 	@PostMapping("") // Permit all
 	public ResponseEntity<UserResponseDTO> saveUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
@@ -122,6 +161,17 @@ public class UserController {
 	}
 	
 	@Operation(summary = "Save artist user", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul>")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "201", description = "Artist saved", content = {
+			@Content(schema = @Schema(implementation = UserResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "Role not found", content = {
+			@Content(schema = @Schema(example = "The entity Role with name 'ARTIST' doesn't exist"))
+		}),
+		@ApiResponse(responseCode =  "400", description = "Entered email already in use OR the entered username is already in use", content = {
+			@Content(schema = @Schema(example = "The email 'user1@gmail.com' is already in use OR an artists with the username 'artist1' already exists"))
+		})
+	})
 	@Hidden
 	@PostMapping("/artist") // Permit all
 	public ResponseEntity<UserResponseDTO> saveArtistUser(@RequestBody @Valid UserRequestDTO request) throws EmailAlreadyUsedException, NotFoundException {
@@ -132,6 +182,20 @@ public class UserController {
 			parameters = {
 				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
 			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "200", description = "User updated", content = {
+			@Content(schema = @Schema(implementation = UserResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "User not found", content = {
+			@Content(schema = @Schema(example = "The entity User with id '1' doesn't exist"))
+		}),
+		@ApiResponse(responseCode =  "400", description = "Entered email already in use OR the entered username is already in use", content = {
+			@Content(schema = @Schema(example = "The email 'user1@gmail.com' is already in use OR an artists with the username 'artist1' already exists"))
+		}),
+		@ApiResponse(responseCode =  "401", description = "No authenticated user", content = {
+			@Content(schema = @Schema(example = "No authenticated user available"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
@@ -143,6 +207,17 @@ public class UserController {
 			parameters = {
 				@Parameter(name = "id", description = "User id", required = true)
 			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "200", description = "User role updated", content = {
+			@Content(schema = @Schema(implementation = UserResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "User or Role not found", content = {
+			@Content(schema = @Schema(example = "The entity User with id '1' doesn't exist OR the entity Role with name 'USER' doesn't exist"))
+		}),
+		@ApiResponse(responseCode =  "400", description = "Entered role is not valid or the permissions from the user can't be change", content = {
+			@Content(schema = @Schema(example = "Cannot change permissions of user with the role 'SUPER_ADMIN'"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/role/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.SUPER_ADMIN + "')")
@@ -155,6 +230,14 @@ public class UserController {
 				@Parameter(name = "id", description = "User id", required = true),
 				@Parameter(name = "Authorization", description = "Authentication token provided when login or register", required = true)
 			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode =  "200", description = "User deleted", content = {
+			@Content(schema = @Schema(implementation = UserResponseDTO.class))
+		}),
+		@ApiResponse(responseCode =  "404", description = "User not found", content = {
+			@Content(schema = @Schema(example = "The entity User with id '1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
