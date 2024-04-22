@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.music.musicMS.model.Song;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,12 +16,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SongResponseDTO {
-	private int id;
+	@Schema(name = "id", example = "1")
+	private Integer id;
+	
+	@Schema(name = "name", example = "song1")
 	private String name;
+	
+	@Schema(name = "reproductions", example = "100")
 	private Integer reproductions;
+	
+	@Schema(name = "duration", example = "240")
 	private Integer duration; // seconds
+	
+	@Schema(name = "album", example = "album1")
 	private String album;
+	
+	@ArraySchema(schema = @Schema(implementation = ArtistResponseDTO.class))
 	private List<ArtistResponseDTO> artists;
+	
+	@ArraySchema(schema = @Schema(implementation = GenreResponseDTO.class))
 	private List<GenreResponseDTO> genres;
 	
 	public SongResponseDTO(Song song) {

@@ -13,9 +13,17 @@ import com.music.musicMS.model.Artist;
 @Repository(value = "albumRepository")
 public interface AlbumRepository extends JpaRepository<Album, Integer> {
 
+//	@Query("SELECT a"
+//			+ " FROM Album a"
+//			+ " JOIN a.artists aa"
+//			+ " WHERE a.name LIKE CONCAT(:data, '%')"
+//			+ " OR aa.name LIKE CONCAT(:data, '%')")
+//	public List<Album> findAllByFilter(String data);
+	
 	@Query("SELECT a"
 			+ " FROM Album a"
-			+ " JOIN a.artists aa"
+			+ " JOIN Artist aa"
+				+ " ON a.owner.id = aa.id"
 			+ " WHERE a.name LIKE CONCAT(:data, '%')"
 			+ " OR aa.name LIKE CONCAT(:data, '%')")
 	public List<Album> findAllByFilter(String data);

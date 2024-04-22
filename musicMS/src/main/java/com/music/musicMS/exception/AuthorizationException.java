@@ -4,6 +4,6 @@ package com.music.musicMS.exception;
 public class AuthorizationException extends Exception {
 
 	public AuthorizationException() {
-		super("Does not have the authorization to make the current action");
+		super("No authenticated user available");
 	}
 }
