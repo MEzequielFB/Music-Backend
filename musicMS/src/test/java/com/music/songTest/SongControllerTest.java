@@ -18,6 +18,7 @@ import com.music.musicMS.dto.ArtistResponseDTO;
 import com.music.musicMS.dto.GenreResponseDTO;
 import com.music.musicMS.dto.SongRequestDTO;
 import com.music.musicMS.dto.SongResponseDTO;
+import com.music.musicMS.exception.ArtistNotInSongException;
 import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
@@ -76,7 +77,7 @@ public class SongControllerTest {
 	}
 	
 	@Test
-	public void saveSongTest() throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
+	public void saveSongTest() throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, AuthorizationException, ArtistNotInSongException {
 		when(service.saveSong(songRequestMock, tokenMock)).thenReturn(songResponseMock);
 		
 		ResponseEntity<SongResponseDTO> responseEntity = controller.saveSong(songRequestMock, tokenMock);
@@ -86,7 +87,7 @@ public class SongControllerTest {
 	}
 	
 	@Test
-	public void updateSongTest() throws SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
+	public void updateSongTest() throws SomeEntityDoesNotExistException, NotFoundException, AuthorizationException, ArtistNotInSongException {
 		when(service.updateSong(songResponseMock.getId(), songRequestMock, tokenMock)).thenReturn(songResponseMock);
 		
 		ResponseEntity<SongResponseDTO> responseEntity = controller.updateSong(songResponseMock.getId(), songRequestMock, tokenMock);

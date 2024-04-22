@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GeneralExceptionHandler {
 	
+	@ExceptionHandler(ArtistNotInSongException.class)
+	public ResponseEntity<String> handleArtistNotInSongException(ArtistNotInSongException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(PermissionsException.class)
 	public ResponseEntity<String> handlePermissionsException(PermissionsException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);

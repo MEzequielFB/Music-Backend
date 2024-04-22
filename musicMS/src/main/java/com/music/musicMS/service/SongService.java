@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.music.musicMS.dto.SongRequestDTO;
 import com.music.musicMS.dto.SongResponseDTO;
+import com.music.musicMS.exception.ArtistNotInSongException;
 import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
@@ -88,7 +89,7 @@ public class SongService {
 	}
 	
 	@Transactional
-	public SongResponseDTO saveSong(SongRequestDTO request, String token) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
+	public SongResponseDTO saveSong(SongRequestDTO request, String token) throws NameAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, AuthorizationException, ArtistNotInSongException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -137,7 +138,7 @@ public class SongService {
 		
 		// the logged artist should be in the list of artists to save the song
 		if (!containsLoggedUser) {
-			throw new AuthorizationException();
+			throw new ArtistNotInSongException();
 		}
 		
 		Set<Genre> genres = Set.copyOf(genreRepository.findAllById(request.getGenres()));
@@ -159,7 +160,7 @@ public class SongService {
 	}
 	
 	@Transactional
-	public SongResponseDTO updateSong(Integer id, SongRequestDTO request, String token) throws SomeEntityDoesNotExistException, NotFoundException, AuthorizationException {
+	public SongResponseDTO updateSong(Integer id, SongRequestDTO request, String token) throws SomeEntityDoesNotExistException, NotFoundException, AuthorizationException, ArtistNotInSongException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -211,7 +212,7 @@ public class SongService {
 		
 		// the logged artist should be in the list of artists to save the song
 		if (!containsLoggedUser) {
-			throw new AuthorizationException();
+			throw new ArtistNotInSongException();
 		}
 		
 		song.setArtists(artists);

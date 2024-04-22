@@ -26,7 +26,7 @@ public class GenreService {
 	}
 	
 	@Transactional(readOnly = true)
-	public GenreResponseDTO findById(int id) throws NotFoundException {
+	public GenreResponseDTO findById(Integer id) throws NotFoundException {
 		Optional<Genre> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			return new GenreResponseDTO(optional.get());
@@ -47,20 +47,26 @@ public class GenreService {
 	}
 	
 	@Transactional
-	public GenreResponseDTO updateGenre(int id, GenreRequestDTO request) throws NotFoundException {
-		Optional<Genre> optional = repository.findById(id);
+	public GenreResponseDTO updateGenre(Integer id, GenreRequestDTO request) throws NotFoundException, NameAlreadyUsedException {
+		Optional<Genre> optional = repository.findByName(request.getName());
 		if (optional.isPresent()) {
-			Genre genre = optional.get();
-			genre.setName(request.getName());
-			
-			return new GenreResponseDTO(repository.save(genre));
-		} else {
+			throw new NameAlreadyUsedException("Genre", request.getName());
+		}
+		
+		optional = repository.findById(id);
+		
+		if (!optional.isPresent()) {
 			throw new NotFoundException("Genre", id);
 		}
+		
+		Genre genre = optional.get();
+		genre.setName(request.getName());
+		
+		return new GenreResponseDTO(repository.save(genre));
 	}
 	
 	@Transactional
-	public GenreResponseDTO deleteGenre(int id) throws NotFoundException {
+	public GenreResponseDTO deleteGenre(Integer id) throws NotFoundException {
 		Optional<Genre> optional = repository.findById(id);
 		if (optional.isPresent()) {
 			Genre genre = optional.get();

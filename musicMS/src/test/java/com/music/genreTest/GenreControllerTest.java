@@ -75,7 +75,7 @@ public class GenreControllerTest {
 	}
 	
 	@Test
-	public void updateGenreTest() throws NotFoundException {
+	public void updateGenreTest() throws NotFoundException, NameAlreadyUsedException {
 		GenreRequestDTO genreRequestMock = new GenreRequestDTO("rock");
 		GenreResponseDTO genreResponseMock = new GenreResponseDTO(1, "rock");
 		
