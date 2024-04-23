@@ -26,6 +26,7 @@ import com.music.musicMS.exception.AlreadyContainsSongException;
 import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.exception.PermissionsException;
 import com.music.musicMS.model.Artist;
 import com.music.musicMS.model.Genre;
 import com.music.musicMS.service.PlaylistService;
@@ -101,7 +102,7 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void updatePlaylistTest() throws NotFoundException, AuthorizationException {
+	public void updatePlaylistTest() throws NotFoundException, AuthorizationException, PermissionsException {
 		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", "USER");
 		PlaylistUpdateDTO playlistUpdateMock = new PlaylistUpdateDTO("new name", false);
 		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "new name", false, userDTO);
@@ -115,7 +116,7 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void addSongTest() throws NotFoundException, AlreadyContainsSongException, AuthorizationException {
+	public void addSongTest() throws NotFoundException, AlreadyContainsSongException, AuthorizationException, PermissionsException {
 		Genre genre = new Genre(1, "rock", List.of());
 		Artist artist = new Artist(1, 1, "artist1", false, List.of(), List.of(), List.of());
 		SongIdDTO songRequestMock = new SongIdDTO(1);
@@ -130,7 +131,7 @@ public class PlaylistControllerTest {
 	}
 	
 	@Test
-	public void deletePlaylistTest() throws NotFoundException, AuthorizationException {
+	public void deletePlaylistTest() throws NotFoundException, AuthorizationException, PermissionsException {
 		UserDTO userDTO = new UserDTO(1, "username", "email@gmail.com", "USER");
 		PlaylistResponseDTO playlistResponseMock = new PlaylistResponseDTO(1, "playlist1", false, userDTO);
 		

@@ -15,6 +15,7 @@ import com.music.musicMS.dto.NameRequestDTO;
 import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.exception.PermissionsException;
 import com.music.musicMS.model.Artist;
 import com.music.musicMS.repository.ArtistRepository;
 
@@ -90,7 +91,7 @@ public class ArtistService {
 	}
 	
 	@Transactional
-	public ArtistResponseDTO updateArtist(Integer id, NameRequestDTO request, String token) throws NotFoundException, AuthorizationException {
+	public ArtistResponseDTO updateArtist(Integer id, NameRequestDTO request, String token) throws NotFoundException, AuthorizationException, PermissionsException, NameAlreadyUsedException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -105,7 +106,12 @@ public class ArtistService {
 			throw new AuthorizationException();
 		}
 		
-		Optional<Artist> optional = repository.findById(id);
+		Optional<Artist> optional = repository.findByName(request.getName());
+		if (optional.isPresent()) {
+			throw new NameAlreadyUsedException("Artist", request.getName());
+		}
+		
+		optional = repository.findById(id);
 		
 		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("Artist", id);
@@ -114,7 +120,7 @@ public class ArtistService {
 		Artist artist = optional.get();
 		
 		if (!artist.getUserId().equals(loggedUserId)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		artist.setName(request.getName());
@@ -122,7 +128,7 @@ public class ArtistService {
 		return new ArtistResponseDTO(repository.save(artist));
 	}
 	
-	public ArtistResponseDTO updateArtistByUserId(Integer userId, NameRequestDTO request, String token) throws NotFoundException, AuthorizationException {
+	public ArtistResponseDTO updateArtistByUserId(Integer userId, NameRequestDTO request, String token) throws NotFoundException, AuthorizationException, PermissionsException, NameAlreadyUsedException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -137,7 +143,12 @@ public class ArtistService {
 			throw new AuthorizationException();
 		}
 		
-		Optional<Artist> optional = repository.findByUserId(userId);
+		Optional<Artist> optional = repository.findByName(request.getName());
+		if (optional.isPresent()) {
+			throw new NameAlreadyUsedException("Artist", request.getName());
+		}
+		
+		optional = repository.findByUserId(userId);
 		
 		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("Artist", userId);
@@ -146,7 +157,7 @@ public class ArtistService {
 		Artist artist = optional.get();
 		
 		if (!artist.getUserId().equals(loggedUserId)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		artist.setName(request.getName());

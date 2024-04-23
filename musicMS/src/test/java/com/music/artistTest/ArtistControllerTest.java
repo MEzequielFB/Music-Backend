@@ -20,6 +20,7 @@ import com.music.musicMS.dto.NameRequestDTO;
 import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.exception.PermissionsException;
 import com.music.musicMS.service.ArtistService;
 
 public class ArtistControllerTest {
@@ -95,7 +96,7 @@ public class ArtistControllerTest {
 	}
 	
 	@Test
-	public void updateArtistTest() throws NotFoundException, AuthorizationException {
+	public void updateArtistTest() throws NotFoundException, AuthorizationException, PermissionsException, NameAlreadyUsedException {
 		when(service.updateArtist(artistResponseMock.getId(), nameRequestMock, tokenMock)).thenReturn(artistResponseMock);
 		
 		ResponseEntity<ArtistResponseDTO> responseEntity = controller.updateArtist(artistResponseMock.getId(), nameRequestMock, tokenMock);

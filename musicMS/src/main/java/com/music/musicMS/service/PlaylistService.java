@@ -19,6 +19,7 @@ import com.music.musicMS.exception.AuthorizationException;
 import com.music.musicMS.exception.DoNotContainsTheSongException;
 import com.music.musicMS.exception.NameAlreadyUsedException;
 import com.music.musicMS.exception.NotFoundException;
+import com.music.musicMS.exception.PermissionsException;
 import com.music.musicMS.model.Playlist;
 import com.music.musicMS.model.Roles;
 import com.music.musicMS.model.Song;
@@ -256,7 +257,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public SongResponseDTO addSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException {
+	public SongResponseDTO addSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -284,7 +285,7 @@ public class PlaylistService {
 		Song song = songOptional.get();
 		
 		if (!playlist.getUserId().equals(loggedUserId)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		songOptional = songRepository.findByPlaylist(songId, playlist);
@@ -301,7 +302,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public SongResponseDTO removeSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException, DoNotContainsTheSongException {
+	public SongResponseDTO removeSong(Integer id, Integer songId, String token) throws NotFoundException, AlreadyContainsSongException, AuthorizationException, DoNotContainsTheSongException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -329,7 +330,7 @@ public class PlaylistService {
 		Song song = songOptional.get();
 		
 		if (!playlist.getUserId().equals(loggedUserId)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		songOptional = songRepository.findByPlaylist(songId, playlist);
@@ -346,7 +347,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request, String token) throws NotFoundException, AuthorizationException {
+	public PlaylistResponseDTO updatePlaylist(Integer id, PlaylistUpdateDTO request, String token) throws NotFoundException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -369,7 +370,7 @@ public class PlaylistService {
 		Playlist playlist = optional.get();
 		
 		if (!playlist.getUserId().equals(loggedUserId)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		playlist.setName(request.getName());
@@ -394,7 +395,7 @@ public class PlaylistService {
 	}
 	
 	@Transactional
-	public PlaylistResponseDTO deletePlaylist(Integer id, String token) throws NotFoundException, AuthorizationException {
+	public PlaylistResponseDTO deletePlaylist(Integer id, String token) throws NotFoundException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
 			loggedUserId = webClient
@@ -430,7 +431,7 @@ public class PlaylistService {
 		Playlist playlist = optional.get();
 		
 		if (!playlist.getUserId().equals(loggedUserId) && (!loggedUser.getRole().equals(Roles.ADMIN) && !loggedUser.getRole().equals(Roles.SUPER_ADMIN))) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		repository.deleteById(id);
