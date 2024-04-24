@@ -3,6 +3,8 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
+ARG PORT
+ENV PORT=${PORT}
 COPY --from=build /target/userMS-0.0.1-SNAPSHOT.jar userMS.jar
-EXPOSE 8081
-ENTRYPOINT [ "java","-jar","userMS.jar" ]
+
+ENTRYPOINT [ "java", "-Dserver.port=${PORT}", "-jar","userMS.jar" ]
