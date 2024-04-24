@@ -29,6 +29,7 @@ import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.EmptyShoppingCartException;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
+import com.music.merchandisingMS.exception.PermissionsException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
 import com.music.merchandisingMS.exception.StockException;
 import com.music.merchandisingMS.model.Product;
@@ -131,7 +132,7 @@ public class ShoppingCartControllerTest {
 	}
 	
 	@Test
-	public void addProductStockExceptionTest() throws NotFoundException, DeletedEntityException, StockException, AuthorizationException {
+	public void addProductStockExceptionTest() throws NotFoundException, DeletedEntityException, StockException, AuthorizationException, PermissionsException {
 		when(service.addProduct(1, productQuantityRequestMock, tokenMock)).thenThrow(new StockException(Product.builder().id(1).name("note ring").stock(1).build()));
 		
 		ResponseEntity<ShoppingCartResponseDTO> responseEntity = null;
@@ -145,7 +146,7 @@ public class ShoppingCartControllerTest {
 	}
 	
 	@Test
-	public void removeProductTest() throws NotFoundException, AuthorizationException {
+	public void removeProductTest() throws NotFoundException, AuthorizationException, PermissionsException {
 		when(service.removeProduct(1, 1, tokenMock)).thenReturn(shoppingCartResponseMock);
 		
 		ResponseEntity<ShoppingCartResponseDTO> responseEntity = controller.removeProduct(1, productIdMock, tokenMock);

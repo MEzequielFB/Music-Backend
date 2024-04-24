@@ -21,6 +21,12 @@ import com.music.merchandisingMS.model.Roles;
 import com.music.merchandisingMS.service.OrderService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
@@ -31,7 +37,18 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 	@Autowired
 	private OrderService service;
 	
-	@Operation(summary = "Find all orders", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@Operation(summary = "Find all orders", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ",
+			parameters = {
+				@Parameter(name = "Authorization", description = "Authentication token provided when loggin in or registering", required = true)
+			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Orders found", content = {
+			@Content(array = @ArraySchema(schema = @Schema(implementation = OrderResponseDTO.class)))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
@@ -39,7 +56,22 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 		return ResponseEntity.ok(service.findAll(token));
 	}
 	
-	@Operation(summary = "Find order by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@Operation(summary = "Find order by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Order id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when loggin in or registering", required = true)
+			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Order found", content = {
+			@Content(schema = @Schema(implementation = OrderResponseDTO.class))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		}),
+		@ApiResponse(responseCode = "404", description = "Order/User not found", content = {
+			@Content(schema = @Schema(example = "The entity Order/User with id '1'/'1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
@@ -52,7 +84,22 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 //		return new ResponseEntity<>(service.saveOrder(request), HttpStatus.CREATED);
 //	}
 	
-	@Operation(summary = "Update order status", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@Operation(summary = "Update order status", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Order id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when loggin in or registering", required = true)
+			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Order status updated", content = {
+			@Content(schema = @Schema(implementation = OrderResponseDTO.class))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		}),
+		@ApiResponse(responseCode = "404", description = "Order/User/Status not found", content = {
+			@Content(schema = @Schema(example = "The entity Order/User/Status with id '1'/'1'/'1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")
@@ -60,7 +107,22 @@ public class OrderController { // ONLY ADMINS AND DELIVERIES
 		return ResponseEntity.ok(service.updateOrderStatus(id, request, token));
 	}
 	
-	@Operation(summary = "Delete order", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ")
+	@Operation(summary = "Delete order", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>DELIVERY</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Order id", required = true),
+				@Parameter(name = "Authorization", description = "Authentication token provided when loggin in or registering", required = true)
+			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Order deleted", content = {
+			@Content(schema = @Schema(implementation = OrderResponseDTO.class))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		}),
+		@ApiResponse(responseCode = "404", description = "Order/User not found", content = {
+			@Content(schema = @Schema(example = "The entity Order/User with id '1'/'1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.DELIVERY + "')")

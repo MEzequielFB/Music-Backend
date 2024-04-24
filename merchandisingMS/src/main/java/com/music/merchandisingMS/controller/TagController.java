@@ -24,6 +24,12 @@ import com.music.merchandisingMS.model.Roles;
 import com.music.merchandisingMS.service.TagService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 
@@ -35,6 +41,14 @@ public class TagController {
 	private TagService service;
 	
 	@Operation(summary = "Find all tags", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul> ")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tags found", content = {
+			@Content(array = @ArraySchema(schema = @Schema(implementation = TagResponseDTO.class)))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
@@ -42,7 +56,21 @@ public class TagController {
 		return ResponseEntity.ok(service.findAll());
 	}
 	
-	@Operation(summary = "Find tag by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul> ")
+	@Operation(summary = "Find tag by id", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li><li>USER</li><li>ARTIST</li><li>DELIVERY</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Tag id", required = true)
+			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tag found", content = {
+			@Content(schema = @Schema(implementation = TagResponseDTO.class))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		}),
+		@ApiResponse(responseCode = "404", description = "Tag not found", content = {
+			@Content(schema = @Schema(example = "The entity Tag with id '1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@GetMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN +  "', '" + Roles.SUPER_ADMIN + "', '" + Roles.USER + "', '" + Roles.ARTIST + "', '" + Roles.DELIVERY + "')")
@@ -51,6 +79,17 @@ public class TagController {
 	}
 	
 	@Operation(summary = "Save tag", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Tag saved", content = {
+			@Content(schema = @Schema(implementation = TagResponseDTO.class))
+		}),
+		@ApiResponse(responseCode = "400", description = "The entered name is already in use", content = {
+			@Content(schema = @Schema(example = "A Tag with the name 'tag' already exists"))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PostMapping("")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
@@ -58,7 +97,24 @@ public class TagController {
 		return new ResponseEntity<>(service.saveTag(request), HttpStatus.CREATED);
 	}
 	
-	@Operation(summary = "Update tag", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Update tag", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Tag id", required = true)
+			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tag updated", content = {
+			@Content(schema = @Schema(implementation = TagResponseDTO.class))
+		}),
+		@ApiResponse(responseCode = "400", description = "The entered name is already in use", content = {
+			@Content(schema = @Schema(example = "A Tag with the name 'tag' already exists"))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		}),
+		@ApiResponse(responseCode = "404", description = "Tag not found", content = {
+			@Content(schema = @Schema(example = "The entity Tag with id '1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@PutMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")
@@ -66,7 +122,24 @@ public class TagController {
 		return ResponseEntity.ok(service.updateTag(id, request));
 	}
 	
-	@Operation(summary = "Delete tag", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ")
+	@Operation(summary = "Delete tag", description = "<p>Required roles:</p> <ul><li>ADMIN</li><li>SUPER_ADMIN</li></ul> ",
+			parameters = {
+				@Parameter(name = "id", description = "Tag id", required = true)
+			})
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tag deleted", content = {
+			@Content(schema = @Schema(implementation = TagResponseDTO.class))
+		}),
+		@ApiResponse(responseCode = "400", description = "The tag is the only one for some products", content = {
+			@Content(schema = @Schema(example = "The tag 'tag1' cannot be deleted because is the only one for some products"))
+		}),
+		@ApiResponse(responseCode = "403", description = "Role authorization exception", content = {
+			@Content(schema = @Schema(example = "The current user is not authorized to perform action"))
+		}),
+		@ApiResponse(responseCode = "404", description = "Tag not found", content = {
+			@Content(schema = @Schema(example = "The entity Tag with id '1' doesn't exist"))
+		})
+	})
 	@SecurityRequirement(name = "Bearer Authentication")
 	@DeleteMapping("/{id}")
 	@PreAuthorize("hasAnyAuthority('" + Roles.ADMIN + "', '" + Roles.SUPER_ADMIN + "')")

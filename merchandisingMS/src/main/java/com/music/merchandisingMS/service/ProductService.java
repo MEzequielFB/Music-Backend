@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.music.merchandisingMS.dto.ProductRequestDTO;
 import com.music.merchandisingMS.dto.ProductResponseDTO;
-import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.NameAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
 import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
@@ -62,16 +61,13 @@ public class ProductService {
 	}
 	
 	@Transactional(readOnly = true)
-	public ProductResponseDTO findById(Integer id) throws NotFoundException, DeletedEntityException {
+	public ProductResponseDTO findById(Integer id) throws NotFoundException {
 		Optional<Product> optional = repository.findById(id);
-		if (!optional.isPresent()) {
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("Product", id);
 		}
 		
 		Product product = optional.get();
-		if (product.getIsDeleted()) {
-			throw new DeletedEntityException("Product", product.getName());
-		}
 		
 		return new ProductResponseDTO(product);
 	}
@@ -93,21 +89,18 @@ public class ProductService {
 	}
 	
 	@Transactional
-	public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, DeletedEntityException, NameAlreadyUsedException {
+	public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO request) throws NotFoundException, SomeEntityDoesNotExistException, NameAlreadyUsedException {
 		Optional<Product> optional = repository.findByName(request.getName());
 		if (optional.isPresent()) {
 			throw new NameAlreadyUsedException("Product", request.getName());
 		}
 		
 		optional = repository.findById(id);
-		if (!optional.isPresent()) {
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("Product", id);
 		}
 		
 		Product product = optional.get();
-		if (product.getIsDeleted()) {
-			throw new DeletedEntityException("Product", product.getName());
-		}
 		
 		List<Tag> tags = tagRepository.findAllByIds(request.getTags());
 		if (tags.size() != request.getTags().size()) {
@@ -123,16 +116,13 @@ public class ProductService {
 	}
 	
 	@Transactional // Logic delete because cannot delete referenced products on Order
-	public ProductResponseDTO deleteProduct(Integer id) throws NotFoundException, DeletedEntityException {
+	public ProductResponseDTO deleteProduct(Integer id) throws NotFoundException {
 		Optional<Product> optional = repository.findById(id);
-		if (!optional.isPresent()) {
+		if (!optional.isPresent() || optional.get().getIsDeleted()) {
 			throw new NotFoundException("Product", id);
 		}
 		
 		Product product = optional.get();
-		if (product.getIsDeleted()) {
-			throw new DeletedEntityException("Product", product.getName());
-		}
 		
 		List<ShoppingCart> shoppingCarts = shoppingCartRepository.findAllByProduct(product);
 		for (ShoppingCart shoppingCart : shoppingCarts) {

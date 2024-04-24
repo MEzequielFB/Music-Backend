@@ -22,11 +22,10 @@ import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
 import com.music.merchandisingMS.dto.ShoppingCartResponseDTO;
 import com.music.merchandisingMS.dto.UserDTO;
 import com.music.merchandisingMS.exception.AuthorizationException;
-import com.music.merchandisingMS.exception.DeletedEntityException;
 import com.music.merchandisingMS.exception.EmptyShoppingCartException;
 import com.music.merchandisingMS.exception.EntityWithUserIdAlreadyUsedException;
 import com.music.merchandisingMS.exception.NotFoundException;
-import com.music.merchandisingMS.exception.SomeEntityDoesNotExistException;
+import com.music.merchandisingMS.exception.PermissionsException;
 import com.music.merchandisingMS.exception.StockException;
 import com.music.merchandisingMS.model.Order;
 import com.music.merchandisingMS.model.OrderStatus;
@@ -54,7 +53,7 @@ public class ShoppingCartService {
 	private OrderRepository orderRepository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
@@ -65,7 +64,7 @@ public class ShoppingCartService {
 				.stream()
 				.map(shoppingCart -> {
 					UserDTO user = null;
-					user = webClientBuilder.build()
+					user = webClient
 							.get()
 							.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 							.header("Authorization", token)
@@ -86,7 +85,7 @@ public class ShoppingCartService {
 			
 			UserDTO user = null;
 			try {
-				user = webClientBuilder.build()
+				user = webClient
 						.get()
 						.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 						.header("Authorization", token)
@@ -107,7 +106,7 @@ public class ShoppingCartService {
 	public ShoppingCartResponseDTO findByLoggedUser(String token) throws AuthorizationException, NotFoundException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
@@ -128,7 +127,7 @@ public class ShoppingCartService {
 		
 		UserDTO user = null; 
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
@@ -143,10 +142,10 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO saveShoppingCart(ShoppingCartRequestDTO request, String token) throws EntityWithUserIdAlreadyUsedException, SomeEntityDoesNotExistException, NotFoundException, StockException, DeletedEntityException, AuthorizationException {
+	public ShoppingCartResponseDTO saveShoppingCart(ShoppingCartRequestDTO request, String token) throws EntityWithUserIdAlreadyUsedException, NotFoundException, StockException, AuthorizationException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
@@ -165,7 +164,7 @@ public class ShoppingCartService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
 					.header("Authorization", token)
@@ -179,13 +178,11 @@ public class ShoppingCartService {
 		List<Product> products = new ArrayList<>();
 		for (Integer productId : request.getProducts()) {
 			Optional<Product> productOptional = productRepository.findById(productId);
-			if (!productOptional.isPresent()) {
+			if (!productOptional.isPresent() || productOptional.get().getIsDeleted()) {
 				throw new NotFoundException("Product", productId);
 			}
+			
 			Product product = productOptional.get();
-			if (product.getIsDeleted()) {
-				throw new DeletedEntityException("Product", product.getName());
-			}
 			products.add(product);
 		}
 		
@@ -231,23 +228,19 @@ public class ShoppingCartService {
 			}
 		}
 		
-		try {
-			webClientBuilder.build() // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE, ACCOUNT NOT FOUND AND AUTHORIZATION ISSUE
-					.put()
-					.uri(String.format("%s:8001/api/account/%s/removeBalance", this.domain, accountId))
-					.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-					.header("Authorization", token)
-					.body(BodyInserters.fromValue(new BalanceDTO(shoppingCart.getTotalPrice())))
-					.retrieve()
-					.bodyToMono(AccountDTO.class)
-					.block();
-		} catch (Exception e) {
-			throw new NotFoundException("Account", accountId);
-		}
+		webClient // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE, ACCOUNT NOT FOUND AND AUTHORIZATION ISSUE
+				.put()
+				.uri(String.format("%s:8001/api/account/%s/removeBalance", this.domain, accountId))
+				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+				.header("Authorization", token)
+				.body(BodyInserters.fromValue(new BalanceDTO(shoppingCart.getTotalPrice())))
+				.retrieve()
+				.bodyToMono(AccountDTO.class)
+				.block();
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 					.header("Authorization", token)
@@ -278,10 +271,10 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request, String token) throws NotFoundException, DeletedEntityException, StockException, AuthorizationException {
+	public ShoppingCartResponseDTO addProduct(Integer id, ProductQuantityRequestDTO request, String token) throws NotFoundException, StockException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
@@ -299,7 +292,7 @@ public class ShoppingCartService {
 		}
 		
 		Optional<Product> productOptional = productRepository.findById(request.getProductId());
-		if (!productOptional.isPresent()) {
+		if (!productOptional.isPresent() || productOptional.get().getIsDeleted()) {
 			throw new NotFoundException("Product", request.getProductId());
 		}
 		
@@ -307,11 +300,7 @@ public class ShoppingCartService {
 		Product product = productOptional.get();
 		
 		if (!shoppingCart.getUserId().equals(loggedUserId)) {
-			throw new AuthorizationException();
-		}
-		
-		if (product.getIsDeleted()) {
-			throw new DeletedEntityException("Product", product.getName());
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		if (shoppingCart.getQuantityOfProduct(product) + request.getQuantity() > product.getStock()) {
@@ -320,7 +309,7 @@ public class ShoppingCartService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 //					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
 					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
@@ -342,10 +331,10 @@ public class ShoppingCartService {
 	}
 	
 	@Transactional
-	public ShoppingCartResponseDTO removeProduct(Integer id, Integer productId, String token) throws NotFoundException, AuthorizationException {
+	public ShoppingCartResponseDTO removeProduct(Integer id, Integer productId, String token) throws NotFoundException, AuthorizationException, PermissionsException {
 		Integer loggedUserId = null;
 		try {
-			loggedUserId = webClientBuilder.build()
+			loggedUserId = webClient
 					.get()
 					.uri(String.format("%s:8004/api/auth/id", this.domain))
 					.header("Authorization", token)
@@ -371,12 +360,12 @@ public class ShoppingCartService {
 		Product product = productOptional.get();
 		
 		if (!shoppingCart.getUserId().equals(loggedUserId)) {
-			throw new AuthorizationException();
+			throw new PermissionsException(loggedUserId);
 		}
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 					.header("Authorization", token)
@@ -409,7 +398,7 @@ public class ShoppingCartService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
 					.header("Authorization", token)

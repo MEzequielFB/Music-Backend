@@ -21,6 +21,16 @@ public class GeneralExceptionHandler {
 		return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(ClientException.class)
+	public ResponseEntity<String> handleClientException(ClientException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(PermissionsException.class)
+	public ResponseEntity<String> handlePermissionsException(PermissionsException e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+	}
+	
 	@ExceptionHandler(AuthorizationException.class)
 	public ResponseEntity<String> handleAuthorizationException(AuthorizationException e) {
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);

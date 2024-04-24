@@ -30,7 +30,7 @@ public class OrderService {
 	private StatusRepository statusRepository;
 	
 	@Autowired
-	private WebClient.Builder webClientBuilder;
+	private WebClient webClient;
 	
 	@Value("${app.api.domain}")
 	private String domain;
@@ -40,7 +40,7 @@ public class OrderService {
 		return repository.findAll()
 				.stream()
 				.map(order -> {
-					UserDTO user = webClientBuilder.build()
+					UserDTO user = webClient
 							.get()
 							.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 							.header("Authorization", token)
@@ -65,7 +65,7 @@ public class OrderService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 					.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 					.header("Authorization", token)
@@ -134,7 +134,7 @@ public class OrderService {
 		
 		UserDTO user = null;
 		try {
-			user = webClientBuilder.build()
+			user = webClient
 					.get()
 					.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 					.header("Authorization", token)
@@ -157,7 +157,7 @@ public class OrderService {
 			
 			UserDTO user = null;
 			try {
-				user = webClientBuilder.build()
+				user = webClient
 						.get()
 						.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
 						.header("Authorization", token)
