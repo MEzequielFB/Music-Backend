@@ -28,10 +28,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController("orderController")
 @RequestMapping("/api/order")
+@Tag(name = "Order Controller", description = "<p>Used for order management: return/delete orders, update orders status</p>")
 public class OrderController { // ONLY ADMINS AND DELIVERIES
 
 	@Autowired

@@ -39,10 +39,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController("shoppingCartController")
 @RequestMapping("/api/shoppingCart")
+@Tag(name = "ShoppingCart Controller", description = "<p>Used for shopping cart management: save/delete/return shopping carts, add/remove products, buy added products</p>")
 public class ShoppingCartController {
 
 	@Autowired
