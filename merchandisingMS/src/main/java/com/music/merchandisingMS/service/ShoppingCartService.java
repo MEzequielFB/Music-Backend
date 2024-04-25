@@ -58,6 +58,12 @@ public class ShoppingCartService {
 	@Value("${app.api.domain}")
 	private String domain;
 	
+	@Value("${app.api.userms.domain}")
+	private String usermsDomain;
+	
+	@Value("${app.api.authms.domain}")
+	private String authmsDomain;
+	
 	@Transactional(readOnly = true)
 	public List<ShoppingCartResponseDTO> findAll(String token) {
 		return repository.findAll()
@@ -66,7 +72,7 @@ public class ShoppingCartService {
 					UserDTO user = null;
 					user = webClient
 							.get()
-							.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
+							.uri(String.format("%s/api/user/%s", this.usermsDomain, shoppingCart.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -87,7 +93,7 @@ public class ShoppingCartService {
 			try {
 				user = webClient
 						.get()
-						.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
+						.uri(String.format("%s/api/user/%s", this.usermsDomain, shoppingCart.getUserId()))
 						.header("Authorization", token)
 						.retrieve()
 						.bodyToMono(UserDTO.class)
@@ -108,7 +114,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -129,7 +135,7 @@ public class ShoppingCartService {
 		try {
 			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -147,7 +153,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -166,7 +172,7 @@ public class ShoppingCartService {
 		try {
 			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, loggedUserId))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, loggedUserId))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -230,7 +236,7 @@ public class ShoppingCartService {
 		
 		webClient // EXCEPTION HANDLE FOR NOT ENOUGH BALANCE, ACCOUNT NOT FOUND AND AUTHORIZATION ISSUE
 				.put()
-				.uri(String.format("%s:8001/api/account/%s/removeBalance", this.domain, accountId))
+				.uri(String.format("%s/api/account/%s/removeBalance", this.usermsDomain, accountId))
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 				.header("Authorization", token)
 				.body(BodyInserters.fromValue(new BalanceDTO(shoppingCart.getTotalPrice())))
@@ -242,7 +248,7 @@ public class ShoppingCartService {
 		try {
 			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -276,7 +282,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -312,7 +318,7 @@ public class ShoppingCartService {
 			user = webClient
 					.get()
 //					.uri("http://localhost:8001/api/user/" + shoppingCart.getUserId())
-					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -336,7 +342,7 @@ public class ShoppingCartService {
 		try {
 			loggedUserId = webClient
 					.get()
-					.uri(String.format("%s:8004/api/auth/id", this.domain))
+					.uri(String.format("%s/api/auth/id", this.authmsDomain))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(Integer.class)
@@ -367,7 +373,7 @@ public class ShoppingCartService {
 		try {
 			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -400,7 +406,7 @@ public class ShoppingCartService {
 		try {
 			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s", this.domain, shoppingCart.getUserId()))
+					.uri(String.format("%s/api/user/%s", this.usermsDomain, shoppingCart.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)

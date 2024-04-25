@@ -35,6 +35,9 @@ public class OrderService {
 	@Value("${app.api.domain}")
 	private String domain;
 	
+	@Value("${app.api.userms.domain}")
+	private String usermsDomain;
+	
 	@Transactional(readOnly = true)
 	public List<OrderResponseDTO> findAll(String token) {
 		return repository.findAll()
@@ -42,7 +45,7 @@ public class OrderService {
 				.map(order -> {
 					UserDTO user = webClient
 							.get()
-							.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
+							.uri(String.format("%s/api/user/%s/evenDeleted", this.usermsDomain, order.getUserId()))
 							.header("Authorization", token)
 							.retrieve()
 							.bodyToMono(UserDTO.class)
@@ -67,7 +70,7 @@ public class OrderService {
 		try {
 			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
+					.uri(String.format("%s/api/user/%s/evenDeleted", this.usermsDomain, order.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -136,7 +139,7 @@ public class OrderService {
 		try {
 			user = webClient
 					.get()
-					.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
+					.uri(String.format("%s/api/user/%s/evenDeleted", this.usermsDomain, order.getUserId()))
 					.header("Authorization", token)
 					.retrieve()
 					.bodyToMono(UserDTO.class)
@@ -159,7 +162,7 @@ public class OrderService {
 			try {
 				user = webClient
 						.get()
-						.uri(String.format("%s:8001/api/user/%s/evenDeleted", this.domain, order.getUserId()))
+						.uri(String.format("%s/api/user/%s/evenDeleted", this.usermsDomain, order.getUserId()))
 						.header("Authorization", token)
 						.retrieve()
 						.bodyToMono(UserDTO.class)
