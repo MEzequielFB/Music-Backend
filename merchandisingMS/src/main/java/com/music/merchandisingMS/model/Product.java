@@ -1,6 +1,7 @@
 package com.music.merchandisingMS.model;
 
 import java.util.List;
+import java.util.Set;
 
 import com.music.merchandisingMS.dto.ProductRequestDTO;
 
@@ -48,12 +49,12 @@ public class Product {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "product_id")},
 			inverseJoinColumns = {@JoinColumn(name = "tag_id")})
-	private List<Tag> tags;
+	private Set<Tag> tags;
 	
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "products")
 	private List<Order> orders;
 	
-	public Product(ProductRequestDTO request, List<Tag> tags) {
+	public Product(ProductRequestDTO request, Set<Tag> tags) {
 		this.name = request.getName();
 		this.price = request.getPrice();
 		this.discount = 0;

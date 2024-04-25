@@ -2,6 +2,7 @@ package com.music.merchandisingMS.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,7 +80,7 @@ public class ProductService {
 			throw new NameAlreadyUsedException("Product", request.getName());
 		}
 		
-		List<Tag> tags = tagRepository.findAllByIds(request.getTags());
+		Set<Tag> tags = tagRepository.findAllByIds(request.getTags());
 		if (tags.size() != request.getTags().size()) {
 			throw new SomeEntityDoesNotExistException("tags");
 		}
@@ -102,7 +103,7 @@ public class ProductService {
 		
 		Product product = optional.get();
 		
-		List<Tag> tags = tagRepository.findAllByIds(request.getTags());
+		Set<Tag> tags = tagRepository.findAllByIds(request.getTags());
 		if (tags.size() != request.getTags().size()) {
 			throw new SomeEntityDoesNotExistException("tags");
 		}

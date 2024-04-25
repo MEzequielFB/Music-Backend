@@ -1,10 +1,11 @@
 package com.music.merchandisingMS.service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -181,7 +182,7 @@ public class ShoppingCartService {
 			throw new NotFoundException("User", loggedUserId);
 		}
 		
-		List<Product> products = new ArrayList<>();
+		Set<Product> products = new HashSet<>();
 		for (Integer productId : request.getProducts()) {
 			Optional<Product> productOptional = productRepository.findById(productId);
 			if (!productOptional.isPresent() || productOptional.get().getIsDeleted()) {

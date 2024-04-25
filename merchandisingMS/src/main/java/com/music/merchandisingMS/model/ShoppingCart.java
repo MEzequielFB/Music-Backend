@@ -1,8 +1,6 @@
 package com.music.merchandisingMS.model;
 
-import java.util.List;
-
-import com.music.merchandisingMS.dto.ShoppingCartRequestDTO;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,9 +37,9 @@ public class ShoppingCart {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "shopping_cart_id")},
 			inverseJoinColumns = {@JoinColumn(name = "product_id")})
-	private List<Product> products;
+	private Set<Product> products;
 	
-	public ShoppingCart(Integer userId, List<Product> products) {
+	public ShoppingCart(Integer userId, Set<Product> products) {
 		this.userId = userId;
 		this.products = products;
 	}

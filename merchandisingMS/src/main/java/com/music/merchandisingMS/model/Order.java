@@ -1,7 +1,7 @@
 package com.music.merchandisingMS.model;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import com.music.merchandisingMS.dto.OrderRequestDTO;
 
@@ -55,9 +55,9 @@ public class Order {
 	@JoinTable(
 			joinColumns = {@JoinColumn(name = "order_id")},
 			inverseJoinColumns = {@JoinColumn(name = "product_id")})
-	private List<Product> products;
+	private Set<Product> products;
 	
-	public Order(Integer userId, String shippingAddress, Double totalPrice, Status status, List<Product> products) {
+	public Order(Integer userId, String shippingAddress, Double totalPrice, Status status, Set<Product> products) {
 		this.userId = userId;
 		this.createdAt = new Date(System.currentTimeMillis());
 		this.shippingAddress = shippingAddress;
@@ -67,7 +67,7 @@ public class Order {
 		this.products = products;
 	}
 	
-	public Order(OrderRequestDTO request, Double totalPrice, Status status, List<Product> products) {
+	public Order(OrderRequestDTO request, Double totalPrice, Status status, Set<Product> products) {
 		this.userId = request.getUserId();
 		this.createdAt = new Date(System.currentTimeMillis());
 		this.shippingAddress = request.getShippingAddress();
