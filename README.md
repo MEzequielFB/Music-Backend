@@ -1,6 +1,12 @@
 
 # Music Backend
 
+Credenciales de cuenta de administrador y delivery:
+
+    Cuenta admin: bianca@gmail.com | password123
+    Cuenta super_admin: superadmin@gmail.com | password123
+    Cuenta de delivery: delivery@gmail.com | password123
+
 ## Introducción
 API de música hecha con Spring Boot que cuenta con:
 
