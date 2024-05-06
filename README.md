@@ -17,16 +17,16 @@ API de música hecha con Spring Boot que cuenta con:
 - Documentación con Swagger
 
 ## Microservicios
-### [AuthenticationMS](https://authenticationms-production.up.railway.app/swagger-ui/index.html#/)
+### [AuthenticationMS](https://authenticationms.onrender.com/swagger-ui/index.html#/)
 Se encarga de la autenticación y registro de usuarios mediante Spring Security y JWT Token. Se comunica con el microservicio de usuario para el registro y autenticación de los usuarios.
 
-### [UserMS](https://userms-railway-production.up.railway.app/swagger-ui/index.html#/)
+### [UserMS](https://music-render-pvrq.onrender.com/swagger-ui/index.html#)
 Se encarga de la gestión de usuarios, cuentas bancarias y roles de usuarios.
 
-### [MusicMS](https://musicms-production.up.railway.app/swagger-ui/index.html#/)
+### [MusicMS](https://musicms.onrender.com/swagger-ui/index.html#/)
 Se encarga de la gestión de artistas, álbumes, playlists, canciones y géneros musicales.
 
-### [MerchandisingMS](https://merchandisingms-production.up.railway.app/swagger-ui/index.html#/)
+### [MerchandisingMS](https://mechandisingms.onrender.com/swagger-ui/index.html#/)
 Se encarga de la gestión de productos, carritos de compra, órdenes de compra, estados de las órdenes y las etiquetas de los productos.
 
 ## Roles
